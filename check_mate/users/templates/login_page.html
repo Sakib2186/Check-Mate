@@ -19,14 +19,6 @@
               rel="stylesheet">
 
         <link type="text/css"
-              href="{% static 'perfect-scrollbar.css' %}"
-              rel="stylesheet">
-
-        <link type="text/css"
-              href="{% static 'material-icons.css' %}"
-              rel="stylesheet">
-
-        <link type="text/css"
               href="{% static 'spinkit.css' %}"
               rel="stylesheet">
 
@@ -58,21 +50,27 @@
                         <h4 class="card-title">Login</h4>
                         <p class="card-subtitle">Access your account</p>
                     </div>
+                    {% for message in messages %}
+                        <p class="message" style="color:#941910; text-align: center;">{{message}}</p>
+                    {% endfor %}
                     <div class="card-body">
 
-                        <form method="get">
+                        <form method="POST">
+                            {% comment "" %} csrf token is necessary in django for form validation otherwise form won't submit{% endcomment %}
+                            {% csrf_token %}
                             <div class="form-group">
                                 <label class="form-label"
-                                       for="email">Your email address:</label>
+                                       for="email">Your username:</label>
                                 <div class="input-group input-group-merge">
-                                    <input id="email"
-                                           type="email"
-                                           required=""
+                                    <input id="user"
+                                           type="text"
+                                           name = "user_username"
+                                           required
                                            class="form-control form-control-prepended"
-                                           placeholder="Your email address">
+                                           placeholder="Your User name">{% comment "" %} name="user_email" will be used to get the value that the user wrote in the view.py for data manupulation{% endcomment %}
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">
-                                            <i class="fa-solid fa-envelope"></i>
+                                            <i class="fa-solid fa-circle-user"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -83,9 +81,10 @@
                                 <div class="input-group input-group-merge">
                                     <input id="password"
                                            type="password"
-                                           required=""
+                                           required
                                            class="form-control form-control-prepended"
-                                           placeholder="Your password">
+                                           placeholder="Your password"
+                                           name="user_password">{% comment "" %} name="user_password" will be used to get the value that the user wrote in the view.py for data manupulation{% endcomment %}
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">
                                             <i class="fa-solid fa-key"></i>
@@ -94,8 +93,8 @@
                                 </div>
                             </div>
                             <div class="form-group ">
-                                <button type="submit"
-                                        class="btn btn-primary btn-block">Login</button>
+                                <input type="submit"
+                                        class="btn btn-primary btn-block" name = "login_button_pressed" value="Login">
                             </div>
                             <div class="text-center">
                                 <a href="guest-forgot-password.html"
@@ -105,7 +104,7 @@
                         </form>
                     </div>
                     <div class="card-footer text-center text-black-50">
-                        Not yet registered? <a href="guest-signup.html">Sign Up</a>
+                        Not yet registered? <a href="">Sign Up</a>
                     </div>
                 </div>
             </div>

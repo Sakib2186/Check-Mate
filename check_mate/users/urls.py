@@ -7,6 +7,7 @@ app_name = "users"
 
 urlpatterns = [
 
+    path('',views.check_mate,name="check_mate"),
     path('login/',views.login,name="login"),      
  
 ]
