@@ -9,8 +9,7 @@
               content="IE=edge">
         <meta name="viewport"
               content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{{page_title}} - Login</title>
-        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+        <title>Signup</title>
 
         <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
               rel="stylesheet">
@@ -22,6 +21,7 @@
         <link type="text/css"
               href="{% static 'app.css' %}"
               rel="stylesheet">
+
 
     </head>
 
@@ -35,77 +35,85 @@
                     <div class="avatar avatar-lg">
                         <img src="{% static 'login_images/graduation.png' %}"
                              class="avatar-img"
-                             alt="{{page_title}}"
-                             style = "width:100%;height:auto;" />
+                             alt="CheckMate" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mb-5 navbar-light">
-                    <h1 class="navbar-brand m-0" style="font-size:35px">{{page_title}}</h1>
+                    <h1 class="navbar-brand m-0">{{page_title}}</h1>
                 </div>
                 <div class="card navbar-shadow">
                     <div class="card-header text-center">
-                        <h4 class="card-title">Login</h4>
-                        <p class="card-subtitle">Access your account</p>
+                        <h4 class="card-title">Sign Up</h4>
+                        <p class="card-subtitle">Create a new account</p>
                     </div>
-                    {% for message in messages %}
-                        <p class="message" style="color:#941910; text-align: center;">{{message}}</p>
-                    {% endfor %}
                     <div class="card-body">
 
+                        {% for message in messages %}
+                            <p class="message" style="color:#941910; text-align: center;">{{message}}</p>
+                        {% endfor %}
                         <form method="POST">
-                            {% comment "" %} csrf token is necessary in django for form validation otherwise form won't submit{% endcomment %}
                             {% csrf_token %}
                             <div class="form-group">
                                 <label class="form-label"
-                                       for="email">Your username:</label>
+                                       for="name">User Name:</label>
                                 <div class="input-group input-group-merge">
-                                    <input id="user"
+                                    <input id="name"
                                            type="text"
-                                           name = "user_username"
                                            required
                                            class="form-control form-control-prepended"
-                                           placeholder="Your User name">{% comment "" %} name="user_email" will be used to get the value that the user wrote in the view.py for data manupulation{% endcomment %}
+                                           placeholder="Your Username"
+                                           name = "user_name">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">
-                                            <i class="fa-solid fa-circle-user"></i>
+                                            <span class="far fa-user"></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label"
-                                       for="password">Your password:</label>
+                                       for="password">Password:</label>
                                 <div class="input-group input-group-merge">
                                     <input id="password"
                                            type="password"
                                            required
                                            class="form-control form-control-prepended"
-                                           placeholder="Your password"
-                                           name="user_password">{% comment "" %} name="user_password" will be used to get the value that the user wrote in the view.py for data manupulation{% endcomment %}
+                                           placeholder="Choose a password"
+                                           name = "user_password">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">
-                                            <i class="fa-solid fa-key"></i>
+                                            <span class="far fa-key"></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group ">
-                                <input type="submit"
-                                        class="btn btn-primary btn-block" name = "login_button_pressed" value="Login">
+                            <div class="form-group">
+                                <label class="form-label"
+                                       for="password2"> Confirm Password:</label>
+                                <div class="input-group input-group-merge">
+                                    <input id="password2"
+                                           type="password"
+                                           required
+                                           class="form-control form-control-prepended"
+                                           placeholder="Confirm password"
+                                           name = "confirm_user_password">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <span class="far fa-key"></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-center">
-                                <a href="guest-forgot-password.html"
-                                   class="text-black-70"
-                                   style="text-decoration: underline;">Forgot Password?</a>
-                            </div>
+                            <input type="submit"
+                                    class="btn btn-primary btn-block mb-3" value = "Sign Up" name = "registration_button">
+    
                         </form>
                     </div>
-                    <div class="card-footer text-center text-black-50">
-                        Not yet registered? <a href="{% url 'users:registration' %}">Sign Up</a>
-                    </div>
+                    <div class="card-footer text-center text-black-50">Already signed up? <a href="{% url 'users:login' %}">Login</a></div>
                 </div>
             </div>
         </div>
+        
 
     </body>
 

@@ -49,3 +49,39 @@ def login(request):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors('Login Error',error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")
+    
+def registration(request):
+
+    try:
+
+        if request.method == "POST":
+
+            if request.POST.get('registration_button'):
+                
+                #getting user credentials
+                user_name = request.POST.get('user_name')
+                password = request.POST.get('user_password')
+                confirm_password = request.POST.get('confirm_user_password')
+
+                #getting maipulated data from render_data
+                registration = Login.register_user(user_name,password,confirm_password)
+                #checking to see if user is successfully registered
+                if registration[0]:
+                    auth.login(request,registration[1])
+                    return HttpResponse("Loggin in!!")
+                else:
+                    messages.error(request,registration[1])
+                    return redirect('users:registration')
+
+        context = {
+            'page_title':'Check Mate'
+        }
+
+        return render(request,"registration.html",context)
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    

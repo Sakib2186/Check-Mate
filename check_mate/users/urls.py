@@ -8,7 +8,8 @@ app_name = "users"
 urlpatterns = [
 
     path('',views.check_mate,name="check_mate"),
-    path('login/',views.login,name="login"),      
+    path('login/',views.login,name="login"),  
+    path('registration/',views.registration,name = "registration"),   
  
 ]
 urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
