@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from .models import System_Errors
 from check_mate.settings import DEBUG
-from django.core.mail import send_mail
+from django.core.mail import send_mail,EmailMultiAlternatives
 from django.conf import settings
 
 class ErrorHandling:
