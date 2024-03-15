@@ -33,16 +33,22 @@ def login(request):
                 user = auth.authenticate(username=user_username,password=user_password)
                 #if user not found then logged him in
                 if user is not None:
-                    school_user = School_Users.objects.get(user_id = user_username)
-                    #checking to see if school user is verified or not
-                    if school_user.user_otp_verified:
+                    
+                    try:
+                        school_user = School_Users.objects.get(user_id = user_username)
+                        #checking to see if school user is verified or not
+                        if school_user.user_otp_verified:
+                            auth.login(request,user)
+                            return HttpResponse("Loggin in!!")
+                        else:
+                            #not verified so sending them the link for verification
+                            verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
+                            messages.error(request,f"Your account is not verified yet! Verification link: {request.build_absolute_uri(verification_link)}")
+                            return redirect('users:login') 
+                    except:
+                        #admin is logging in
                         auth.login(request,user)
                         return HttpResponse("Loggin in!!")
-                    else:
-                        #not verified so sending them the link for verification
-                        verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
-                        messages.error(request,f"Your account is not verified yet! Verification link: {request.build_absolute_uri(verification_link)}")
-                        return redirect('users:login') 
                 else:
                     #user might not be registered or gives the wrong credentials
                     messages.info(request,"Credentials given are wrong")
