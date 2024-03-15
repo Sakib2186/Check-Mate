@@ -10,6 +10,7 @@ urlpatterns = [
     path('',views.check_mate,name="check_mate"),
     path('login/',views.login,name="login"),  
     path('registration/',views.registration,name = "registration"),   
+    path('registration/email_verification/<str:user_id>',views.registration_email_verification,name = "registration_email_verification")
  
 ]
 urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
