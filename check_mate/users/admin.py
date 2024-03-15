@@ -17,9 +17,3 @@ class School_Users_Admin_Panel(admin.ModelAdmin):
         'user_id','user_first_name','user_middle_name','user_last_name','user_email',
         'user_phone_number','user_profile_picture','user_otp_verified'
     ]
-
-@admin.register(School_User_Token)
-class School_User_Token_Admin_Panel(admin.ModelAdmin):
-    list_display = [
-        'user','token'
-    ]

@@ -34,7 +34,7 @@ class School_Users(models.Model):
     user_phone_number = models.CharField(null=True,blank=True,max_length=16)
     user_profile_picture=models.ImageField(null=True,blank=True,upload_to='School_User/user_profile_pictures/')
     user_otp_verified = models.BooleanField(null=True,blank=True,default = False)
-    
+
     #This function will return the id of the user object when called.
     def __str__(self) -> str:
         return str(self.user_id)
@@ -45,17 +45,4 @@ class School_Users(models.Model):
         #as default
         verbose_name = "Registered Members"
 
-class School_User_Token(models.Model):
-
-    user = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    token = models.CharField(max_length = 15,null=True,blank=True,default = 0)
-    password = models.CharField(max_length = 100,null=True,blank=True,default="")
-    def __str__(self) -> str:
-        return str(self.user.user_id)
-    
-    class Meta:
-
-        #gave a different name on the admin panel rather then setting class name on admin
-        #as default
-        verbose_name = "Token For Registration"
 
