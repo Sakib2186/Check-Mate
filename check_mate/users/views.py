@@ -128,6 +128,7 @@ def registration_email_verification(request,user_id):
                             school_user.user_otp_verified = True
                             school_user.save()
                             auth.login(request,user)
+                            #removing the otp keys from the session
                             request.session.pop('otp_secret_key', None)
                             request.session.pop('otp_valid_date', None)
                             return HttpResponse("Loggin in!!")
