@@ -30,7 +30,7 @@ class Login:
                         #returning message as tuple
                         return (False,message)
                     else:
-                        #user not signed up so creating new User
+                        #user not signed up so creating new User by first sending otp to their email
                         if Login.registration_email(request,get_school_user):
                             user = User.objects.create_user(username = get_school_user.user_id,email=get_school_user.user_email,password=password)
                             user.save()
@@ -90,4 +90,5 @@ class Login:
             return True
         
         except:
+            #email could not be sent
             return False
