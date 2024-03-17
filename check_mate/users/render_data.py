@@ -64,27 +64,30 @@ class Login:
         valid_date = datetime.now() + timedelta(minutes=1)
         request.session['otp_valid_date'] = str(valid_date)
         #sending email to user
+        try:
+            context = {
+                'user':user,
+                'otp':otp,
+                'year':datetime.now().year,
 
-        context = {
-            'user':user,
-            'otp':otp,
-            'year':datetime.now().year,
+            }
+            html_message = render_to_string("email_otp.html",context)
+            plain_message = strip_tags(html_message)
 
-        }
-        html_message = render_to_string("email_otp.html",context)
-        plain_message = strip_tags(html_message)
+            email_from = settings.EMAIL_HOST_USER
+            subject="Registration OTP"
+            recipient_list = []
+            recipient_list.append(user.user_email)
 
-        email_from = settings.EMAIL_HOST_USER
-        subject="Registration OTP"
-        recipient_list = []
-        recipient_list.append(user.user_email)
-
-        sent_email = EmailMultiAlternatives(
-            subject= subject,
-            body = plain_message,
-            from_email=email_from,
-            to = recipient_list,
-        )
-        sent_email.attach_alternative(html_message,"text/html")
-        sent_email.send()
-        return True
+            sent_email = EmailMultiAlternatives(
+                subject= subject,
+                body = plain_message,
+                from_email=email_from,
+                to = recipient_list,
+            )
+            sent_email.attach_alternative(html_message,"text/html")
+            sent_email.send()
+            return True
+        
+        except:
+            return False
