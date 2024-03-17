@@ -105,57 +105,67 @@ def registration_email_verification(request,user_id):
     try:
 
         school_user = School_Users.objects.get(user_id = user_id)
-        if request.method == "POST":
+        #if user is not verified then allowing to enter page
+        if not school_user.user_otp_verified:
 
-            if request.POST.get('submit_otp'):
-                #if user is already verified then not sending otp again
-                if school_user.user_otp_verified:
-                    messages.error(request,'OTP already verified!')
-                    return redirect('users:registration_email_verification',user_id)
-                #getting user otp
-                otp = request.POST.get('otp')
-                #putting them session dictionary
-                otp_secret_key = request.session['otp_secret_key']
-                otp_valid_date = request.session['otp_valid_date']
-                #checking to see if otp is valid and matches with users input one
-                if otp_secret_key and otp_valid_date is not None:
-                    valid_until = datetime.fromisoformat(otp_valid_date)
+            if request.method == "POST":
 
-                    if valid_until > datetime.now():
-                        totp = pyotp.TOTP(otp_secret_key,interval = 60)
-                        if totp.verify(otp):
-                            user = User.objects.get(username = user_id)
-                            school_user.user_otp_verified = True
-                            school_user.save()
-                            auth.login(request,user)
-                            #removing the otp keys from the session
-                            request.session.pop('otp_secret_key', None)
-                            request.session.pop('otp_valid_date', None)
-                            return HttpResponse("Loggin in!!")
+                if request.POST.get('submit_otp'):
+                    
+                    #getting user otp
+                    otp = str(request.POST.get('otp'))
+                    
+                    #checking if otp is empty
+                    if otp == "":
+                        messages.error(request,'Provide OTP!')
+                        return redirect('users:registration_email_verification',user_id)
+                    try:
+                        #putting them session dictionary
+                        otp_secret_key = request.session['otp_secret_key']
+                        otp_valid_date = request.session['otp_valid_date']
+                        #checking to see if otp is valid and matches with users input one
+                        if otp_secret_key and otp_valid_date is not None:
+                            valid_until = datetime.fromisoformat(otp_valid_date)
+
+                            if valid_until > datetime.now():
+                                totp = pyotp.TOTP(otp_secret_key,interval = 60)
+                                if totp.verify(otp):
+                                    user = User.objects.get(username = user_id)
+                                    school_user.user_otp_verified = True
+                                    school_user.save()
+                                    auth.login(request,user)
+                                    #removing the otp keys from the session
+                                    request.session.pop('otp_secret_key', None)
+                                    request.session.pop('otp_valid_date', None)
+                                    return HttpResponse("Loggin in!!")
+                                else:
+                                    messages.error(request,"invalid OTP")
+                                    return redirect('users:registration_email_verification',user_id)
+                            else:
+                                messages.error(request,"OTP expired")
+                                redirect('users:registration_email_verification',user_id)
+
                         else:
-                            messages.error(request,"invalid OTP")
-                            return redirect('users:registration_email_verification',user_id)
-                    else:
-                        messages.error(request,"OTP expired")
-                        redirect('users:registration_email_verification',user_id)
+                            messages.error(request,"Something went wrong..")
+                            redirect('users:registration_email_verification',user_id)
+                    except:
+                        messages.error(request,"invalid OTP")
+                        return redirect('users:registration_email_verification',user_id)
 
-                else:
-                    messages.error(request,"Something went wrong..")
+                if request.POST.get('resend_otp'):
+                    
+                    request.session.pop('otp_secret_key', None)
+                    request.session.pop('otp_valid_date', None)
+                    Login.registration_email(request,school_user)
                     redirect('users:registration_email_verification',user_id)
-
-            if request.POST.get('resend_otp'):
-                #if user is already verified then not sending otp again
-                if school_user.user_otp_verified:
-                    messages.error(request,'OTP already verified!')
-                    return redirect('users:registration_email_verification',user_id)
-                
-                Login.registration_email(request,school_user)
-                redirect('users:registration_email_verification',user_id)
-                
-        context = {
-            'page_title':'Check Mate'
-        }
-        return render(request,"registration_verification.html",context)
+                    
+            context = {
+                'page_title':'Check Mate'
+            }
+            return render(request,"registration_verification.html",context)
+        
+        else:
+            return HttpResponse("Already verified")
 
     except Exception as e:
         #saving error information in database if error occured
