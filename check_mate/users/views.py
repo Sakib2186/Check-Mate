@@ -9,6 +9,8 @@ from system_administrator.system_error_handling import ErrorHandling
 from .render_data import Login
 from .models import *
 import pyotp
+from django.utils.safestring import mark_safe
+
 
 logger=logging.getLogger(__name__)
 
@@ -43,7 +45,9 @@ def login(request):
                         else:
                             #not verified so sending them the link for verification
                             verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
-                            messages.error(request,f"Your account is not verified yet! Verification link: {request.build_absolute_uri(verification_link)}")
+                            verification_url = request.build_absolute_uri(verification_link)
+                            verification_message = f"Your account is not verified yet! Verification link: <a href='{verification_url}'>{verification_url}</a>"
+                            messages.error(request, mark_safe(verification_message))
                             return redirect('users:login') 
                     except:
                         #admin is logging in
