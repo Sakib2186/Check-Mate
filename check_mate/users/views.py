@@ -10,6 +10,7 @@ from .render_data import Login
 from .models import *
 import pyotp
 from django.utils.safestring import mark_safe
+from django.contrib.auth.decorators import login_required
 
 
 logger=logging.getLogger(__name__)
@@ -41,7 +42,7 @@ def login(request):
                         #checking to see if school user is verified or not
                         if school_user.user_otp_verified:
                             auth.login(request,user)
-                            return HttpResponse("Loggin in!!")
+                            return redirect('users:dashboard')
                         else:
                             #not verified so sending them the link for verification
                             verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
@@ -52,7 +53,7 @@ def login(request):
                     except:
                         #admin is logging in
                         auth.login(request,user)
-                        return HttpResponse("Loggin in!!")
+                        return redirect('users:dashboard')
                 else:
                     #user might not be registered or gives the wrong credentials
                     messages.info(request,"Credentials given are wrong")
@@ -127,12 +128,14 @@ def registration_email_verification(request,user_id):
                         #putting them session dictionary
                         otp_secret_key = request.session['otp_secret_key']
                         otp_valid_date = request.session['otp_valid_date']
+                        print("here")
                         #checking to see if otp is valid and matches with users input one
                         if otp_secret_key and otp_valid_date is not None:
                             valid_until = datetime.fromisoformat(otp_valid_date)
 
                             if valid_until > datetime.now():
                                 totp = pyotp.TOTP(otp_secret_key,interval = 60)
+                                print("here2")
                                 if totp.verify(otp):
                                     user = User.objects.get(username = user_id)
                                     school_user.user_otp_verified = True
@@ -141,7 +144,7 @@ def registration_email_verification(request,user_id):
                                     #removing the otp keys from the session
                                     request.session.pop('otp_secret_key', None)
                                     request.session.pop('otp_valid_date', None)
-                                    return HttpResponse("Loggin in!!")
+                                    return redirect('users:dashboard')
                                 else:
                                     messages.error(request,"invalid OTP")
                                     return redirect('users:registration_email_verification',user_id)
@@ -171,6 +174,38 @@ def registration_email_verification(request,user_id):
         else:
             return HttpResponse("Already verified")
 
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def dashboard(request):
+
+    try:
+        if request.user.is_superuser:
+            print("YOO")
+        else:
+            print("normal")
+        context = {
+            'page_title':'Check Mate',
+        }
+
+        return render(request,"dashboard.html",context)
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    
+@login_required
+def logout(request):
+    
+    try:
+        auth.logout(request)
+        return redirect('users:login')
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
