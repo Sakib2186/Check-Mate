@@ -1,7 +1,7 @@
 from .models import *
 from django.contrib.auth.models import User
 from check_mate import settings
-from django.core.mail import send_mail,EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 import pyotp
 from datetime import datetime,timedelta
 from django.template.loader import render_to_string
@@ -93,3 +93,43 @@ class Login:
         except:
             #email could not be sent
             return False
+        
+    def logged_in_user(request):
+
+        '''This function will return the user that logged in'''
+
+        logged_in_user = request.user.username
+        try:
+            user = School_Users.objects.get(user_id = logged_in_user)
+        except:
+            #admin user
+            user=None
+        
+        return user
+        
+    def user_type_logged_in(request):
+
+        '''This function will return which user logged in whether it is a
+            TA or Instructor or Student'''
+        
+        logged_in_user = request.user.username
+
+        type = []
+        try:
+            #trying to get school using
+            user = School_Users.objects.get(user_id = logged_in_user)
+            #getting the list of all roles for this user
+            role_type = user.user_role.all()
+            for role in role_type:
+                if role.role_id== int(1):
+                    type.append(role.role_id)
+                if role.role_id == int(2):
+                    type.append(role.role_id)
+                if role.role_id == int(3):
+                    type.append(role.role_id)
+        except:
+            #else it is admin
+            #4 is not saved in database but we are referring 4 as super user (Admin)
+            type.append(4)
+
+        return type

@@ -13,6 +13,7 @@ urlpatterns = [
     path('registration/',views.registration,name = "registration"),   
     path('registration/email_verification/<str:user_id>',views.registration_email_verification,name = "registration_email_verification"),
     path('dashboard/',views.dashboard,name="dashboard"),
+    path('edit_profile/',views.edit_profile,name="edit_profile"),
 ]
 urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

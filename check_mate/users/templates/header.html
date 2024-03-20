@@ -1,0 +1,57 @@
+{% load static %}
+{% block header %}
+<div id="header"
+        class="mdk-header bg-dark js-mdk-header m-0"
+        data-fixed
+        data-effects="waterfall">
+    <div class="mdk-header__content">
+
+        <!-- Navbar -->
+        <nav id="default-navbar"
+                class="navbar navbar-expand navbar-dark bg-primary m-0">
+            <div class="container">
+
+                <a href="{% url 'users:dashboard' %}"
+                    class="navbar-brand">
+                    <img src="{% static 'login_images/graduation.png' %}"
+                            class="mr-2"
+                            alt="Check Mate" 
+                            style="width:30px;height:auto;"/>
+                    <span class="d-none d-xs-md-block">{{page_title}}</span>
+                </a>
+
+                <div class="flex"></div>
+
+                <!-- Menu -->
+                <ul class="nav navbar-nav flex-nowrap">
+
+                    <!-- User dropdown -->
+                    <li class="nav-item dropdown ml-1 ml-md-3">
+                        <a class="nav-link dropdown-toggle "
+                            data-toggle="dropdown"
+                            href="#"
+                            role="button">
+                            <img src="{{media_url}}{{logged_in_user.user_profile_picture}}"
+                                alt="Avatar"
+                                style="width: 40px; height: auto;"
+                                onerror="this.onerror=null;this.src='{% if 4 in user_type %}{% static 'profile_picture_admin/admin.png'%}{% else %}{% static 'default_profile_picture/default_profile_picture.png'%}{% endif%}';"></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item"
+                                href="{% url 'users:edit_profile' %}">
+                                <i class="fa-solid fa-pen-to-square"></i>&nbspEdit Account
+                            </a>
+                            <a class="dropdown-item"
+                                href="{% url 'users:logout' %}">
+                                <i class="fa-solid fa-right-from-bracket"></i>&nbsp Logout
+                            </a>
+                        </div>
+                    </li>
+                    <!-- // END User dropdown -->
+                </ul>
+            </div>
+        </nav>
+        <!-- // END Navbar -->
+
+    </div>
+</div>
+{% endblock header %}
