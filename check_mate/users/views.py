@@ -9,6 +9,10 @@ from system_administrator.system_error_handling import ErrorHandling
 from .render_data import Login
 from .models import *
 import pyotp
+from django.utils.safestring import mark_safe
+from django.contrib.auth.decorators import login_required
+from check_mate import settings
+
 
 logger=logging.getLogger(__name__)
 
@@ -33,16 +37,24 @@ def login(request):
                 user = auth.authenticate(username=user_username,password=user_password)
                 #if user not found then logged him in
                 if user is not None:
-                    school_user = School_Users.objects.get(user_id = user_username)
-                    #checking to see if school user is verified or not
-                    if school_user.user_otp_verified:
+                    
+                    try:
+                        school_user = School_Users.objects.get(user_id = user_username)
+                        #checking to see if school user is verified or not
+                        if school_user.user_otp_verified:
+                            auth.login(request,user)
+                            return redirect('users:dashboard')
+                        else:
+                            #not verified so sending them the link for verification
+                            verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
+                            verification_url = request.build_absolute_uri(verification_link)
+                            verification_message = f"Your account is not verified yet! Verification link: <a href='{verification_url}'>{verification_url}</a>"
+                            messages.error(request, mark_safe(verification_message))
+                            return redirect('users:login') 
+                    except:
+                        #admin is logging in
                         auth.login(request,user)
-                        return HttpResponse("Loggin in!!")
-                    else:
-                        #not verified so sending them the link for verification
-                        verification_link = reverse('users:registration_email_verification', args=[school_user.user_id])
-                        messages.error(request,f"Your account is not verified yet! Verification link: {request.build_absolute_uri(verification_link)}")
-                        return redirect('users:login') 
+                        return redirect('users:dashboard')
                 else:
                     #user might not be registered or gives the wrong credentials
                     messages.info(request,"Credentials given are wrong")
@@ -99,56 +111,125 @@ def registration_email_verification(request,user_id):
     try:
 
         school_user = School_Users.objects.get(user_id = user_id)
-        if request.method == "POST":
+        #if user is not verified then allowing to enter page
+        if not school_user.user_otp_verified:
 
-            if request.POST.get('submit_otp'):
-                #if user is already verified then not sending otp again
-                if school_user.user_otp_verified:
-                    messages.error(request,'OTP already verified!')
-                    return redirect('users:registration_email_verification',user_id)
-                #getting user otp
-                otp = request.POST.get('otp')
-                #putting them session dictionary
-                otp_secret_key = request.session['otp_secret_key']
-                otp_valid_date = request.session['otp_valid_date']
-                #checking to see if otp is valid and matches with users input one
-                if otp_secret_key and otp_valid_date is not None:
-                    valid_until = datetime.fromisoformat(otp_valid_date)
+            if request.method == "POST":
 
-                    if valid_until > datetime.now():
-                        totp = pyotp.TOTP(otp_secret_key,interval = 60)
-                        if totp.verify(otp):
-                            user = User.objects.get(username = user_id)
-                            school_user.user_otp_verified = True
-                            school_user.save()
-                            auth.login(request,user)
-                            request.session.pop('otp_secret_key', None)
-                            request.session.pop('otp_valid_date', None)
-                            return HttpResponse("Loggin in!!")
+                if request.POST.get('submit_otp'):
+                    
+                    #getting user otp
+                    otp = str(request.POST.get('otp'))
+                    
+                    #checking if otp is empty
+                    if otp == "":
+                        messages.error(request,'Provide OTP!')
+                        return redirect('users:registration_email_verification',user_id)
+                    try:
+                        #putting them session dictionary
+                        otp_secret_key = request.session['otp_secret_key']
+                        otp_valid_date = request.session['otp_valid_date']
+                        print("here")
+                        #checking to see if otp is valid and matches with users input one
+                        if otp_secret_key and otp_valid_date is not None:
+                            valid_until = datetime.fromisoformat(otp_valid_date)
+
+                            if valid_until > datetime.now():
+                                totp = pyotp.TOTP(otp_secret_key,interval = 60)
+                                print("here2")
+                                if totp.verify(otp):
+                                    user = User.objects.get(username = user_id)
+                                    school_user.user_otp_verified = True
+                                    school_user.save()
+                                    auth.login(request,user)
+                                    #removing the otp keys from the session
+                                    request.session.pop('otp_secret_key', None)
+                                    request.session.pop('otp_valid_date', None)
+                                    return redirect('users:dashboard')
+                                else:
+                                    messages.error(request,"invalid OTP")
+                                    return redirect('users:registration_email_verification',user_id)
+                            else:
+                                messages.error(request,"OTP expired")
+                                redirect('users:registration_email_verification',user_id)
+
                         else:
-                            messages.error(request,"invalid OTP")
-                            return redirect('users:registration_email_verification',user_id)
-                    else:
-                        messages.error(request,"OTP expired")
-                        redirect('users:registration_email_verification',user_id)
+                            messages.error(request,"Something went wrong..")
+                            redirect('users:registration_email_verification',user_id)
+                    except:
+                        messages.error(request,"invalid OTP")
+                        return redirect('users:registration_email_verification',user_id)
 
-                else:
-                    messages.error(request,"Something went wrong..")
+                if request.POST.get('resend_otp'):
+                    
+                    request.session.pop('otp_secret_key', None)
+                    request.session.pop('otp_valid_date', None)
+                    Login.registration_email(request,school_user)
                     redirect('users:registration_email_verification',user_id)
+                    
+            context = {
+                'page_title':'Check Mate'
+            }
+            return render(request,"registration_verification.html",context)
+        
+        else:
+            return HttpResponse("Already verified")
 
-            if request.POST.get('resend_otp'):
-                #if user is already verified then not sending otp again
-                if school_user.user_otp_verified:
-                    messages.error(request,'OTP already verified!')
-                    return redirect('users:registration_email_verification',user_id)
-                
-                Login.registration_email(request,school_user)
-                redirect('users:registration_email_verification',user_id)
-                
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def dashboard(request):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
         context = {
-            'page_title':'Check Mate'
+            'page_title':'Check Mate',
+            'user_type':type_of_logged_in_user,
+            'media_url':settings.MEDIA_URL,
+            'logged_in_user':logged_in_user,
         }
-        return render(request,"registration_verification.html",context)
+
+        return render(request,"dashboard.html",context)
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    
+@login_required
+def logout(request):
+    
+    try:
+        auth.logout(request)
+        return redirect('users:login')
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors('Registration Error',error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def edit_profile(request):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        context = {
+            'page_title':'Check Mate',
+            'user_type':type_of_logged_in_user,
+            'media_url':settings.MEDIA_URL,
+            'logged_in_user':logged_in_user,
+            'year':datetime.now().year,
+        }
+        return render(request,"edit_account.html",context)
 
     except Exception as e:
         #saving error information in database if error occured

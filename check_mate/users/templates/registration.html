@@ -18,7 +18,7 @@
 
 
         <link type="text/css"
-              href="{% static 'check_mate.css' %}"
+              href="{% static 'css/check_mate.css' %}"
               rel="stylesheet">
 
 
@@ -49,7 +49,7 @@
                     <div class="card-body">
 
                         {% for message in messages %}
-                            <p class="message" style="color:#941910; text-align: center;">{{message}}</p>
+                            <p  class="alert alert-danger" role="alert" style="text-align: center;">{{message}}</p>
                         {% endfor %}
                         <form method="POST">
                             {% csrf_token %}

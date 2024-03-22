@@ -17,7 +17,7 @@
 
 
         <link type="text/css"
-              href="{% static 'check_mate.css' %}"
+              href="{% static 'css/check_mate.css' %}"
               rel="stylesheet">
 
     </head>
@@ -44,11 +44,12 @@
                         <h4 class="card-title">Login</h4>
                         <p class="card-subtitle">Access your account</p>
                     </div>
+                    <br>
                     {% for message in messages %}
-                        <p class="message" style="color:#941910; text-align: center;">{{message}}</p>
+                        <p  class="alert alert-danger" role="alert" style="text-align: center;">{{message}}</p>
                     {% endfor %}
                     <div class="card-body">
-
+                        
                         <form method="POST">
                             {% comment "" %} csrf token is necessary in django for form validation otherwise form won't submit{% endcomment %}
                             {% csrf_token %}
