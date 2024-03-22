@@ -56,6 +56,16 @@
                             <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
                         </ol> {% endcomment %}
                         <h1 class="h2">Dashboard</h1>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="media flex-wrap align-items-center">
+                                    <div class="media-body"
+                                         style="min-width: 180px">
+                                        User Name: <strong>{{logged_in_user.user_id}}, {{logged_in_user.user_first_name}}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="container page__container">
