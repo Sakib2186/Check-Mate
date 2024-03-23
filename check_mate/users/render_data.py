@@ -110,7 +110,7 @@ class Login:
     def user_type_logged_in(request):
 
         '''This function will return which user logged in whether it is a
-            TA or Instructor or Student'''
+            Instructor or Student'''
         
         logged_in_user = request.user.username
 
@@ -125,11 +125,9 @@ class Login:
                     type.append(role.role_id)
                 if role.role_id == int(2):
                     type.append(role.role_id)
-                if role.role_id == int(3):
-                    type.append(role.role_id)
         except:
             #else it is admin
-            #4 is not saved in database but we are referring 4 as super user (Admin)
-            type.append(4)
+            #3 is not saved in database but we are referring 3 as super user (Admin)
+            type.append(3)
 
         return type

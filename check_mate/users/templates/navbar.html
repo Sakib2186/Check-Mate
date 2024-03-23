@@ -8,16 +8,16 @@
                     class="nav-link">Home</a>
             </li>
             <li class="nav-item dropdown">
-                <a href="#"
+                <a href="{% url 'users:courses' %}"
                     class="nav-link">Courses</a>
             </li>
-            {% if 2 in user_type or 3 in user_type or 4 in user_type%}
+            {% if 2 in user_type or 3 in user_type %}
             <li class="nav-item dropdown">
                 <a href="#"
                     class="nav-link">My Results</a>
             </li>
             {% endif %}
-            {% if 1 in user_type or 4 in user_type%}
+            {% if 1 in user_type or 3 in user_type%}
             <li class="nav-item dropdown">
                 <a href="#"
                     class="nav-link">Take Exam</a>
@@ -27,7 +27,21 @@
                 <a href="#"
                     class="nav-link">Announcements</a>
             </li>
-            
+            {% if 3 in user_type%}
+            <li class="nav-item dropdown">
+                <a href="#"
+                   class="nav-link dropdown-toggle"
+                   data-toggle="dropdown">Admin</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item"
+                       href="">Add Course</a>
+                    <a class="dropdown-item"
+                       href="">Add Student</a>
+                    <a class="dropdown-item"
+                       href="">Add Instructor</a>
+                </div>
+            </li>
+            {% endif %}
         </ul>
     </div>
 

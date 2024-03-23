@@ -68,11 +68,9 @@
                         </div>
                     </div>
 
-                    <div class="container page__container">
-                        {% comment %} <div class="footer">
-                            Copyright &copy; 2016 - <a href="">Purchase LearnPlus</a>
-                        </div> {% endcomment %}
-                    </div>
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
                 </div>
             </div>
 

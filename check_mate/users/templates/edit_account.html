@@ -189,6 +189,23 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
+                                            <label for="password"
+                                                   class="col-sm-3 col-form-label form-label">Confirm New Password</label>
+                                            <div class="col-sm-6 col-md-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text">
+                                                            <i class="fa-solid fa-key"></i>
+                                                        </div>
+                                                    </div>
+                                                    <input type="password"
+                                                           id="password"
+                                                           class="form-control"
+                                                           placeholder="Confirm new password">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
                                             <div class="col-sm-8 offset-sm-3">
                                                 <div class="media align-items-center">
                                                     <div class="media-left">
@@ -299,11 +316,9 @@
                         </div>
                     </div>
 
-                    <div class="container page__container">
-                        <div class="footer">
-                            Copyright &copy; {{year}} - <a href="">Check Mate</a>
-                        </div>
-                    </div>
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
                 </div>
             </div>
 

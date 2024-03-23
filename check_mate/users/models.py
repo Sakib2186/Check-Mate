@@ -4,7 +4,7 @@ from django.db import models
 class Roles(models.Model):
 
     '''This model will save the type of user our system will have apart from Admin'''
-    #only for Instructor, Teaching Assistant and Student
+    #only for Instructor, and Student (Instructor id is 1 and Student is 2)
 
     role_id = models.IntegerField(null=False,blank=False,default = 0,unique = True)
     role_name = models.CharField(max_length = 30, null = False, blank = False)
@@ -23,7 +23,7 @@ class Roles(models.Model):
 class School_Users(models.Model):
 
     '''This model will hold all the users of our system other than admins'''
-    #only for  Instructor, Teaching Assistant and Student
+    #only for  Instructor and Student (Student can be TA)
 
     user_id = models.CharField(max_length = 20,null=False,blank=False,unique = True)
     user_role = models.ManyToManyField(Roles)  
@@ -45,4 +45,20 @@ class School_Users(models.Model):
         #as default
         verbose_name = "Registered Members"
 
+class Course(models.Model):
 
+    '''This model will hold the course details'''
+
+    students = models.ManyToManyField(School_Users)
+    instructor = models.ForeignKey(School_Users,on_delete=models.CASCADE,related_name = "instructor")
+    teaching_assistant = models.ForeignKey(School_Users,on_delete=models.CASCADE,related_name = "teaching_assistant")
+    course_code = models.CharField(max_length = 50,null=True,blank=True,default="")
+    course_name = models.CharField(max_length = 200,null=True,blank=True,default="")
+    course_section = models.IntegerField(null=True,blank=True,default = 0)
+
+    def __str__(self) -> str:
+        return str(self.course_code)
+    
+    class Meta:
+
+        verbose_name = "Courses"
