@@ -20,5 +20,6 @@ class School_Users_Admin_Panel(admin.ModelAdmin):
 @admin.register(Course)
 class Course_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'instructor','teaching_assistant','course_code','course_name','course_section'
+        'instructor','teaching_assistant','course_code','course_name','course_section','course_picture',
+        'course_description'
     ]

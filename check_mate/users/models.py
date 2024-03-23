@@ -1,4 +1,5 @@
 from django.db import models
+from django_resized import ResizedImageField
 
 # Create your models here.
 class Roles(models.Model):
@@ -55,6 +56,8 @@ class Course(models.Model):
     course_code = models.CharField(max_length = 50,null=True,blank=True,default="")
     course_name = models.CharField(max_length = 200,null=True,blank=True,default="")
     course_section = models.IntegerField(null=True,blank=True,default = 0)
+    course_picture = ResizedImageField(size=[500, 300], upload_to=f'Courses/{str(course_code)}/course_cover_picture/', blank=True, null=True)
+    course_description = models.TextField(null=True,blank=True,default="")
 
     def __str__(self) -> str:
         return str(self.course_code)
