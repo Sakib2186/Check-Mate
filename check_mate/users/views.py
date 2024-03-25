@@ -317,7 +317,7 @@ def all_courses(request):
         return HttpResponse("Bad Request")
 
 @login_required
-def course_edit(request,course_id):
+def add_course(request):
 
     try:
         #loading the data to pass them in dictionary, context

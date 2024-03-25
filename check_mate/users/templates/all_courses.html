@@ -61,8 +61,30 @@
                                 <h1 class="h2">All Courses</h1>
                             </div>
                             <div class="media-right d-flex align-items-center">
-                                <a href="fixed-instructor-quiz-edit.html"
+                                <a href="{% url 'users:add_course'  %}"
                                    class="btn btn-success mr-2">Add More</a>
+                                   <div class="dropdown">
+                                    <a href="#"
+                                       data-toggle="dropdown"
+                                       class="btn btn-success mr-2">Edit course</a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <div class="dropdown-item">
+                                            <form action="#">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label"
+                                                           for="custom-select">Courses</label><br>
+                                                    <select id="custom-select"
+                                                            class="form-control custom-select"
+                                                            style="width: 200px;">
+                                                        <option>------</option>
+                                                        <option value="https://www.google.com">CHE101</option>
+                                                    >
+                                                    </select>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="card-columns">
@@ -101,6 +123,15 @@
             </div>
 
         </div>
+        <script>
+            // Add event listener to the select element
+            document.getElementById('custom-select').addEventListener('change', function() {
+                // Get the selected option value
+                var selectedOption = this.value;
+                // Navigate to the selected URL
+                window.location.href = selectedOption;
+            });
+        </script>
 
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>

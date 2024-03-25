@@ -14,5 +14,5 @@ urlpatterns = [
     path('edit_profile/',views.edit_profile,name="edit_profile"),
     path('courses/',views.courses,name="courses"),
     path('all_courses/',views.all_courses,name="all_courses"),
-    path('all_courses/course_edit/<int:course_id>',views.course_edit,name="course_edit"),
+    path('all_courses/add_course/',views.add_course,name="add_course"),
 ]
