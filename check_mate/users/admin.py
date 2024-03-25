@@ -20,6 +20,21 @@ class School_Users_Admin_Panel(admin.ModelAdmin):
 @admin.register(Course)
 class Course_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'instructor','teaching_assistant','course_code','course_name','course_section','course_picture',
+        'course_code','course_name','course_picture',
         'course_description'
+    ]
+@admin.register(Student)
+class Student_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'student_id','semester','year'
+    ]
+@admin.register(Instructor)
+class Instructor_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'instructor_id','semester','year'
+    ]
+@admin.register(Teaching_Assistant)
+class Teaching_Asistant_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'teaching_id','semester','year'
     ]

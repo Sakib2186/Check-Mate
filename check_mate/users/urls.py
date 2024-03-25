@@ -1,6 +1,4 @@
 from django.urls import path,include
-from django.conf.urls.static import static
-from django.conf import settings
 from . import views
 
 app_name = "users"
@@ -16,5 +14,3 @@ urlpatterns = [
     path('edit_profile/',views.edit_profile,name="edit_profile"),
     path('courses/',views.courses,name="courses"),
 ]
-urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
-urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -33,7 +33,7 @@ class School_Users(models.Model):
     user_last_name = models.CharField(max_length = 50,null=True,blank=True)
     user_email = models.EmailField(null = True,blank = True)
     user_phone_number = models.CharField(null=True,blank=True,max_length=16)
-    user_profile_picture=models.ImageField(null=True,blank=True,upload_to='School_User/user_profile_pictures/')
+    user_profile_picture=ResizedImageField(null=True,blank=True,upload_to='School_User/user_profile_pictures/')
     user_otp_verified = models.BooleanField(null=True,blank=True,default = False)
 
     #This function will return the id of the user object when called.
@@ -50,12 +50,8 @@ class Course(models.Model):
 
     '''This model will hold the course details'''
 
-    students = models.ManyToManyField(School_Users)
-    instructor = models.ForeignKey(School_Users,on_delete=models.CASCADE,related_name = "instructor")
-    teaching_assistant = models.ForeignKey(School_Users,on_delete=models.CASCADE,related_name = "teaching_assistant")
     course_code = models.CharField(max_length = 50,null=True,blank=True,default="")
     course_name = models.CharField(max_length = 200,null=True,blank=True,default="")
-    course_section = models.IntegerField(null=True,blank=True,default = 0)
     course_picture = ResizedImageField(size=[500, 300], upload_to=f'Courses/{str(course_code)}/course_cover_picture/', blank=True, null=True)
     course_description = models.TextField(null=True,blank=True,default="")
 
@@ -65,3 +61,60 @@ class Course(models.Model):
     class Meta:
 
         verbose_name = "Courses"
+
+class Student(models.Model):
+    
+    student_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course)
+    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    year = models.DateField(null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.student_id.user_id)
+    
+    class Meta:
+
+        verbose_name = "Student Courses"
+
+class Instructor(models.Model):
+
+    instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course,related_name = "instructor_courses")
+    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    year = models.DateField(null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.instructor_id.user_id)
+    
+    class Meta:
+
+        verbose_name = "Instructor Courses"
+
+class Teaching_Assistant(models.Model):
+
+    teaching_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course)
+    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    year = models.DateField(null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.teaching_id_id_id.user_id)
+    
+    class Meta:
+
+        verbose_name = "Teaching Assistant Courses"
+
+class Course_Section(models.Model):
+
+    course_id = models.ForeignKey(Course,on_delete=models.CASCADE)
+    section_number = models.IntegerField(default=0)
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+    students = models.ManyToManyField(Student)
+    teaching_assistant = models.ManyToManyField(Teaching_Assistant)
+
+    def __str__(self) -> str:
+        return str(self.course.course_code)
+    
+    class Meta:
+
+        verbose_name = "Course Section"
