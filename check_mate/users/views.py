@@ -188,6 +188,10 @@ def dashboard(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
@@ -201,7 +205,7 @@ def dashboard(request):
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.save_system_errors(logged_in_user.user_id,error_name=e,error_traceback=traceback.format_exc())
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")
     
 @login_required
@@ -223,6 +227,10 @@ def edit_profile(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
@@ -235,7 +243,7 @@ def edit_profile(request):
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.save_system_errors(logged_in_user.user_id,error_name=e,error_traceback=traceback.format_exc())
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")
     
 @login_required
@@ -246,6 +254,12 @@ def courses(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         all_courses = Load_Courses.get_user_courses(logged_in_user)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
@@ -262,5 +276,74 @@ def courses(request):
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.save_system_errors(logged_in_user.user_id,error_name=e,error_traceback=traceback.format_exc())
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    
+@login_required
+def all_courses(request):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        all_courses = Load_Courses.get_user_courses(logged_in_user)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        if logged_in_user == None:
+
+            context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+
+                'all_courses':all_courses,
+
+            }
+
+            return render(request,"all_courses.html",context)
+        else:
+            return HttpResponse("Not Allowed")
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def course_edit(request,course_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        if logged_in_user == None:
+            context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+
+            }
+            return render(request,"course_edit.html",context)
+        else:
+            return HttpResponse("Not Allowed")
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")

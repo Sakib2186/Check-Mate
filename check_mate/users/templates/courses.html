@@ -52,28 +52,29 @@
                 <div class="page ">
 
                     <div class="container page__container">
-                        {% comment %} <ol class="breadcrumb">
+                        <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                        </ol> {% endcomment %}
-                        <h1 class="h2">Courses</h1>
+                            <li class="breadcrumb-item active">My Courses</li>
+                        </ol>
+                        <h1 class="h2">My Courses</h1>
                         <div class="card-deck">
                             <div class="row">
                                 {% for x in all_courses %}
                                 <div class="col-md-4 mb-4">
-                                    <div class="card">
-                                        <a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">
-                                        <img class="card-img-top" src="..." alt="Card image cap">
+                                    <div class="card" style="width:300px;">
+                                        <a href="" class="card-link" style="text-decoration:none;color:black;">
+                                            <img class="card-img-top" src="{{ media_url }}{{ x.course_id.course_picture }}" alt="{{ x.course_id.course_name }}">
                                         </a>
                                         <div class="card-body">
-                                            <h5 class="card-title"><a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">Card title</a></h5>
-                                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>                                        </div>
-                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                            <h5 class="card-title"><a href="" class="card-link" style="text-decoration:none;color:black;">{{ x.course_id.course_code }}</a></h5>
+                                            <p class="card-text">{{x.course_id.course_description}}</p>
                                         </div>
-                                </div>
-                                
+                                        
+                                    </div>
+                                </div>                                
                                 {% endfor %}
-                            </div> 
-                        </div> 
+                            </div>
+                        </div>
                     </div>
 
                     {% block footer %}

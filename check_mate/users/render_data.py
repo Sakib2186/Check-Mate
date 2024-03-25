@@ -150,8 +150,7 @@ class Load_Courses:
         all_courses = []
         #getting all courses of this user
         if 3 in roles:
-            print("Heer")
-            pass
+            all_courses = Course_Section.objects.all()
         elif 2 in roles:
             student_courses = Student.objects.get(student_id = logged_in_user,semester = semester)
             for course in student_courses.courses.all():

@@ -1,5 +1,11 @@
 from django.db import models
 from django_resized import ResizedImageField
+import os
+
+#funtion for saving image path in os
+def course_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', str(instance.course_code), 'course_cover_picture', filename)
 
 # Create your models here.
 
@@ -58,13 +64,14 @@ class School_Users(models.Model):
         #as default
         verbose_name = "Registered Members"
 
+
 class Course(models.Model):
 
     '''This model will hold the course details'''
 
     course_code = models.CharField(max_length = 50,null=True,blank=True,default="")
     course_name = models.CharField(max_length = 200,null=True,blank=True,default="")
-    course_picture = ResizedImageField(size=[500, 300], upload_to=f'Courses/{str(course_code)}/course_cover_picture/', blank=True, null=True)
+    course_picture = ResizedImageField(size=[500, 300], upload_to=course_picture_upload_path, blank=True, null=True)
     course_description = models.TextField(null=True,blank=True,default="")
 
     def __str__(self) -> str:
