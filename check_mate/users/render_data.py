@@ -131,3 +131,49 @@ class Login:
             type.append(3)
 
         return type
+
+class Load_Courses:
+
+    def get_user_courses(logged_in_user):
+
+        #semester
+        semester = Session.objects.get(current=True)
+        #role of user
+        roles = []
+        if logged_in_user == None:
+            roles.append(3)
+        else:
+            user_role = logged_in_user.user_role.all()
+            for i in user_role:
+                roles.append(i.role_id)
+        
+        all_courses = []
+        #getting all courses of this user
+        if 3 in roles:
+            print("Heer")
+            pass
+        elif 2 in roles:
+            student_courses = Student.objects.get(student_id = logged_in_user,semester = semester)
+            for course in student_courses.courses.all():
+                specific_course = Course_Section.objects.get(course_id = course)
+                all_courses.append(specific_course)
+            try:
+                ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester=semester)
+                for course in ta_courses.courses.all():
+                    specific_course - Course_Section.objects.get(course_id = course)
+                    if specific_course not in all_courses:
+                        all_courses.append(specific_course)
+            except:
+                pass
+
+        elif 1 in roles:
+            instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester = semester)
+            for course in instructor_courses.courses.all():
+                specific_course = Course_Section.objects.get(course_id = course)
+                all_courses.append(specific_course)
+
+        return all_courses
+
+
+            
+        

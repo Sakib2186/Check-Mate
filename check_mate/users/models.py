@@ -2,6 +2,18 @@ from django.db import models
 from django_resized import ResizedImageField
 
 # Create your models here.
+
+class Session(models.Model):
+
+    session_name = models.CharField(max_length = 50,default = "")
+    current = models.BooleanField(default = False)
+
+    def __str__(self) -> str:
+        return str(self.session_name)
+    
+    class Meta:
+        verbose_name = "Session"
+
 class Roles(models.Model):
 
     '''This model will save the type of user our system will have apart from Admin'''
@@ -66,11 +78,11 @@ class Student(models.Model):
     
     student_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
     courses = models.ManyToManyField(Course)
-    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.DateField(null=True,blank=True)
 
     def __str__(self) -> str:
-        return str(self.student_id.user_id)
+        return str(self.student_id)
     
     class Meta:
 
@@ -80,7 +92,7 @@ class Instructor(models.Model):
 
     instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
     courses = models.ManyToManyField(Course,related_name = "instructor_courses")
-    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.DateField(null=True,blank=True)
 
     def __str__(self) -> str:
@@ -94,11 +106,11 @@ class Teaching_Assistant(models.Model):
 
     teaching_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
     courses = models.ManyToManyField(Course)
-    semester = models.CharField(max_length = 50,null=True,blank=True,default="")
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.DateField(null=True,blank=True)
 
     def __str__(self) -> str:
-        return str(self.teaching_id_id_id.user_id)
+        return str(self.teaching_id.user_id)
     
     class Meta:
 
@@ -111,9 +123,10 @@ class Course_Section(models.Model):
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     students = models.ManyToManyField(Student)
     teaching_assistant = models.ManyToManyField(Teaching_Assistant)
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
 
     def __str__(self) -> str:
-        return str(self.course.course_code)
+        return str(self.course_id)
     
     class Meta:
 

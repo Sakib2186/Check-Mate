@@ -6,7 +6,7 @@ from django.contrib.auth.models import auth,User
 from django.contrib import messages
 from system_administrator.models import *
 from system_administrator.system_error_handling import ErrorHandling
-from .render_data import Login
+from .render_data import *
 from .models import *
 import pyotp
 from django.utils.safestring import mark_safe
@@ -245,12 +245,15 @@ def courses(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        all_courses = Load_Courses.get_user_courses(logged_in_user)
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
             'media_url':settings.MEDIA_URL,
             'logged_in_user':logged_in_user,
             'year':datetime.now().year,
+
+            'all_courses':all_courses,
         }
 
         return render(request,"courses.html",context)

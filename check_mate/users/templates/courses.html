@@ -58,7 +58,8 @@
                         <h1 class="h2">Courses</h1>
                         <div class="card-deck">
                             <div class="row">
-                                <div class="col-md-4">
+                                {% for x in all_courses %}
+                                <div class="col-md-4 mb-4">
                                     <div class="card">
                                         <a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">
                                         <img class="card-img-top" src="..." alt="Card image cap">
@@ -69,33 +70,9 @@
                                             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
                                         </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card">
-                                        <a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">
-                                        <img class="card-img-top" src="..." alt="Card image cap">
-                                        </a>
-                                        <div class="card-body">
-                                            <h5 class="card-title"><a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">Card title</a></h5>
-                                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>                                        </div>
-                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                        </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card">
-                                        <a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">
-                                        <img class="card-img-top" src="..." alt="Card image cap">
-                                        </a>
-                                        <div class="card-body">
-                                            <h5 class="card-title"><a href="#link-to-course1" class="card-link" style="text-decoration:none;color:black;">Card title</a></h5>
-                                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>                                        </div>
-                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                                        </div>
-                                </div>
+                                
+                                {% endfor %}
                             </div> 
-                            <div class="row">
-                                
-                                
-                            </div>
                         </div> 
                     </div>
 
