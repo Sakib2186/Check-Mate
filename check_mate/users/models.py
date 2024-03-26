@@ -126,7 +126,7 @@ class Teaching_Assistant(models.Model):
 class Course_Section(models.Model):
 
     course_id = models.ForeignKey(Course,on_delete=models.CASCADE)
-    section_number = models.IntegerField(default=0)
+    section_number = models.IntegerField(default=1)
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, null=True, blank=True)
     students = models.ManyToManyField(Student)
     teaching_assistant = models.ManyToManyField(Teaching_Assistant)
