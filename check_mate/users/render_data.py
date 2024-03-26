@@ -195,7 +195,7 @@ class Save:
     def save_course(course_code,course_name,course_description,course_picture,course_existing):
 
         '''This function returns True if successfully saved/updated details of course'''
-        #semester
+        #current semeter
         semester = Session.objects.get(current=True)
 
         if course_existing == None:
@@ -232,7 +232,9 @@ class Delete:
 
         course = Course.objects.get(id = course_id)
         #delete the image if any
+        #finding the path on the OS
         path = settings.MEDIA_ROOT+str(course.course_picture)
+        #if file path exists then deleting it
         if os.path.isfile(path):
             os.remove(path)
         course.delete()
