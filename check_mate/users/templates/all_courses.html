@@ -209,6 +209,12 @@
     // Attach keyup event listener to the search input
     document.getElementById('searchInput').addEventListener('keyup', filterDropdown);
 </script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    {% for message in messages %}
+    swal("Done!", "{{message}}", "success");
+    {% endfor %}
+</script>
 
 </body>
 

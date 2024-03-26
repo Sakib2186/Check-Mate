@@ -63,7 +63,7 @@
                                 <h4 class="card-title">Provide Details</h4>
                             </div>
                             <div class="card-body">
-                                <form method="POST" enctype="multipart/form-data">
+                                <form method="POST" id = "Form" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="form-group row">
                                         <label for="quiz_title"
@@ -126,8 +126,13 @@
                                     <div class="form-group row mb-0">
                                         <div class="col-sm-9 offset-sm-3">
                                             <input type="submit"
-                                                    class="btn btn-success" {% if course %}value="Update"{% else %} value = "Save" {% endif %} name="save_course"> 
-                                        </div>
+                                                    class="btn btn-success" {% if course %}value="Update"{% else %} value = "Save" {% endif %} name="save_course">
+                                            {% if course %}
+                                            <input type="hidden" name="delete_course_flag" id="deleteCourseFlag" value="0">
+                                            <button type="button"
+                                                    class="btn btn-danger" id="deleteBtn">Delete</button> 
+                                            {% endif %}
+                                    </div>
                                     </div>
                                 </form>
                             </div>
@@ -146,6 +151,28 @@
             {% for message in messages %}
             swal("Done!", "{{message}}", "success");
             {% endfor %}
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('deleteBtn').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+            
+                    swal({
+                        title: "Are you sure?",
+                        text: "Once deleted, you will not be able to recover this course!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => { 
+                        if (willDelete) {
+                            document.getElementById('deleteCourseFlag').value = "1";
+                            document.getElementById('Form').submit(); 
+                        } else {
+                            swal("Your course is safe!");
+                        }
+                    });
+                });
+            });
+            
         </script>
 
         <script src="{% static 'js/jquery.min.js' %}"></script>

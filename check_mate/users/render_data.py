@@ -222,5 +222,19 @@ class Save:
 
             return (True,course_existing)
 
+class Delete:
 
+    '''This class will hold all the delete functionalities'''
+
+    def delete_course(course_id):
+
+        '''This function will delete the course'''
+
+        course = Course.objects.get(id = course_id)
+        #delete the image if any
+        path = settings.MEDIA_ROOT+str(course.course_picture)
+        if os.path.isfile(path):
+            os.remove(path)
+        course.delete()
+        return True
             

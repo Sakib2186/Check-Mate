@@ -404,6 +404,18 @@ def edit_course_details(request,course_id):
                     else:
                         messages.error(request,"Something went wrong. Try again later")
                         return redirect('users:edit_course_details',result[1].pk)
+                    
+                if request.POST.get('delete_course_flag'):
+
+                    flag = str(request.POST.get('delete_course_flag'))
+                    if flag == str(1):
+                        
+                        if Delete.delete_course(course_id):
+                            messages.success(request,"Course deleted successfully!")
+                            return redirect('users:all_courses')
+                        else:
+                            messages.error(request,"Could not delete. Please try again.")
+                            return redirect('users:edit_course_details',course_id)
             context = {
                 'page_title':'Check Mate',
                 'user_type':type_of_logged_in_user,
