@@ -54,8 +54,8 @@
                     <div class="container page__container">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                            <li class="breadcrumb-item active"><a href="{% url 'users:all_courses' %}">Add Courses</a></li>
-                            <li class="breadcrumb-item active">Add Course</li>
+                            <li class="breadcrumb-item active"><a href="{% url 'users:all_courses' %}">All Courses</a></li>
+                            <li class="breadcrumb-item active">{% if course %}Edit Course{% else %}Add Course{% endif %}</li>
                         </ol>
                         <h1 class="h2">Course Details</h1>
                         <div class="card">
@@ -63,7 +63,8 @@
                                 <h4 class="card-title">Provide Details</h4>
                             </div>
                             <div class="card-body">
-                                <form action="#">
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
                                     <div class="form-group row">
                                         <label for="quiz_title"
                                                class="col-sm-3 col-form-label form-label">Course Name:</label>
@@ -74,7 +75,7 @@
                                                    placeholder="Course Name"
                                                    required
                                                    name = "course_name"
-                                                   value="">
+                                                   value="{{course.course_name}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -87,7 +88,7 @@
                                                    placeholder="Course Code"
                                                    required
                                                    name = "course_code"
-                                                   value="">
+                                                   value="{{course.course_code}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -99,289 +100,33 @@
                                                    class="form-control"
                                                    placeholder="Course Description"
                                                    required
-                                                   name = "course_name"
-                                                   value="">
+                                                   name = "course_description"
+                                                   value="{{course.course_description}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="quiz_image"
                                                class="col-sm-3 col-form-label form-label">Cover Picture:</label>
                                         <div class="col-sm-9 col-md-4">
-                                            <p><img src="assets/images/vuejs.png"
+                                            <p><img src="{{media_url}}{{course.course_picture}}"
                                                      alt=""
                                                      width="150"
                                                      class="rounded"></p>
                                             <div class="custom-file">
                                                 <input type="file"
                                                        id="quiz_image"
-                                                       class="custom-file-input">
+                                                       class="custom-file-input"
+                                                       name="cover_picture"
+                                                       accept="image/*">
                                                 <label for="quiz_image"
                                                        class="custom-file-label">Choose file</label>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <label for="course_title"
-                                               class="col-sm-3 col-form-label form-label">Instructor:</label>
-                                               <div class="col-lg-8">
-
-                                                <div class="table-responsive border-bottom"
-                                                     data-toggle="lists"
-                                                     data-lists-values='["js-lists-values-employee-name"]'>
-
-                                                    <div class="search-form search-form--light mb-3">
-                                                        <input type="text"
-                                                               class="form-control search"
-                                                               placeholder="Search">
-                                                        <button class="btn"
-                                                                type="button"
-                                                                role="button"><i class="fa-solid fa-magnifying-glass"></i></button>
-                                                    </div>
-        
-                                                    <table class="table mb-0">
-                                                        <thead>
-                                                            <tr>
-        
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
-        
-                                                                <th>Instructor</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="list"
-                                                               id="staff">
-        
-                                                            <tr class="selected">
-        
-                                                                <td>
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row"
-                                                                               checked=""
-                                                                               id="customCheck1_1">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
-                                                                    </div>
-                                                                </td>
-        
-                                                                <td>
-        
-                                                                    <div class="media align-items-center">
-                                                                        <div class="avatar avatar-sm mr-3">
-                                                                            <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
-                                                                                 alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
-                                                                        </div>
-                                                                        <div class="media-body">
-        
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
-        
-                                                                        </div>
-                                                                    </div>
-        
-                                                                </td>
-                                                                <td>2121422</td>
-                                                                
-                                                            </tr>
-        
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-        
-                                            </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="course_title"
-                                               class="col-sm-3 col-form-label form-label">Teaching Assistant:</label>
-                                               <div class="col-lg-8">
-
-                                                <div class="table-responsive border-bottom"
-                                                     data-toggle="lists"
-                                                     data-lists-values='["js-lists-values-employee-name"]'>
-
-                                                    <div class="search-form search-form--light mb-3">
-                                                        <input type="text"
-                                                               class="form-control search"
-                                                               placeholder="Search">
-                                                        <button class="btn"
-                                                                type="button"
-                                                                role="button"><i class="fa-solid fa-magnifying-glass"></i></button>
-                                                    </div>
-        
-                                                    <table class="table mb-0">
-                                                        <thead>
-                                                            <tr>
-        
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
-        
-                                                                <th>Teaching Assistant</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="list"
-                                                               id="staff">
-        
-                                                            <tr class="selected">
-        
-                                                                <td>
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row"
-                                                                               checked=""
-                                                                               id="customCheck1_1">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
-                                                                    </div>
-                                                                </td>
-        
-                                                                <td>
-        
-                                                                    <div class="media align-items-center">
-                                                                        <div class="avatar avatar-sm mr-3">
-                                                                            <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
-                                                                                 alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
-                                                                        </div>
-                                                                        <div class="media-body">
-        
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
-        
-                                                                        </div>
-                                                                    </div>
-        
-                                                                </td>
-                                                                <td>2121422</td>
-                                                                
-                                                            </tr>
-        
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-        
-                                            </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="course_title"
-                                               class="col-sm-3 col-form-label form-label">Students:</label>
-                                               <div class="col-lg-8">
-
-                                                <div class="table-responsive border-bottom"
-                                                     data-toggle="lists"
-                                                     data-lists-values='["js-lists-values-employee-name"]'>
-
-                                                    <div class="search-form search-form--light mb-3">
-                                                        <input type="text"
-                                                               class="form-control search"
-                                                               placeholder="Search">
-                                                        <button class="btn"
-                                                                type="button"
-                                                                role="button"><i class="fa-solid fa-magnifying-glass"></i></button>
-                                                    </div>
-        
-                                                    <table class="table mb-0">
-                                                        <thead>
-                                                            <tr>
-        
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
-        
-                                                                <th>Students</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="list"
-                                                               id="staff">
-        
-                                                            <tr class="selected">
-        
-                                                                <td>
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row"
-                                                                               checked=""
-                                                                               id="customCheck1_1">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
-                                                                    </div>
-                                                                </td>
-        
-                                                                <td>
-        
-                                                                    <div class="media align-items-center">
-                                                                        <div class="avatar avatar-sm mr-3">
-                                                                            <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
-                                                                                 alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
-                                                                        </div>
-                                                                        <div class="media-body">
-        
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
-        
-                                                                        </div>
-                                                                    </div>
-        
-                                                                </td>
-                                                                <td>2121422</td>
-                                                                
-                                                            </tr>
-        
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-        
-                                            </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="quiz_title"
-                                               class="col-sm-3 col-form-label form-label">Section Number:</label>
-                                        <div class="col-sm-9">
-                                            <input id="touch-spin-2"
-                                            data-toggle="touch-spin"
-                                            data-min="-1000000"
-                                            data-max="1000000"
-                                            data-step="50"
-                                            type="number"
-                                            placeholder = "Course Section"
-                                            value=""
-                                            required
-                                            name="course_section"
-                                            class="form-control" />
-                                        </div>
-                                    </div>
-                                    
                                     <div class="form-group row mb-0">
                                         <div class="col-sm-9 offset-sm-3">
-                                            <button type="submit"
-                                                    class="btn btn-success">Save</button>
+                                            <input type="submit"
+                                                    class="btn btn-success" {% if course %}value="Update"{% else %} value = "Save" {% endif %} name="save_course"> 
                                         </div>
                                     </div>
                                 </form>
@@ -396,6 +141,12 @@
             </div>
 
         </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            swal("Done!", "{{message}}", "success");
+            {% endfor %}
+        </script>
 
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>

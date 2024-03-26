@@ -288,12 +288,15 @@ def all_courses(request):
         logged_in_user = Login.logged_in_user(request)
         all_courses = Load_Courses.get_user_courses(logged_in_user)
 
+
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
 
         if logged_in_user == None:
+
+            courses_all = Load_Courses.get_all_courses()
 
             context = {
                 'page_title':'Check Mate',
@@ -303,6 +306,7 @@ def all_courses(request):
                 'year':datetime.now().year,
 
                 'all_courses':all_courses,
+                'courses':courses_all,
 
             }
 
@@ -330,6 +334,25 @@ def add_course(request):
             user = logged_in_user.user_id
 
         if logged_in_user == None:
+
+            if request.method == "POST":
+
+                if request.POST.get('save_course'):
+
+                    course_name = request.POST.get('course_name')
+                    course_code = request.POST.get('course_code')
+                    course_description = request.POST.get('course_description')
+                    cover_picture = request.FILES['cover_picture']
+                    
+                    result = Save.save_course(course_code,course_name,course_description,cover_picture,course=None)
+                    if result[0]:
+                        messages.success(request,'Course Added Successfully!')
+                        return redirect('users:edit_course_details',result[1].pk)
+                    else:
+                        messages.error(request,"Something went wrong. Try again later")
+                        return redirect('users:add_course')
+
+                    
             context = {
                 'page_title':'Check Mate',
                 'user_type':type_of_logged_in_user,
@@ -341,6 +364,59 @@ def add_course(request):
             return render(request,"course_edit.html",context)
         else:
             return HttpResponse("Not Allowed")
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    
+@login_required
+def edit_course_details(request,course_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        if logged_in_user == None:
+            course = Load_Courses.get_specific_course(course_id)
+
+            if request.method == "POST":
+
+                if request.POST.get('save_course'):
+
+                    course_name = request.POST.get('course_name')
+                    course_code = request.POST.get('course_code')
+                    course_description = request.POST.get('course_description')
+                    cover_picture = request.FILES.get('cover_picture')
+                    if cover_picture == "":
+                        cover_picture = None
+                    result = Save.save_course(course_code,course_name,course_description,cover_picture,course)
+                    if result[0]:
+                        messages.success(request,'Course Updated Successfully!')
+                        return redirect('users:edit_course_details',result[1].pk)
+                    else:
+                        messages.error(request,"Something went wrong. Try again later")
+                        return redirect('users:edit_course_details',result[1].pk)
+            context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+                'course':course,
+
+            }
+            return render(request,"course_edit.html",context)
+        else:
+            return HttpResponse("Not Allowed")
+
 
     except Exception as e:
         #saving error information in database if error occured

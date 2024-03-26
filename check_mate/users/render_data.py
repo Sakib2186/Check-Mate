@@ -6,6 +6,7 @@ import pyotp
 from datetime import datetime,timedelta
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+import os
 class Login:
 
     '''This class will hold all the functionalities to log in and regsitration of new user'''
@@ -150,13 +151,16 @@ class Load_Courses:
         all_courses = []
         #getting all courses of this user
         if 3 in roles:
+            #as admin so getting all courses
             all_courses = Course_Section.objects.all()
         elif 2 in roles:
+            #getting students courses
             student_courses = Student.objects.get(student_id = logged_in_user,semester = semester)
             for course in student_courses.courses.all():
                 specific_course = Course_Section.objects.get(course_id = course)
                 all_courses.append(specific_course)
             try:
+                #if the student is also a TA then loading those courses as well
                 ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester=semester)
                 for course in ta_courses.courses.all():
                     specific_course - Course_Section.objects.get(course_id = course)
@@ -166,6 +170,7 @@ class Load_Courses:
                 pass
 
         elif 1 in roles:
+            #loading instructors courses
             instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester = semester)
             for course in instructor_courses.courses.all():
                 specific_course = Course_Section.objects.get(course_id = course)
@@ -173,6 +178,49 @@ class Load_Courses:
 
         return all_courses
 
+    def get_all_courses():
+
+        '''This function will return all the courses that are registered in Course'''
+
+        return Course.objects.all()
+    
+    def get_specific_course(course_id):
+
+        return Course.objects.get(id = course_id )
+            
+class Save:
+
+    '''This class will hold all the functions for saving new data and updating existing one'''
+
+    def save_course(course_code,course_name,course_description,course_picture,course_existing):
+
+        '''This function returns True if successfully saved/updated details of course'''
+        #semester
+        semester = Session.objects.get(current=True)
+
+        if course_existing == None:
+            course = Course.objects.create(
+                course_code = course_code,course_name = course_name, course_picture = course_picture,
+                course_description = course_description
+            )
+            course.save()
+            #linking with Course Section
+            course_section = Course_Section.objects.create(course_id = course,semester = semester)
+            course_section.save()
+
+            return (True,course)
+        else:
+            course_existing.course_code = course_code
+            course_existing.course_name = course_name
+            course_existing.course_description = course_description
+            if course_picture != None:
+                path = settings.MEDIA_ROOT+str(course_existing.course_picture)
+                if os.path.isfile(path):
+                    os.remove(path)
+                course_existing.course_picture = course_picture
+            course_existing.save()
+
+            return (True,course_existing)
+
 
             
-        
