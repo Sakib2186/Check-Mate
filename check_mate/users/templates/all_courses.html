@@ -1,144 +1,215 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en"
-      dir="ltr">
+<html lang="en" dir="ltr">
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible"
-            content="IE=edge">
-        <meta name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{{page_title}} - Dashboard</title>
-        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{page_title}} - Dashboard</title>
+    <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
 
-        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
-            rel="stylesheet">
-                    
-        <link type="text/css"
-            href="{% static 'css/check_mate.css' %}"
-            rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+          rel="stylesheet">
 
-        <link type="text/css"
-              href="{% static 'css/perfect-scrollbar.css' %}"
-              rel="stylesheet">
+    <link type="text/css" href="{% static 'css/check_mate.css' %}" rel="stylesheet">
 
+    <link type="text/css" href="{% static 'css/perfect-scrollbar.css' %}" rel="stylesheet">
+    <style>
+        .search-form {
+            padding: 10px;
+        }
+        
+        /* CSS for the dropdown list */
+        .dropdown-list {
+            max-height: 200px; /* Adjust the maximum height as needed */
+            overflow-y: auto;
+            width: 100%; /* Ensure the dropdown list occupies full width */
+            column-width: auto; /* Set column width to auto to allow items to stack vertically */
+        }
+        
+        .dropdown-link {
+            display: block;
+            padding: 5px 10px;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .dropdown-link:hover {
+            background-color: #f0f0f0;
+        }
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                max-height: calc(100vh - 100px); /* Adjust as needed */
+                overflow-y: auto;
+            }
+            .dropdown-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
 
-    </head>
+<body class=" fixed-layout">
 
-    <body class=" fixed-layout">
+<div class="mdk-header-layout js-mdk-header-layout">
 
-        <div class="mdk-header-layout js-mdk-header-layout">
+    {% block header%}
+    {% include 'header.html' %}
+    {% endblock header %}
 
-            {% block header%}
-                {% include 'header.html' %}
-            {% endblock header %}
+    <!-- Header Layout Content -->
+    <div class="mdk-header-layout__content d-flex flex-column">
 
-            <!-- Header Layout Content -->
-            <div class="mdk-header-layout__content d-flex flex-column">
+        <div class="page__header">
+            <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
+                <div class="container">
 
-                <div class="page__header">
-                    <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
-                        <div class="container">
+                    {% block navbar %}
+                    {% include 'navbar.html' %}
+                    {% endblock navbar %}
 
-                            {% block navbar %}
-                                {% include 'navbar.html' %}
-                            {% endblock navbar %}
+                </div>
+            </div>
+        </div>
 
+        <div class="page ">
+
+            <div class="container page__container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item active">All Courses</li>
+                </ol>
+                <div class="media align-items-center mb-headings">
+                    <div class="media-body">
+                        <h1 class="h2">All Courses</h1>
+                    </div>
+                    <div class="media-right d-flex align-items-center">
+                        <!-- Real-time Search Box -->
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search Courses" aria-label="Search" id="searchInput" onkeyup="searchFilter()">
+                        </form>
+                        <!-- End Real-time Search Box -->
+                        <a href="{% url 'users:add_course'  %}" class="btn btn-success mr-2">Add New Course</a>
+                        <div class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="btn btn-success mr-2">Edit Course</a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-item">
+                                    <form action="#" class="search-form">
+                                        <div class="form-group mb-0">
+                                            <label class="form-label" for="searchInput">Search:</label><br>
+                                            <input type="text" class="form-control" id="searchInput_course" placeholder="Search..." onkeyup="filterDropdown()">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="dropdown-item dropdown-list">
+                                    {% for course in courses %}
+                                    <a href="{% url 'users:edit_course_details' course.pk %}" class="dropdown-link">{{course.course_code}}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="page ">
-
-                    <div class="container page__container">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                            <li class="breadcrumb-item active">All Courses</li>
-                        </ol>
-                        <div class="media align-items-center mb-headings">
-                            <div class="media-body">
-                                <h1 class="h2">All Courses</h1>
-                            </div>
-                            <div class="media-right d-flex align-items-center">
-                                <a href="{% url 'users:add_course'  %}"
-                                   class="btn btn-success mr-2">Add New Course</a>
-                                   <div class="dropdown">
-                                    <a href="#"
-                                       data-toggle="dropdown"
-                                       class="btn btn-success mr-2">Edit Course</a>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <div class="dropdown-item">
-                                            <form action="#">
-                                                <div class="form-group mb-0">
-                                                    <label class="form-label"
-                                                           for="custom-select">Courses</label><br>
-                                                    <select id="custom-select"
-                                                            class="form-control custom-select"
-                                                            style="width: 200px;">
-                                                        <option>------</option>
-                                                        {% for course in courses %}
-                                                        <option value="{% url 'users:edit_course_details' course.pk %}">{{course.course_code}}</option>
-                                                        {% endfor %}
-                                                    >
-                                                    </select>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="card-columns">
+                    {% for course in all_courses %}
+                    <div class="card">
+                        <div>
+                            <div class="card-image">
+                                <a href="" class="card-link" style="text-decoration:none;color:black;">
+                                    <img class="card-img-top" src="{{ media_url }}{{ course.course_id.course_picture }}" alt="{{ course.course_id.course_name }}">
+                                </a>
                             </div>
                         </div>
-                        <div class="card-columns">
-                            {% for course in all_courses %}
-                            <div class="card">
-                                <div class="col-md-4 mb-4">
-                                    <div class="card" style="width:500px;">
-                                        <a href="" class="card-link" style="text-decoration:none;color:black;">
-                                            <img class="card-img-top" src="{{ media_url }}{{ course.course_id.course_picture }}" alt="{{ course.course_id.course_name }}">
-                                        </a>
-                                        
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="card-footer text-center">
-                                    <a href="fixed-instructor-quiz-edit.html"
-                                       class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
-                                    <div class="clearfix"></div>
-                                    <p style="text-align:left;"><b>{{course.course_id.course_code}}.{{course.section_number}}: {{course.course_id.course_name}}</b></p>
-                                    <p style="text-align:justify;">{{course.course_id.course_description}}</p>
-                                </div>
-                            </div>
-                            {% endfor %}
+                        <hr>
+                        <div class="card-footer text-center">
+                            <a href="fixed-instructor-quiz-edit.html" class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
+                            <div class="clearfix"></div>
+                            <p style="text-align:left;" class="card-title"><b>{{course.course_id.course_code}}.{{course.section_number}}: {{course.course_id.course_name}}</b></p>
+                            <p style="text-align:justify;"><span class="course-description">{{ course.course_id.course_description }}</span></p>
                         </div>
                     </div>
-
-                    {% block footer %}
-                        {% include 'footer.html' %}
-                    {% endblock footer %}
+                    {% endfor %}
                 </div>
             </div>
 
+            {% block footer %}
+            {% include 'footer.html' %}
+            {% endblock footer %}
         </div>
-        <script>
-            // Add event listener to the select element
-            document.getElementById('custom-select').addEventListener('change', function() {
-                // Get the selected option value
-                var selectedOption = this.value;
-                // Navigate to the selected URL
-                window.location.href = selectedOption;
-            });
-        </script>
+    </div>
 
-        <script src="{% static 'js/jquery.min.js' %}"></script>
-        <script src="{% static 'js/popper.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
-        <script src="{% static 'js/dom-factory.js' %}"></script>
-        <script src="{% static 'js/material-design-kit.js' %}"></script>
-        <script src="{% static 'js/check_mate.js' %}"></script>
+</div>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'js/dom-factory.js' %}"></script>
+<script src="{% static 'js/material-design-kit.js' %}"></script>
+<script src="{% static 'js/check_mate.js' %}"></script>
 
+<script>
+    // Function to filter search
+    function searchFilter() {
+        var input, filter, cards, card, title, i;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        cards = document.querySelectorAll('.card');
 
-    </body>
+        cards.forEach(function (card) {
+            title = card.querySelector('.card-title').innerText.toUpperCase();
+            if (title.includes(filter)) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    // Attach keyup event listener to the search input
+    document.getElementById('searchInput').addEventListener('keyup', searchFilter);
+</script>
+<script>
+    // Function to limit words in course description
+    function limitDescriptionWords() {
+        var descriptions = document.querySelectorAll('.course-description');
+        var maxWords = 20; // Change this value to set the maximum number of words
+
+        descriptions.forEach(function (description) {
+            var words = description.textContent.split(' ');
+            if (words.length > maxWords) {
+                description.textContent = words.slice(0, maxWords).join(' ') + '...';
+            }
+        });
+    }
+
+    // Call the function when the page loads
+    window.addEventListener('load', limitDescriptionWords);
+</script>
+<script>
+    // Function to filter dropdown items based on search input
+    function filterDropdown() {
+        var input, filter, dropdown, items, item, i;
+        input = document.getElementById('searchInput_course');
+        filter = input.value.toUpperCase();
+        dropdown = document.querySelector('.dropdown-list');
+        items = dropdown.getElementsByTagName('a');
+
+        // Loop through all dropdown items, and hide those that don't match the search query
+        for (i = 0; i < items.length; i++) {
+            item = items[i];
+            if (item.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    }
+
+    // Attach keyup event listener to the search input
+    document.getElementById('searchInput').addEventListener('keyup', filterDropdown);
+</script>
+
+</body>
 
 </html>
