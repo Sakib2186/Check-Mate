@@ -43,6 +43,28 @@
                        href="">Block User</a>
                 </div>
             </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Semester</a>
+                <div class="dropdown-menu dropdown-menu-right" style="padding: 10px; width: 200px;">
+                    <form method = "POST" action="{% url 'users:save_semester' %}" class="px-4 py-3">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="type" style="font-size: 14px;">Select Semester:</label>
+                            <select id="type" class="custom-select" name = "selectedSemester">
+                                <option value="0">------</option>
+                                <option value="1">Spring</option>
+                                <option value="2">Summer</option>
+                                <option value="3">Fall</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                        <label for="checkbox" style="font-size: 14px;">Current?<label>&nbsp
+                        <input type="checkbox" id = "checkbox" name = "checkboxChecked">
+                        </div>
+                        <input type="submit" name="semeter_submit" class="btn btn-primary" value = "Save">
+                    </form>
+                </div>
+            </li>
             {% endif %}
         </ul>
     </div>

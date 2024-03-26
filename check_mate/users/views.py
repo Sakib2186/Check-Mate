@@ -435,3 +435,42 @@ def edit_course_details(request,course_id):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")
+
+@login_required
+def save_semester(request):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        if request.method == 'POST':
+            if request.POST.get('semeter_submit'):
+                selected_semester = request.POST.get('selectedSemester')
+                checkbox_checked = request.POST.get('checkboxChecked')
+
+                print(selected_semester)
+                print(checkbox_checked)
+
+        context = {
+            'page_title':'Check Mate',
+            'user_type':type_of_logged_in_user,
+            'media_url':settings.MEDIA_URL,
+            'logged_in_user':logged_in_user,
+            'year':datetime.now().year
+        }
+
+        return render(request,"dashboard.html",context)
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+        
+
+            
