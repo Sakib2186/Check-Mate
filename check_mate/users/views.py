@@ -453,14 +453,15 @@ def save_semester(request):
             if request.POST.get('semeter_submit'):
                 selected_semester = int(request.POST.get('selectedSemester'))
                 checkbox_checked = request.POST.get('checkboxChecked')
+                year = int(request.POST.get('year'))
 
                 if selected_semester == 0:
                     messages.error(request,'Could not save!')
                     return redirect('users:dashboard')
 
                 if checkbox_checked == "on":
-
-                    if Save.save_semester(selected_semester):
+                    
+                    if Save.save_semester(selected_semester,year):
                         messages.success(request,'Semester Saved!')
                         return redirect('users:dashboard')
                     else:

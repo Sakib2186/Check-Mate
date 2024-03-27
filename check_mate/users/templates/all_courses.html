@@ -15,6 +15,10 @@
     <link type="text/css" href="{% static 'css/check_mate.css' %}" rel="stylesheet">
 
     <link type="text/css" href="{% static 'css/perfect-scrollbar.css' %}" rel="stylesheet">
+
+    <link type="text/css" href = "{% static 'css/nestable.css' %}" rel="stylesheet">
+    <link type="text/css" href = "{% static 'css/bootstrap-touchpin.css' %}" rel="stylesheet">
+
     <style>
         .search-form {
             padding: 10px;
@@ -46,6 +50,10 @@
             .dropdown-list {
                 flex-direction: column;
             }
+        }
+
+        .modal {
+            z-index: 1000; /* Adjust the value as needed */
         }
     </style>
 </head>
@@ -90,6 +98,8 @@
                             <input class="form-control mr-sm-2" type="search" placeholder="Search Courses" aria-label="Search" id="searchInput" onkeyup="searchFilter()">
                         </form>
                         <!-- End Real-time Search Box -->
+                        <a data-toggle="modal"
+                        data-target="#editQuiz" class="btn btn-success mr-2">Add Section</a>
                         <a href="{% url 'users:add_course'  %}" class="btn btn-success mr-2">Add New Course</a>
                         <div class="dropdown">
                             <a href="#" data-toggle="dropdown" class="btn btn-success mr-2">Edit Course</a>
@@ -138,6 +148,56 @@
             {% endblock footer %}
         </div>
     </div>
+
+    <div class="modal fade"
+             id="editQuiz">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h4 class="modal-title text-white">Add Sections</h4>
+                        <button type="button"
+                                class="close text-white"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="#">
+                            <div class="form-group row">
+                                <label for="qtitle"
+                                       class="col-form-label form-label col-md-3">Section Number:</label>
+                                <div class="col-md-9">
+                                    <input id="qtitle"
+                                           type="text"
+                                           class="form-control"
+                                           value="Database Access">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="type"
+                                       class="col-form-label form-label col-md-3">Course:</label>
+                                <div class="col-md-4">
+                                    <select id="type"
+                                            class="custom-control custom-select form-control">
+                                        <option value="1">Input</option>
+                                        <option value="2">Textarea</option>
+                                        <option value="3">Checkbox</option>
+                                        <option value="3">Radio</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-0">
+                                <div class="col-md-8 offset-md-3">
+                                    <button type="submit"
+                                            class="btn btn-success">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 </div>
 <script src="{% static 'js/jquery.min.js' %}"></script>

@@ -222,7 +222,7 @@ class Save:
 
             return (True,course_existing)
         
-    def save_semester(semester):
+    def save_semester(semester,year):
 
         '''This function will save which semester is current and the rest would be off'''
         try:
@@ -231,9 +231,20 @@ class Save:
             session.save()
         except:
             pass
-        session = Session.objects.get(session_id = semester)
-        session.current = True
-        session.save()
+        try:
+            result = Session.objects.get(session_id = semester, year = year)
+            result.current = True
+            result.save()         
+        except:
+            session_name = ""
+            if semester== 1:
+                session_name="Spring"
+            elif semester == 2:
+                session_name = "Summer"
+            elif semester == 3:
+                session_name = "Fall"
+            result = Session.objects.create(session_name=session_name,session_id = semester,year=year,current=True)
+            result.save()
 
         return True
 

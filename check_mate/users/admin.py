@@ -46,5 +46,5 @@ class Course_Section_Admin_Panel(admin.ModelAdmin):
 @admin.register(Session)
 class Session_ADmin_Panel(admin.ModelAdmin):
     list_display = [
-        'session_name','session_id','current'
+        'session_name','session_id','current','year'
     ]

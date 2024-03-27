@@ -14,6 +14,7 @@ class Session(models.Model):
     session_name = models.CharField(max_length = 50,default = "")
     session_id = models.IntegerField(default = 0)
     current = models.BooleanField(default = False)
+    year = models.IntegerField(default = 0)
 
     def __str__(self) -> str:
         return str(self.session_name)
