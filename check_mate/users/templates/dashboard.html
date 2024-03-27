@@ -75,7 +75,12 @@
             </div>
 
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            swal("{{message}}");
+            {% endfor %}
+        </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>

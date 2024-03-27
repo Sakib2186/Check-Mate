@@ -221,6 +221,24 @@ class Save:
             course_existing.save()
 
             return (True,course_existing)
+        
+    def save_semester(semester):
+
+        '''This function will save which semester is current and the rest would be off'''
+        try:
+            session = Session.objects.get(current = True)
+            session.current=False
+            session.save()
+        except:
+            pass
+        session = Session.objects.get(session_id = semester)
+        session.current = True
+        session.save()
+
+        return True
+
+
+
 
 class Delete:
 

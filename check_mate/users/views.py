@@ -443,25 +443,32 @@ def save_semester(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
-
+        error = False
         if request.method == 'POST':
             if request.POST.get('semeter_submit'):
-                selected_semester = request.POST.get('selectedSemester')
+                selected_semester = int(request.POST.get('selectedSemester'))
                 checkbox_checked = request.POST.get('checkboxChecked')
 
-                print(selected_semester)
-                print(checkbox_checked)
+                if checkbox_checked == "on":
+
+                    if Save.save_semester(selected_semester):
+                        messages.success(request,'Semester Saved!')
+                        return redirect('users:dashboard')
+                    else:
+                        messages.error(request,'Could not save!')
+                        return redirect('users:dashboard')
 
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
             'media_url':settings.MEDIA_URL,
             'logged_in_user':logged_in_user,
-            'year':datetime.now().year
+            'year':datetime.now().year,
         }
 
         return render(request,"dashboard.html",context)

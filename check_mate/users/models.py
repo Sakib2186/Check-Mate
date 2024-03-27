@@ -12,6 +12,7 @@ def course_picture_upload_path(instance, filename):
 class Session(models.Model):
 
     session_name = models.CharField(max_length = 50,default = "")
+    session_id = models.IntegerField(default = 0)
     current = models.BooleanField(default = False)
 
     def __str__(self) -> str:
