@@ -154,27 +154,33 @@ class Load_Courses:
             #as admin so getting all courses
             all_courses = Course_Section.objects.filter(semester_id = semester.session_id)
         elif 2 in roles:
-            #getting students courses
-            student_courses = Student.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
-            for course in student_courses.courses.all():
-                specific_course = Course_Section.objects.get(course_id = course)
-                all_courses.append(specific_course)
             try:
-                #if the student is also a TA then loading those courses as well
-                ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
-                for course in ta_courses.courses.all():
-                    specific_course - Course_Section.objects.get(course_id = course)
-                    if specific_course not in all_courses:
-                        all_courses.append(specific_course)
+                #getting students courses
+                student_courses = Student.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
+                for course in student_courses.courses.all():
+                    specific_course = Course_Section.objects.get(course_id = course)
+                    all_courses.append(specific_course)
+                try:
+                    #if the student is also a TA then loading those courses as well
+                    ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
+                    for course in ta_courses.courses.all():
+                        specific_course - Course_Section.objects.get(course_id = course)
+                        if specific_course not in all_courses:
+                            all_courses.append(specific_course)
+                except:
+                    pass
             except:
                 pass
 
         elif 1 in roles:
-            #loading instructors courses
-            instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester_id = semester.session_id)
-            for course in instructor_courses.courses.all():
-                specific_course = Course_Section.objects.get(course_id = course)
-                all_courses.append(specific_course)
+            try:
+                #loading instructors courses
+                instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester_id = semester.session_id)
+                for course in instructor_courses.courses.all():
+                    specific_course = Course_Section.objects.get(course_id = course)
+                    all_courses.append(specific_course)
+            except:
+                pass
 
         return all_courses
 
@@ -204,9 +210,6 @@ class Save:
                 course_description = course_description
             )
             course.save()
-            #linking with Course Section
-            course_section = Course_Section.objects.create(course_id = course,semester = semester)
-            course_section.save()
 
             return (True,course)
         else:
