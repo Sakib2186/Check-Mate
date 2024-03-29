@@ -163,15 +163,17 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="#">
+                        <form method = "POST" >
+                            {% csrf_token %}
                             <div class="form-group row">
                                 <label for="qtitle"
                                        class="col-form-label form-label col-md-3">Section Number:</label>
                                 <div class="col-md-9">
                                     <input id="qtitle"
-                                           type="text"
+                                           type="number"
                                            class="form-control"
-                                           value="Database Access">
+                                           name = "section_number"
+                                           required>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -179,18 +181,18 @@
                                        class="col-form-label form-label col-md-3">Course:</label>
                                 <div class="col-md-4">
                                     <select id="type"
-                                            class="custom-control custom-select form-control">
-                                        <option value="1">Input</option>
-                                        <option value="2">Textarea</option>
-                                        <option value="3">Checkbox</option>
-                                        <option value="3">Radio</option>
+                                            class="custom-control custom-select form-control" name="course_code" required>
+                                        <option value="0">--------------</option>
+                                        {% for course in courses %} 
+                                        <option value={{course.pk}}>{{course.course_code}}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row mb-0">
                                 <div class="col-md-8 offset-md-3">
-                                    <button type="submit"
-                                            class="btn btn-success">Save</button>
+                                    <input type="submit"
+                                            class="btn btn-success" value="Save" name="save_section">
                                 </div>
                             </div>
                         </form>
@@ -272,7 +274,11 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     {% for message in messages %}
+    {% if message.tags == 'error' %}
+    swal("Error!", "{{message}}", "error");
+    {% else %}
     swal("Done!", "{{message}}", "success");
+    {% endif %}
     {% endfor %}
 </script>
 

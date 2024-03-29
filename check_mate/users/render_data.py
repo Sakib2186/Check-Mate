@@ -201,8 +201,6 @@ class Save:
     def save_course(course_code,course_name,course_description,course_picture,course_existing):
 
         '''This function returns True if successfully saved/updated details of course'''
-        #current semeter
-        semester = Session.objects.get(current=True)
 
         if course_existing == None:
             course = Course.objects.create(
@@ -251,7 +249,22 @@ class Save:
 
         return True
 
+    def save_section(section_number,course_id):
 
+        '''This function will add new section to the course'''
+        session = Session.objects.get(current = True)
+        course = Course.objects.get(pk = course_id)
+        try:
+            course_sec = Course_Section.objects.get(course_id = course,section_number = section_number,semester = session,year = session.year)
+            if course_sec:
+                #preventing creating new one as already exists
+                return (False,"Section already exists!")
+        except:
+            pass
+        
+        course_sec = Course_Section.objects.create(course_id = course,section_number = section_number,semester = session,year = session.year)
+        course_sec.save()
+        return (True,"Section Created Successfully!")
 
 
 class Delete:

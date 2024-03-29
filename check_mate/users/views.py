@@ -287,7 +287,7 @@ def all_courses(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         all_courses = Load_Courses.get_user_courses(logged_in_user)
-
+        
 
         if logged_in_user == None:
             user = request.user.username
@@ -295,8 +295,22 @@ def all_courses(request):
             user = logged_in_user.user_id
 
         if logged_in_user == None:
-
+            #as admin so loading all courses 
             courses_all = Load_Courses.get_all_courses()
+            
+            if request.POST.get('save_section'):
+
+                section_number = int(request.POST.get('section_number'))
+                course = request.POST.get('course_code')
+
+                result = Save.save_section(section_number,course)
+                if result[0]:
+                    messages.success(request,result[1])
+                    return redirect('users:all_courses')
+                else:
+                    messages.error(request,result[1])
+                    return redirect('users:all_courses')
+                
 
             context = {
                 'page_title':'Check Mate',
@@ -448,7 +462,7 @@ def save_semester(request):
             user = request.user.username
         else:
             user = logged_in_user.user_id
-        error = False
+
         if request.method == 'POST':
             if request.POST.get('semeter_submit'):
                 selected_semester = int(request.POST.get('selectedSemester'))

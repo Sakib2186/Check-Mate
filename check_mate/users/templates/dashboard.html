@@ -78,7 +78,11 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             {% for message in messages %}
-            swal("{{message}}");
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
             {% endfor %}
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
