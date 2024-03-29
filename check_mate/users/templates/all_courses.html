@@ -133,7 +133,7 @@
                         </div>
                         <hr>
                         <div class="card-footer text-center">
-                            <a href="fixed-instructor-quiz-edit.html" class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
+                            <a href="{% url 'users:course_edit' course.pk %}" class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
                             <div class="clearfix"></div>
                             <p style="text-align:left;" class="card-title"><b>{{course.course_id.course_code}}.{{course.section_number}}: {{course.course_id.course_name}}</b></p>
                             <p style="text-align:justify;"><span class="course-description">{{ course.course_id.course_description }}</span></p>

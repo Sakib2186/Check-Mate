@@ -193,7 +193,20 @@ class Load_Courses:
     def get_specific_course(course_id):
 
         return Course.objects.get(id = course_id )
+    
+    def get_specific_course_section(course_id):
+
+        return Course_Section.objects.get(id = course_id)
+    
+    def get_all_instructors():
+
+        roles = Roles.objects.get(role_id = 1)
+        return School_Users.objects.filter(user_role = roles)
             
+    def get_all_student():
+
+        roles = Roles.objects.get(role_id = 2)
+        return School_Users.objects.filter(user_role=roles)
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''

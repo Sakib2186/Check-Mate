@@ -41,7 +41,7 @@ class Teaching_Asistant_Admin_Panel(admin.ModelAdmin):
 @admin.register(Course_Section)
 class Course_Section_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'course_id','section_number','instructor','semester','year'
+        'pk','course_id','section_number','instructor','semester','year'
     ]
 @admin.register(Session)
 class Session_ADmin_Panel(admin.ModelAdmin):

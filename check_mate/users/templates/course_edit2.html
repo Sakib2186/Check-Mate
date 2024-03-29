@@ -72,9 +72,8 @@
                                                    type="text"
                                                    class="form-control"
                                                    placeholder="Course Name"
-                                                   required
-                                                   name = "course_name"
-                                                   value="">
+                                                   value="{{course_details.course_id.course_name}}"
+                                                   disabled>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -85,9 +84,25 @@
                                                    type="text"
                                                    class="form-control"
                                                    placeholder="Course Code"
-                                                   required
-                                                   name = "course_code"
-                                                   value="">
+                                                   disabled
+                                                   value="{{course_details.course_id.course_code}}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="quiz_title"
+                                               class="col-sm-3 col-form-label form-label">Section Number:</label>
+                                        <div class="col-sm-9">
+                                            <input id="touch-spin-2"
+                                            data-toggle="touch-spin"
+                                            data-min="-1000000"
+                                            data-max="1000000"
+                                            data-step="50"
+                                            type="number"
+                                            placeholder = "Course Section"
+                                            value="{{course_details.section_number}}"
+                                            required
+                                            name="course_section"
+                                            class="form-control" />
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -98,26 +113,18 @@
                                                    type="text"
                                                    class="form-control"
                                                    placeholder="Course Description"
-                                                   required
-                                                   name = "course_name"
-                                                   value="">
+                                                   disabled
+                                                   value="{{course_details.course_id.course_description}}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="quiz_image"
                                                class="col-sm-3 col-form-label form-label">Cover Picture:</label>
                                         <div class="col-sm-9 col-md-4">
-                                            <p><img src="assets/images/vuejs.png"
+                                            <p><img src="{{media_url}}{{course_details.course_id.course_picture}}"
                                                      alt=""
-                                                     width="150"
+                                                     width="300"
                                                      class="rounded"></p>
-                                            <div class="custom-file">
-                                                <input type="file"
-                                                       id="quiz_image"
-                                                       class="custom-file-input">
-                                                <label for="quiz_image"
-                                                       class="custom-file-label">Choose file</label>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -141,33 +148,21 @@
                                                     <table class="table mb-0">
                                                         <thead>
                                                             <tr>
-        
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
-        
                                                                 <th>Instructor</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;"></th>
+                                                                <th>User ID</th>
+                                                                <th style="width: 24px;">Name</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="list"
                                                                id="staff">
-        
+                                                            {% for instructor in all_instructors %}
                                                             <tr class="selected">
         
                                                                 <td>
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row"
-                                                                               checked=""
+                                                                               
                                                                                id="customCheck1_1">
                                                                         <label class="custom-control-label"
                                                                                for="customCheck1_1"><span class="text-hide">Check</span></label>
@@ -179,21 +174,22 @@
                                                                     <div class="media align-items-center">
                                                                         <div class="avatar avatar-sm mr-3">
                                                                             <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
-                                                                                 alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
+                                                                                 alt=""
+                                                                                 class="avatar-img rounded-circle"
+                                                                                 onerror="this.onerror=null;this.src='{% static 'default_profile_picture/default_profile_picture.png'%}';">
                                                                         </div>
                                                                         <div class="media-body">
         
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
+                                                                            <span class="js-lists-values-employee-name">{{instructor.user_first_name}}</span>
         
                                                                         </div>
                                                                     </div>
         
                                                                 </td>
-                                                                <td>2121422</td>
+                                                                <td>{{instructor.user_id}}</td>
                                                                 
                                                             </tr>
-        
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -222,35 +218,24 @@
                                                         <thead>
                                                             <tr>
         
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
-        
                                                                 <th>Teaching Assistant</th>
                                                                 <th>ID</th>
-                                                                <th style="width: 24px;"></th>
+                                                                <th style="width: 24px;">Name</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="list"
                                                                id="staff">
-        
+                                                            {% for student in all_students %}
                                                             <tr class="selected">
-        
+                                                                
                                                                 <td>
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row"
-                                                                               checked=""
-                                                                               id="customCheck1_1">
+                                                                               class="custom-control-input js-check-selected-row2"
+                                                                               
+                                                                               id="customCheck1_2">
                                                                         <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
+                                                                               for="customCheck1_2"><span class="text-hide">Check</span></label>
                                                                     </div>
                                                                 </td>
         
@@ -260,20 +245,21 @@
                                                                         <div class="avatar avatar-sm mr-3">
                                                                             <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
                                                                                  alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
+                                                                                 class="avatar-img rounded-circle"
+                                                                                 onerror="this.onerror=null;this.src='{% static 'default_profile_picture/default_profile_picture.png'%}';">
                                                                         </div>
                                                                         <div class="media-body">
         
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
+                                                                            <span class="js-lists-values-employee-name">{{student.user_id}}</span>
         
                                                                         </div>
                                                                     </div>
         
                                                                 </td>
-                                                                <td>2121422</td>
+                                                                <td>{{student.user_first_name}}</td>
                                                                 
                                                             </tr>
-        
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -301,17 +287,7 @@
                                                     <table class="table mb-0">
                                                         <thead>
                                                             <tr>
-        
-                                                                <th style="width: 18px;">
-                                                                    <div class="custom-control custom-checkbox">
-                                                                        <input type="checkbox"
-                                                                               class="custom-control-input js-toggle-check-all"
-                                                                               data-target="#staff"
-                                                                               id="customCheckAll">
-                                                                        <label class="custom-control-label"
-                                                                               for="customCheckAll"><span class="text-hide">Toggle all</span></label>
-                                                                    </div>
-                                                                </th>
+    
         
                                                                 <th>Students</th>
                                                                 <th>ID</th>
@@ -326,11 +302,11 @@
                                                                 <td>
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row"
+                                                                               class="custom-control-input js-check-selected-row3"
                                                                                checked=""
-                                                                               id="customCheck1_1">
+                                                                               id="customCheck1_3">
                                                                         <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
+                                                                               for="customCheck1_3"><span class="text-hide">Check</span></label>
                                                                     </div>
                                                                 </td>
         
@@ -359,23 +335,6 @@
                                                 </div>
         
                                             </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="quiz_title"
-                                               class="col-sm-3 col-form-label form-label">Section Number:</label>
-                                        <div class="col-sm-9">
-                                            <input id="touch-spin-2"
-                                            data-toggle="touch-spin"
-                                            data-min="-1000000"
-                                            data-max="1000000"
-                                            data-step="50"
-                                            type="number"
-                                            placeholder = "Course Section"
-                                            value=""
-                                            required
-                                            name="course_section"
-                                            class="form-control" />
-                                        </div>
                                     </div>
                                     
                                     <div class="form-group row mb-0">
