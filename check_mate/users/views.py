@@ -188,6 +188,8 @@ def dashboard(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -197,7 +199,8 @@ def dashboard(request):
             'user_type':type_of_logged_in_user,
             'media_url':settings.MEDIA_URL,
             'logged_in_user':logged_in_user,
-            'year':datetime.now().year
+            'year':datetime.now().year,
+            'current_semester':current_semester,
         }
 
         return render(request,"dashboard.html",context)
@@ -227,6 +230,8 @@ def edit_profile(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -237,6 +242,7 @@ def edit_profile(request):
             'media_url':settings.MEDIA_URL,
             'logged_in_user':logged_in_user,
             'year':datetime.now().year,
+            'current_semester':current_semester,
         }
         return render(request,"edit_account.html",context)
 
@@ -254,6 +260,7 @@ def courses(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         all_courses = Load_Courses.get_user_courses(logged_in_user)
+        current_semester = Session.objects.get(current=True)
 
         if logged_in_user == None:
             user = request.user.username
@@ -266,6 +273,7 @@ def courses(request):
             'media_url':settings.MEDIA_URL,
             'logged_in_user':logged_in_user,
             'year':datetime.now().year,
+            'current_semester':current_semester,
 
             'all_courses':all_courses,
         }
@@ -287,6 +295,7 @@ def all_courses(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         all_courses = Load_Courses.get_user_courses(logged_in_user)
+        current_semester = Session.objects.get(current=True)
         
 
         if logged_in_user == None:
@@ -318,6 +327,7 @@ def all_courses(request):
                 'media_url':settings.MEDIA_URL,
                 'logged_in_user':logged_in_user,
                 'year':datetime.now().year,
+                'current_semester':current_semester,
 
                 'all_courses':all_courses,
                 'courses':courses_all,
@@ -341,6 +351,7 @@ def add_course(request):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
 
         if logged_in_user == None:
             user = request.user.username
@@ -373,6 +384,7 @@ def add_course(request):
                 'media_url':settings.MEDIA_URL,
                 'logged_in_user':logged_in_user,
                 'year':datetime.now().year,
+                'current_semester':current_semester,
 
             }
             return render(request,"course_edit.html",context)
@@ -392,6 +404,7 @@ def edit_course_details(request,course_id):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
 
         if logged_in_user == None:
             user = request.user.username
@@ -436,6 +449,8 @@ def edit_course_details(request,course_id):
                 'media_url':settings.MEDIA_URL,
                 'logged_in_user':logged_in_user,
                 'year':datetime.now().year,
+                'current_semester':current_semester,
+
                 'course':course,
 
             }
@@ -506,6 +521,7 @@ def course_edit(request,course_id):
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
 
         if logged_in_user == None:
             user = request.user.username
@@ -513,6 +529,25 @@ def course_edit(request,course_id):
             user = logged_in_user.user_id
 
         if logged_in_user == None:
+
+            if request.method == "POST":
+
+                if request.POST.get('save_course_section'):
+
+                    section_number = int(request.POST.get('course_section'))
+                    instructor = request.POST.get('instructor_checbox')
+                    ta = request.POST.get('ta_checkbox')
+                    students = request.POST.getlist('student_checkbox')
+
+                    result =  Save.save_course_section_details(section_number,instructor,ta,students,course_id)
+                    if result[0]:
+                        messages.success(request,result[1])
+                        #TODO:redirect ot edit page after done
+                        return redirect('users:all_courses')
+                    else:
+                        messages.error(request,"Could not save!")
+                        #TODO:redirect ot edit page after done
+                        return redirect('users:course_edit',course_id)
 
             instructors = Load_Courses.get_all_instructors()
             students = Load_Courses.get_all_student()
@@ -524,6 +559,7 @@ def course_edit(request,course_id):
                 'media_url':settings.MEDIA_URL,
                 'logged_in_user':logged_in_user,
                 'year':datetime.now().year,
+                'current_semester':current_semester,
 
                 'course_details':course_details,
                 'all_instructors':instructors,

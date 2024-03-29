@@ -100,7 +100,7 @@ class Student(models.Model):
 class Instructor(models.Model):
 
     instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course,related_name = "instructor_courses")
+    courses = models.ManyToManyField(Course)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
 

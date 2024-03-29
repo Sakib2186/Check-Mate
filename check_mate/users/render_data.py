@@ -279,6 +279,54 @@ class Save:
         course_sec.save()
         return (True,"Section Created Successfully!")
 
+    def save_course_section_details(section,instructor,ta,students,course_id):
+
+        '''This function will save the students, TA and Instructor for a section'''
+        
+        session = Session.objects.get(current = True)
+        print(students)
+        course_section = Load_Courses.get_specific_course_section(course_id)
+        instructor = School_Users.objects.get(user_id = instructor)
+        ta = School_Users.objects.get(user_id = ta)
+
+        courses = course_section.course_id
+
+        ta = Teaching_Assistant.objects.create(teaching_id = ta,semester = session,year = session.year)
+        ta.courses.add(courses)
+        ta.semester = session
+        ta.year = session.year
+        ta.save()
+
+        instructor = Instructor.objects.create(instructor_id = instructor,semester = session,year = session.year)
+        instructor.courses.add(courses)
+        instructor.semester = session
+        instructor.year = session.year
+        instructor.save()
+
+        student_list = []
+        for i in students:
+            inst = School_Users.objects.get(user_id = i)
+            stud = Student.objects.create(student_id = inst,semester = session,year = session.year)
+            stud.courses.add(courses)
+            stud.semester = session
+            stud.year = session.year
+            stud.save()
+            student_list.append(stud)
+
+        course_section.section_number = section
+        course_section.instructor = instructor
+        course_section.teaching_assistant.add(ta)
+        course_section.students.add(*student_list)
+        course_section.semester = session
+        course_section.year = session.year
+
+        course_section.save()
+
+        return (True,"Successfully Saved!")
+
+
+
+
 
 class Delete:
 

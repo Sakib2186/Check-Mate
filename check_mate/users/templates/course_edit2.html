@@ -63,7 +63,8 @@
                                 <h4 class="card-title">Provide Details</h4>
                             </div>
                             <div class="card-body">
-                                <form action="#">
+                                <form method = "POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
                                     <div class="form-group row">
                                         <label for="quiz_title"
                                                class="col-sm-3 col-form-label form-label">Course Name:</label>
@@ -132,7 +133,7 @@
                                                class="col-sm-3 col-form-label form-label">Instructor:</label>
                                                <div class="col-lg-8">
 
-                                                <div class="table-responsive border-bottom"
+                                                <div class="table-responsive border-bottom" style="max-height: 300px; overflow-y: auto;"
                                                      data-toggle="lists"
                                                      data-lists-values='["js-lists-values-employee-name"]'>
 
@@ -148,9 +149,9 @@
                                                     <table class="table mb-0">
                                                         <thead>
                                                             <tr>
-                                                                <th>Instructor</th>
-                                                                <th>User ID</th>
-                                                                <th style="width: 24px;">Name</th>
+                                                                <th style="width: 33.33%;">Instructor</th>
+                                                                <th style="width: 33.33%;">User ID</th>
+                                                                <th style="width: 0%;">Name</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="list"
@@ -162,10 +163,10 @@
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row"
-                                                                               
-                                                                               id="customCheck1_1">
+                                                                               name="instructor_checbox" value="{{instructor.user_id}}"
+                                                                               id="customCheck1_{{forloop.counter}}_1">
                                                                         <label class="custom-control-label"
-                                                                               for="customCheck1_1"><span class="text-hide">Check</span></label>
+                                                                               for="customCheck1_{{forloop.counter}}_1"><span class="text-hide">Check</span></label>
                                                                     </div>
                                                                 </td>
         
@@ -201,7 +202,7 @@
                                                class="col-sm-3 col-form-label form-label">Teaching Assistant:</label>
                                                <div class="col-lg-8">
 
-                                                <div class="table-responsive border-bottom"
+                                                <div class="table-responsive border-bottom" style="max-height: 300px; overflow-y: auto;"
                                                      data-toggle="lists"
                                                      data-lists-values='["js-lists-values-employee-name"]'>
 
@@ -218,9 +219,9 @@
                                                         <thead>
                                                             <tr>
         
-                                                                <th>Teaching Assistant</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;">Name</th>
+                                                                <th style="width: 33.33%;">Teaching Assistant</th>
+                                                                <th style="width: 33.33%;">User ID</th>
+                                                                <th style="width: 0%;">Name</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="list"
@@ -232,10 +233,10 @@
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row2"
-                                                                               
-                                                                               id="customCheck1_2">
+                                                                               name="ta_checkbox" value="{{student.user_id}}"
+                                                                               id="customCheck1_{{forloop.counter}}_2">
                                                                         <label class="custom-control-label"
-                                                                               for="customCheck1_2"><span class="text-hide">Check</span></label>
+                                                                               for="customCheck1_{{forloop.counter}}_2"><span class="text-hide">Check</span></label>
                                                                     </div>
                                                                 </td>
         
@@ -271,7 +272,7 @@
                                                class="col-sm-3 col-form-label form-label">Students:</label>
                                                <div class="col-lg-8">
 
-                                                <div class="table-responsive border-bottom"
+                                                <div class="table-responsive border-bottom" style="max-height: 300px; overflow-y: auto;"
                                                      data-toggle="lists"
                                                      data-lists-values='["js-lists-values-employee-name"]'>
 
@@ -287,26 +288,25 @@
                                                     <table class="table mb-0">
                                                         <thead>
                                                             <tr>
-    
         
-                                                                <th>Students</th>
-                                                                <th>ID</th>
-                                                                <th style="width: 24px;"></th>
+                                                                <th style="width: 33.33%;">Students</th>
+                                                                <th style="width: 33.33%;">User ID</th>
+                                                                <th style="width: 0%;">Name</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody class="list"
                                                                id="staff">
-        
+                                                            {% for student in all_students %}
                                                             <tr class="selected">
-        
+                                                                
                                                                 <td>
                                                                     <div class="custom-control custom-checkbox">
                                                                         <input type="checkbox"
-                                                                               class="custom-control-input js-check-selected-row3"
-                                                                               checked=""
-                                                                               id="customCheck1_3">
+                                                                               class="custom-control-input js-check-selected-row2"
+                                                                               name="student_checkbox" value="{{student.user_id}}"
+                                                                               id="customCheck1_{{forloop.counter}}_3">
                                                                         <label class="custom-control-label"
-                                                                               for="customCheck1_3"><span class="text-hide">Check</span></label>
+                                                                               for="customCheck1_{{forloop.counter}}_3"><span class="text-hide">Check</span></label>
                                                                     </div>
                                                                 </td>
         
@@ -316,20 +316,22 @@
                                                                         <div class="avatar avatar-sm mr-3">
                                                                             <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
                                                                                  alt="Avatar"
-                                                                                 class="avatar-img rounded-circle">
+                                                                                 class="avatar-img rounded-circle"
+                                                                                 onerror="this.onerror=null;this.src='{% static 'default_profile_picture/default_profile_picture.png'%}';">
                                                                         </div>
                                                                         <div class="media-body">
         
-                                                                            <span class="js-lists-values-employee-name">Kalum Atherton</span>
+                                                                            <span class="js-lists-values-employee-name">{{student.user_id}}</span>
         
                                                                         </div>
                                                                     </div>
         
                                                                 </td>
-                                                                <td>2121422</td>
+                                                                <td>{{student.user_first_name}}</td>
                                                                 
                                                             </tr>
-        
+                                                            
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -339,8 +341,8 @@
                                     
                                     <div class="form-group row mb-0">
                                         <div class="col-sm-9 offset-sm-3">
-                                            <button type="submit"
-                                                    class="btn btn-success">Save</button>
+                                            <input type="submit"
+                                                    class="btn btn-success" name="save_course_section" value="Save">
                                         </div>
                                     </div>
                                 </form>
@@ -355,7 +357,16 @@
             </div>
 
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
