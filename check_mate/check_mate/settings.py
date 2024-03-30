@@ -173,3 +173,10 @@ EMAIL_PORT=587
 EMAIL_HOST_USER=os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD=os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS=True
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Sessions expire when the browser is closed
+SESSION_COOKIE_AGE = 3600  # Set the session cookie to expire after a specific time (in seconds)
+
+LOGIN_URL = '/users/login/'
+LOGOUT_REDIRECT_URL='users:logoutUser'
+LOGIN_URL='users:login'

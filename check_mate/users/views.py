@@ -19,7 +19,12 @@ logger=logging.getLogger(__name__)
 # Create your views here.
 
 def check_mate(request):
-    return HttpResponse("Landing Page")
+    if request.user.is_authenticated:
+        return redirect('users:dashboard')
+    else:
+        return HttpResponse("Landing Page")
+
+    
 def login(request):
 
     try:
@@ -529,7 +534,7 @@ def course_edit(request,course_id):
             user = logged_in_user.user_id
 
         if logged_in_user == None:
-            
+
             selected_members = Load_Courses.get_selected_ta_students_instructors(course_id)    
 
             if request.method == "POST":

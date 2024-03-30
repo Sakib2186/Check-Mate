@@ -19,6 +19,10 @@
     <link type="text/css" href = "{% static 'css/nestable.css' %}" rel="stylesheet">
     <link type="text/css" href = "{% static 'css/bootstrap-touchpin.css' %}" rel="stylesheet">
 
+    <link type="text/css"
+            href="{% static 'css/spinkit.css' %}"
+            rel="stylesheet">
+
     <style>
         .search-form {
             padding: 10px;
@@ -59,6 +63,10 @@
 </head>
 
 <body class=" fixed-layout">
+
+    {% block loader %}
+            {% include 'loader.html' %}
+    {% endblock %}
 
 <div class="mdk-header-layout js-mdk-header-layout">
 
