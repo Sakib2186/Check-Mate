@@ -26,17 +26,17 @@ class Course_Admin_Panel(admin.ModelAdmin):
 @admin.register(Student)
 class Student_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'student_id','semester','year'
+        'student_id','semester','year','section'
     ]
 @admin.register(Instructor)
 class Instructor_Admin_Panel(admin.ModelAdmin):
     list_display=[
-        'instructor_id','semester','year'
+        'instructor_id','semester','year','section'
     ]
 @admin.register(Teaching_Assistant)
 class Teaching_Asistant_Admin_Panel(admin.ModelAdmin):
     list_display=[
-        'teaching_id','semester','year'
+        'teaching_id','semester','year','section'
     ]
 @admin.register(Course_Section)
 class Course_Section_Admin_Panel(admin.ModelAdmin):
@@ -44,7 +44,7 @@ class Course_Section_Admin_Panel(admin.ModelAdmin):
         'pk','course_id','section_number','instructor','semester','year'
     ]
 @admin.register(Session)
-class Session_ADmin_Panel(admin.ModelAdmin):
+class Session_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'session_name','session_id','current','year'
     ]

@@ -63,7 +63,7 @@
                                 <h4 class="card-title">Provide Details</h4>
                             </div>
                             <div class="card-body">
-                                <form method = "POST" enctype="multipart/form-data">
+                                <form method = "POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                                     {% csrf_token %}
                                     <div class="form-group row">
                                         <label for="quiz_title"
@@ -102,7 +102,7 @@
                                             placeholder = "Course Section"
                                             value="{{course_details.section_number}}"
                                             required
-                                            name="course_section"
+                                            disabled
                                             class="form-control" />
                                         </div>
                                     </div>
@@ -164,7 +164,8 @@
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row"
                                                                                name="instructor_checbox" value="{{instructor.user_id}}"
-                                                                               id="customCheck1_{{forloop.counter}}_1">
+                                                                               id="customCheck1_{{forloop.counter}}_1"
+                                                                               {% if instructor == selected_members.0 %} checked {% endif %}>
                                                                         <label class="custom-control-label"
                                                                                for="customCheck1_{{forloop.counter}}_1"><span class="text-hide">Check</span></label>
                                                                     </div>
@@ -234,7 +235,8 @@
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row2"
                                                                                name="ta_checkbox" value="{{student.user_id}}"
-                                                                               id="customCheck1_{{forloop.counter}}_2">
+                                                                               id="customCheck1_{{forloop.counter}}_2"
+                                                                               {% if student in selected_members.1 %} checked {% endif %}>
                                                                         <label class="custom-control-label"
                                                                                for="customCheck1_{{forloop.counter}}_2"><span class="text-hide">Check</span></label>
                                                                     </div>
@@ -304,7 +306,8 @@
                                                                         <input type="checkbox"
                                                                                class="custom-control-input js-check-selected-row2"
                                                                                name="student_checkbox" value="{{student.user_id}}"
-                                                                               id="customCheck1_{{forloop.counter}}_3">
+                                                                               id="customCheck1_{{forloop.counter}}_3"
+                                                                               {% if student in selected_members.2 %} checked {% endif %}>
                                                                         <label class="custom-control-label"
                                                                                for="customCheck1_{{forloop.counter}}_3"><span class="text-hide">Check</span></label>
                                                                     </div>
@@ -342,7 +345,7 @@
                                     <div class="form-group row mb-0">
                                         <div class="col-sm-9 offset-sm-3">
                                             <input type="submit"
-                                                    class="btn btn-success" name="save_course_section" value="Save">
+                                                    class="btn btn-success" name="save_course_section" value="{% if exist %}Update{% else %}Save{% endif %}">
                                         </div>
                                     </div>
                                 </form>
@@ -357,6 +360,36 @@
             </div>
 
         </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
+        <script>
+            function validateForm() {
+                var tables = document.querySelectorAll('.table');
+                for (var i = 0; i < tables.length; i++) {
+                    var checkboxes = tables[i].querySelectorAll('input[type="checkbox"]');
+                    var checked = false;
+                    for (var j = 0; j < checkboxes.length; j++) {
+                        if (checkboxes[j].checked) {
+                            checked = true;
+                            break;
+                        }
+                    }
+                    if (!checked) {
+                        alert("Please select at least one checkbox from each table.");
+                        return false;
+                    }
+                }
+                return true;
+            }
+        </script>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             {% for message in messages %}

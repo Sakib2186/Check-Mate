@@ -89,6 +89,7 @@ class Student(models.Model):
     courses = models.ManyToManyField(Course)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
     
     def __str__(self) -> str:
         return str(self.student_id)
@@ -103,6 +104,7 @@ class Instructor(models.Model):
     courses = models.ManyToManyField(Course)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
 
     def __str__(self) -> str:
         return str(self.instructor_id.user_id)
@@ -117,6 +119,7 @@ class Teaching_Assistant(models.Model):
     courses = models.ManyToManyField(Course)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
 
     def __str__(self) -> str:
         return str(self.teaching_id.user_id)
@@ -129,7 +132,7 @@ class Course_Section(models.Model):
 
     course_id = models.ForeignKey(Course,on_delete=models.CASCADE)
     section_number = models.IntegerField(default=1)
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, null=True, blank=True)
+    instructor = models.ForeignKey(Instructor, on_delete=models.SET_NULL, null=True, blank=True)
     students = models.ManyToManyField(Student)
     teaching_assistant = models.ManyToManyField(Teaching_Assistant)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
@@ -141,3 +144,4 @@ class Course_Section(models.Model):
     class Meta:
 
         verbose_name = "Course Section"
+        ordering = ['-section_number']

@@ -152,21 +152,41 @@ class Load_Courses:
         #getting all courses of this user
         if 3 in roles:
             #as admin so getting all courses
-            all_courses = Course_Section.objects.filter(semester_id = semester.session_id)
+            all_courses = Course_Section.objects.filter(semester = semester,year = semester.year)
         elif 2 in roles:
             try:
                 #getting students courses
-                student_courses = Student.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
+                student_courses = Student.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
+
                 for course in student_courses.courses.all():
-                    specific_course = Course_Section.objects.get(course_id = course)
-                    all_courses.append(specific_course)
+                    
+                    course_obj = Course.objects.get(id = course.pk)
+                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year)
+                    #checking which course section belongs to this student
+                    for i in specific_course:
+                        try:
+                            stud = None
+                            stud = i.students.get(student_id = logged_in_user)
+                            if stud:
+                                all_courses.append(i)
+                                break
+                        except:
+                            pass
+                    print(all_courses)
                 try:
                     #if the student is also a TA then loading those courses as well
-                    ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester_id = semester.session_id)
+                    ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
                     for course in ta_courses.courses.all():
-                        specific_course - Course_Section.objects.get(course_id = course)
-                        if specific_course not in all_courses:
-                            all_courses.append(specific_course)
+                        specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                        for i in specific_course:
+                            try:
+                                ta = None
+                                ta = i.teaching_assistant.get(teaching_id = logged_in_user)
+                                if ta and i not in all_courses:
+                                    all_courses.append(i)
+                                    break
+                            except:
+                                pass
                 except:
                     pass
             except:
@@ -175,10 +195,11 @@ class Load_Courses:
         elif 1 in roles:
             try:
                 #loading instructors courses
-                instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester_id = semester.session_id)
+                instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester = semester,year = semester.year)
                 for course in instructor_courses.courses.all():
-                    specific_course = Course_Section.objects.get(course_id = course)
-                    all_courses.append(specific_course)
+                    specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                    for i in specific_course:
+                        all_courses.append(i)
             except:
                 pass
 
@@ -198,15 +219,43 @@ class Load_Courses:
 
         return Course_Section.objects.get(id = course_id)
     
-    def get_all_instructors():
+    def get_all_instructors(selected_instructor):
+
 
         roles = Roles.objects.get(role_id = 1)
         return School_Users.objects.filter(user_role = roles)
-            
-    def get_all_student():
+
+    def get_all_student(selected_students):
 
         roles = Roles.objects.get(role_id = 2)
-        return School_Users.objects.filter(user_role=roles)
+        return School_Users.objects.filter(user_role = roles)
+        
+    def get_selected_ta_students_instructors(course_id):
+
+        '''This function will return the selected instructors, ta and students for a section
+            where instructor is just and object but rest two is a list'''
+        
+        selected_instructor = None
+        selected_ta = []
+        selected_students = []
+
+        course_section = Course_Section.objects.get(id = course_id)
+        teaching_assistant = course_section.teaching_assistant.all()
+        instructor = course_section.instructor
+        students = course_section.students.all()
+        exist = False
+
+        try:
+            selected_instructor = instructor.instructor_id
+            for i in teaching_assistant:
+                selected_ta.append(i.teaching_id)
+            for stud in students:
+                selected_students.append(stud.student_id)
+            exist = True
+        except:
+            pass
+
+        return (selected_instructor, selected_ta, selected_students,exist)
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
@@ -279,28 +328,39 @@ class Save:
         course_sec.save()
         return (True,"Section Created Successfully!")
 
-    def save_course_section_details(section,instructor,ta,students,course_id):
+    def save_course_section_details(section,instructor,ta,students,course_id,flag):
 
         '''This function will save the students, TA and Instructor for a section'''
         
         session = Session.objects.get(current = True)
-        print(students)
+
         course_section = Load_Courses.get_specific_course_section(course_id)
         instructor = School_Users.objects.get(user_id = instructor)
         ta = School_Users.objects.get(user_id = ta)
 
         courses = course_section.course_id
+        if flag:
+            
+            old_ta = Teaching_Assistant.objects.get(semester = session,year = session.year,section=section,courses = courses)
+            old_ta.delete()
+            old_instructor = Instructor.objects.get(semester = session,year = session.year,section=section,courses = courses)
+            old_instructor.delete()
+            old_students = Student.objects.filter(semester = session,year = session.year,section=section,courses = courses)
+            for i in old_students:
+                i.delete()
 
         ta = Teaching_Assistant.objects.create(teaching_id = ta,semester = session,year = session.year)
         ta.courses.add(courses)
         ta.semester = session
         ta.year = session.year
+        ta.section = section
         ta.save()
 
         instructor = Instructor.objects.create(instructor_id = instructor,semester = session,year = session.year)
         instructor.courses.add(courses)
         instructor.semester = session
         instructor.year = session.year
+        instructor.section = section
         instructor.save()
 
         student_list = []
@@ -310,6 +370,7 @@ class Save:
             stud.courses.add(courses)
             stud.semester = session
             stud.year = session.year
+            stud.section = section
             stud.save()
             student_list.append(stud)
 
@@ -323,6 +384,8 @@ class Save:
         course_section.save()
 
         return (True,"Successfully Saved!")
+
+
 
 
 

@@ -529,28 +529,29 @@ def course_edit(request,course_id):
             user = logged_in_user.user_id
 
         if logged_in_user == None:
+            
+            selected_members = Load_Courses.get_selected_ta_students_instructors(course_id)    
 
             if request.method == "POST":
 
                 if request.POST.get('save_course_section'):
 
-                    section_number = int(request.POST.get('course_section'))
+                    course = Course_Section.objects.get(id = course_id)
+                    section_number = course.section_number
                     instructor = request.POST.get('instructor_checbox')
                     ta = request.POST.get('ta_checkbox')
                     students = request.POST.getlist('student_checkbox')
 
-                    result =  Save.save_course_section_details(section_number,instructor,ta,students,course_id)
+                    result =  Save.save_course_section_details(section_number,instructor,ta,students,course_id,selected_members[3])
                     if result[0]:
                         messages.success(request,result[1])
-                        #TODO:redirect ot edit page after done
-                        return redirect('users:all_courses')
+                        return redirect('users:course_edit',course_id)
                     else:
                         messages.error(request,"Could not save!")
-                        #TODO:redirect ot edit page after done
                         return redirect('users:course_edit',course_id)
 
-            instructors = Load_Courses.get_all_instructors()
-            students = Load_Courses.get_all_student()
+            instructors = Load_Courses.get_all_instructors(selected_members[0])
+            students = Load_Courses.get_all_student(selected_members[2])
             course_details = Load_Courses.get_specific_course_section(course_id)
 
             context = {
@@ -564,6 +565,8 @@ def course_edit(request,course_id):
                 'course_details':course_details,
                 'all_instructors':instructors,
                 'all_students':students,
+                'selected_members':selected_members,
+                'exist':selected_members[3]
             }
 
             return render(request,"course_edit2.html",context)
