@@ -16,9 +16,6 @@ from check_mate import settings
 
 logger=logging.getLogger(__name__)
 
-def custom_404(request):
-    return render(request, 'custom_404.html', status=500)
-
 # Create your views here.
 
 def check_mate(request):
@@ -258,7 +255,7 @@ def edit_profile(request):
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
-        return custom_404(request)
+        return HttpResponse("Bad Request")
     
 @login_required
 def courses(request):
