@@ -69,11 +69,11 @@
                                 {% for x in all_courses %}
                                 <div class ="mb-4">
                                     <div class="card" style="width:300px;">
-                                        <a href="" class="card-link" style="text-decoration:none;color:black;">
+                                        <a href="{% url 'users:course' x.pk %}" class="card-link" style="text-decoration:none;color:black;">
                                             <img class="card-img-top" src="{{ media_url }}{{ x.course_id.course_picture }}" alt="{{ x.course_id.course_name }}">
                                         </a>
                                         <div class="card-body">
-                                            <h5 class="card-title"><a href="" class="card-link" style="text-decoration:none;color:black;">{{ x.course_id.course_code }}.{{x.section_number}}</a></h5>
+                                            <h5 class="card-title"><a href="{% url 'users:course' x.pk %}" class="card-link" style="text-decoration:none;color:black;">{{ x.course_id.course_code }}.{{x.section_number}}</a></h5>
                                             <p class="card-text">{{x.course_id.course_description}}</p>
                                         </div>
                                         

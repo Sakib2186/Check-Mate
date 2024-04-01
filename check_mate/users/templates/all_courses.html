@@ -134,7 +134,7 @@
                     <div class="card">
                         <div>
                             <div class="card-image">
-                                <a href="" class="card-link" style="text-decoration:none;color:black;">
+                                <a href="{% url 'users:course' course.pk %}" class="card-link" style="text-decoration:none;color:black;">
                                     <img class="card-img-top" src="{{ media_url }}{{ course.course_id.course_picture }}" alt="{{ course.course_id.course_name }}">
                                 </a>
                             </div>

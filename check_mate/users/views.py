@@ -583,4 +583,66 @@ def course_edit(request,course_id):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request")
-                
+@login_required            
+def course(request,course_id):
+
+    try:
+         #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+
+        context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+                'current_semester':current_semester,
+
+            }
+        
+        return render(request,"exam_homepage.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request") 
+@login_required
+def take_exam(request,course_id):
+
+    try:
+         #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+
+        context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+                'current_semester':current_semester,
+
+            }
+        
+        return render(request,"add_exam.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request") 
+
