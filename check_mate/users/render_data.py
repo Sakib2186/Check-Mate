@@ -256,6 +256,15 @@ class Load_Courses:
             pass
 
         return (selected_instructor, selected_ta, selected_students,exist)
+    
+    def get_section_exams(course_id):
+
+        '''This function will return all the exams of a section'''
+
+        course_section = Course_Section.objects.get(pk = course_id)
+        sec_exam = Section_Exam.objects.filter(section = course_section)
+
+        return sec_exam
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
@@ -386,7 +395,22 @@ class Save:
         return (True,"Successfully Saved!")
 
 
+    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description):
 
+        '''This function will save/update the exam for a section'''
+
+        course_section = Course_Section.objects.get(pk = course_id)
+        exm_type = Exam_Type.objects.get(type_id = exam_type)
+        exm_mode = Exam_Mode.objects.get(mode_id = exam_mode)
+        new_instance = Section_Exam.objects.create(section = course_section,
+                                                   exam_title = exam_title,
+                                                   exam_description = exam_description,
+                                                   exam_type = exm_type,
+                                                   exam_mode = exm_mode,
+                                                   exam_date = exam_date)
+        new_instance.save()
+        message = "Exam Created Successfully!"
+        return (True,message)
 
 
 

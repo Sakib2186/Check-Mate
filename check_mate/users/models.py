@@ -164,7 +164,7 @@ class Exam_Mode(models.Model):
     mode = models.CharField(max_length = 50,null=True,blank=True,default="")
 
     def __str__(self) -> str:
-        return str(self.mode_id)
+        return str(self.mode)
     
     class Meta:
 
@@ -173,13 +173,15 @@ class Exam_Mode(models.Model):
 class Section_Exam(models.Model):
 
     section = models.ForeignKey(Course_Section,on_delete = models.CASCADE)
+    exam_title = models.CharField(max_length = 200,null=True,blank=True)
+    exam_description = models.TextField(null=True,blank=True,default="")
     exam_type = models.ForeignKey(Exam_Type,on_delete = models.CASCADE)
     exam_mode = models.ForeignKey(Exam_Mode,on_delete = models.CASCADE)
     exam_date = models.DateField(null=True,blank=True)
     exam_time = models.CharField(max_length = 50,null=True,blank=True)
 
     def __str__(self) -> str:
-        return str(self.section.section_number)
+        return str(self.section)
     
     class Meta:
 

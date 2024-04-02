@@ -73,30 +73,31 @@
                             </div>
                         </div>
                         <div class="card-columns">
-
+                            {% for exam in section_exams %}
                             <div class="card card-sm">
                                 <div class="card-body media">
                                     <div class="media-left">
                                         <a href="fixed-instructor-review-quiz.html"
                                            class="avatar avatar-lg avatar-4by3">
-                                            <img src="assets/images/vuejs.png"
+                                            <img src="{% static 'static_pics/Quiz.png' %}"
                                                  alt="Exam Image"
-                                                 class="avatar-img rounded">
+                                                 class="avatar-img">
                                         </a>
                                     </div>
                                     <div class="media-body">
-                                        <h4 class="card-title mb-0"><a href="">Quiz 1</a></h4>
-                                        <small class="text-muted">Description/Topic</small>
+                                        <h4 class="card-title mb-0"><a href="">{{exam.exam_title}}</a></h4>
+                                        <small class="text-muted">{{exam.exam_description}}</small>
                                     </div>
                                 </div>
                                 <div class="card-footer text-center">
                                     <a href=""
                                        class="btn btn-white btn-sm float-left">Review <span class="badge badge-dark ml-2">40 papers</span></a>
-                                    <a href="fixed-instructor-quiz-edit.html"
+                                    <a href=""
                                        class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
                                     <div class="clearfix"></div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
 
@@ -107,7 +108,16 @@
             </div>
 
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>

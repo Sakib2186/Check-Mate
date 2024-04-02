@@ -591,6 +591,7 @@ def course(request,course_id):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
+        section_exams = Load_Courses.get_section_exams(course_id)
 
         if logged_in_user == None:
             user = request.user.username
@@ -607,7 +608,7 @@ def course(request,course_id):
                 'current_semester':current_semester,
 
                 'course_id':course_id,
-
+                'section_exams':section_exams,
             }
         
         return render(request,"exam_homepage.html",context)
@@ -626,6 +627,7 @@ def take_exam(request,course_id):
         current_semester = Session.objects.get(current=True)
         exam_modes = Exam_Mode.objects.all()
         exam_type = Exam_Type.objects.all()
+    
 
         if logged_in_user == None:
             user = request.user.username
@@ -637,10 +639,19 @@ def take_exam(request,course_id):
             if request.POST.get('save_exam'):
 
                 exam_title = request.POST.get('exam_title')
-                exam_type = request.POST.get('exam_type')
-                exam_mode = request.POST.get('exam_mode')
+                exam_type = int(request.POST.get('exam_type'))
+                exam_mode = int(request.POST.get('exam_mode'))
                 exam_date = request.POST.get('exam_date')
+                exam_description = request.POST.get('exam_description')
 
+                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description)
+                if result[0]:
+                    messages.success(request,result[1])
+                    #TODO: return to edit page
+                    return redirect('users:course',course_id)
+                else:
+                    messages.error(request,"Could not save! Try again!")
+                    return redirect('users:course',course_id)
 
         context = {
                 'page_title':'Check Mate',

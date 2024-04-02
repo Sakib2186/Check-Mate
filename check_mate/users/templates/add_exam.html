@@ -105,6 +105,18 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
+                                                        <label for="quiz_title"
+                                                            class="col-sm-3 col-form-label form-label">Description (if any):</label>
+                                                        <div class="col-sm-9">
+                                                            <input id="quiz_title"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="Title"
+                                                                name="exam_description"
+                                                                value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
                                                         <label for="course_title"
                                                             class="col-sm-3 col-form-label form-label">Exam Type:</label>
                                                         <div class="col-sm-9 col-md-4">
@@ -378,6 +390,16 @@
         <script>
             flatpickr("#flatpickr", {enableTime: true,
                 dateFormat: "Y-m-d",});
+        </script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
