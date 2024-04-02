@@ -78,71 +78,87 @@
                                 <li class="nav-item">
                                     <a class="nav-link active"
                                        href="#first"
-                                       data-toggle="tab">Exam Type</a>
+                                       data-toggle="tab">Exam Details</a>
                                 </li>
                             </ul>
                             <div class="card-body tab-content">
                                 
                                 <div class="tab-pane active"
                                      id="first">
-                                    <form>
+                                    <form method="POST"> 
                                     {% csrf_token %}
                                      <div class="card">
                                         <div class="card-header">
-                                            <h4 class="card-title">Basic</h4>
+                                            <h4 class="card-title">Details</h4>
                                         </div>
-                                        <div class="card-body">
-                                                <div class="form-group row">
-                                                    <label for="quiz_title"
-                                                           class="col-sm-3 col-form-label form-label">Quiz Title:</label>
-                                                    <div class="col-sm-9">
-                                                        <input id="quiz_title"
-                                                               type="text"
-                                                               class="form-control"
-                                                               placeholder="Title"
-                                                               value="Vue.js Introduction">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="course_title"
-                                                           class="col-sm-3 col-form-label form-label">Exam Type:</label>
-                                                    <div class="col-sm-9 col-md-4">
-                                                        <select id="course_title"
-                                                                class="custom-select form-control">
-                                                            <option value="#" selected>-------------</option>
-                                                            <option value="1">Offlinr</option>
-                                                            <option value="#">Angular JS</option>
-                                                            
-                                                        </select>
-                                                    </div>
-                                                </div>
-            
-                                                <div class="form-group row">
-                                                    <label for="cmn-toggle"
-                                                           class="col-sm-3 col-form-label form-label">Date:</label>
-                                                    <div class="col-sm-9">
-                                                        <div class="form-group ">
-                                                            <div class="custom-control custom-checkbox-toggle" style="width:25%;">
-                                                                <input id="flatpickr"
+                                            <div class="card-body">
+                                                    <div class="form-group row">
+                                                        <label for="quiz_title"
+                                                            class="col-sm-3 col-form-label form-label">Title:</label>
+                                                        <div class="col-sm-9">
+                                                            <input id="quiz_title"
                                                                 type="text"
                                                                 class="form-control"
-                                                                placeholder="Select dates"
-                                                                data-toggle="flatpickr"
-                                                                data-flatpickr-alt-input="false"
+                                                                placeholder="Title"
+                                                                name="exam_title"
                                                                 value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="course_title"
+                                                            class="col-sm-3 col-form-label form-label">Exam Type:</label>
+                                                        <div class="col-sm-9 col-md-4">
+                                                            <select id="course_title"
+                                                                    class="custom-select form-control" name="exam_type">
+                                                                <option value="0" selected>-------------</option>
+                                                                {% for types in exam_types %}
+                                                                <option value="{{types.type_id}}">{{types.exam_type}}</option>
+                                                                {% endfor %}
                                                                 
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="course_title"
+                                                            class="col-sm-3 col-form-label form-label">Exam Mode:</label>
+                                                        <div class="col-sm-9 col-md-4">
+                                                            <select id="course_title"
+                                                                    class="custom-select form-control" name="exam_mode">
+                                                                <option value="0" selected>-------------</option>
+                                                                {% for modes in exam_modes %}
+                                                                <option value="{{modes.mode_id}}">{{modes.mode}}</option>
+                                                                {% endfor %}
+                                                                
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="cmn-toggle"
+                                                            class="col-sm-3 col-form-label form-label">Date:</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="form-group ">
+                                                                <div class="custom-control custom-checkbox-toggle" style="width:25%;">
+                                                                    <input id="flatpickr"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    placeholder="Select dates"
+                                                                    data-toggle="flatpickr"
+                                                                    data-flatpickr-alt-input="false"
+                                                                    name="exam_date"
+                                                                    value="">
+                                                                    
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group row mb-0">
-                                                    <div class="col-sm-9 offset-sm-3">
-                                                        <input type="submit" class="btn btn-primary next-tab" value="Save">
+                                                    <div class="form-group row mb-0">
+                                                        <div class="col-sm-9 offset-sm-3">
+                                                            <input type="submit" class="btn btn-primary next-tab" value="Save" name="save_exam">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                
+                                                    
+                                            </div>
                                         </div>
-                                    </div>
                                     </form>
                                 </div>
                             </div>

@@ -48,3 +48,18 @@ class Session_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'session_name','session_id','current','year'
     ]
+@admin.register(Exam_Type)
+class Exam_Type_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'type_id','exam_type'
+    ]
+@admin.register(Exam_Mode)
+class Exam_Mode_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'mode_id','mode'
+    ]
+@admin.register(Section_Exam)
+class Section_Exam_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'section','exam_type','exam_mode','exam_date','exam_time'
+    ]

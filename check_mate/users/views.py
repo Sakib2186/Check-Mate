@@ -606,6 +606,8 @@ def course(request,course_id):
                 'year':datetime.now().year,
                 'current_semester':current_semester,
 
+                'course_id':course_id,
+
             }
         
         return render(request,"exam_homepage.html",context)
@@ -622,11 +624,22 @@ def take_exam(request,course_id):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
+        exam_modes = Exam_Mode.objects.all()
+        exam_type = Exam_Type.objects.all()
 
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
+
+        if request.method == "POST":
+
+            if request.POST.get('save_exam'):
+
+                exam_title = request.POST.get('exam_title')
+                exam_type = request.POST.get('exam_type')
+                exam_mode = request.POST.get('exam_mode')
+                exam_date = request.POST.get('exam_date')
 
 
         context = {
@@ -636,6 +649,9 @@ def take_exam(request,course_id):
                 'logged_in_user':logged_in_user,
                 'year':datetime.now().year,
                 'current_semester':current_semester,
+
+                'exam_modes':exam_modes,
+                'exam_types':exam_type,
 
             }
         

@@ -145,3 +145,44 @@ class Course_Section(models.Model):
 
         verbose_name = "Course Section"
         ordering = ['-section_number']
+
+class Exam_Type(models.Model):
+
+    type_id = models.IntegerField(default = 0)
+    exam_type = models.CharField(max_length=50,default="",null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.exam_type)
+    
+    class Meta:
+
+        verbose_name = "Exam Type"
+    
+class Exam_Mode(models.Model):
+
+    mode_id = models.IntegerField(default = 0)
+    mode = models.CharField(max_length = 50,null=True,blank=True,default="")
+
+    def __str__(self) -> str:
+        return str(self.mode_id)
+    
+    class Meta:
+
+        verbose_name = "Exam Mode"
+
+class Section_Exam(models.Model):
+
+    section = models.ForeignKey(Course_Section,on_delete = models.CASCADE)
+    exam_type = models.ForeignKey(Exam_Type,on_delete = models.CASCADE)
+    exam_mode = models.ForeignKey(Exam_Mode,on_delete = models.CASCADE)
+    exam_date = models.DateField(null=True,blank=True)
+    exam_time = models.CharField(max_length = 50,null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.section.section_number)
+    
+    class Meta:
+
+        verbose_name = "Section Exam"
+    
+
