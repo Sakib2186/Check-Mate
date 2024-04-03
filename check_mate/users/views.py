@@ -644,14 +644,24 @@ def take_exam(request,course_id):
                 exam_date = request.POST.get('exam_date')
                 exam_description = request.POST.get('exam_description')
 
-                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description)
+                if exam_mode == 0:
+                    messages.error(request,"Please select Exam Mode!")
+                    return redirect('users:take_exam',course_id)
+                if exam_type == 0:
+                    messages.error(request,"Please select Exam Type!")
+                    return redirect('users:take_exam',course_id)
+
+                if exam_date == "":
+                    messages.error(request,"Please provide Exam date!")
+                    return redirect('users:take_exam',course_id)
+
+                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id=None)
                 if result[0]:
                     messages.success(request,result[1])
-                    #TODO: return to edit page
-                    return redirect('users:course',course_id)
+                    return redirect('users:edit_exam',course_id,result[2].pk)
                 else:
                     messages.error(request,"Could not save! Try again!")
-                    return redirect('users:course',course_id)
+                    return redirect('users:take_exam',course_id)
 
         context = {
                 'page_title':'Check Mate',
@@ -661,6 +671,7 @@ def take_exam(request,course_id):
                 'year':datetime.now().year,
                 'current_semester':current_semester,
 
+                'course_id':course_id,
                 'exam_modes':exam_modes,
                 'exam_types':exam_type,
 
@@ -673,3 +684,72 @@ def take_exam(request,course_id):
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request") 
 
+@login_required
+def edit_exam(request,course_id,exam_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+        exam_modes = Exam_Mode.objects.all()
+        exam_type = Exam_Type.objects.all()
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+
+        if request.method == "POST":
+
+            if request.POST.get('save_exam'):
+
+                exam_title = request.POST.get('exam_title')
+                exam_type = int(request.POST.get('exam_type'))
+                exam_mode = int(request.POST.get('exam_mode'))
+                exam_date = request.POST.get('exam_date')
+                exam_description = request.POST.get('exam_description')
+
+                if exam_mode == 0:
+                    messages.error(request,"Please select Exam Mode!")
+                    return redirect('users:edit_exam',course_id,exam_id)
+                if exam_type == 0:
+                    messages.error(request,"Please select Exam Type!")
+                    return redirect('users:edit_exam',course_id,exam_id)
+
+                if exam_date == "":
+                    messages.error(request,"Please provide Exam date!")
+                    return redirect('users:edit_exam',course_id,exam_id)
+
+                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id)
+                if result[0]:
+                    messages.success(request,result[1])
+                    return redirect('users:edit_exam',course_id,result[2].pk)
+                else:
+                    messages.error(request,"Could not save! Try again!")
+                    return redirect('users:take_exam',course_id)
+
+                
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        context = {
+                'page_title':'Check Mate',
+                'user_type':type_of_logged_in_user,
+                'media_url':settings.MEDIA_URL,
+                'logged_in_user':logged_in_user,
+                'year':datetime.now().year,
+                'current_semester':current_semester,
+                
+                'course_id':course_id,
+                'exam_modes':exam_modes,
+                'exam_types':exam_type,
+                'edit_exam':True,
+                'section_exam':section_exam,
+            }
+
+        return render(request,"add_exam.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request") 

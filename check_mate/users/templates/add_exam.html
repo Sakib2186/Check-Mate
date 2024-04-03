@@ -70,8 +70,8 @@
                     <div class="container page__container">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="">Exams</a></li>
-                            <li class="breadcrumb-item active">Add Exam</li>
+                            <li class="breadcrumb-item"><a href="{% url 'users:course' course_id %}">Exams</a></li>
+                            <li class="breadcrumb-item active">{% if edit_exam %}Edit Exam{% else %}Add Exam{% endif %}</li>
                         </ol>
                         <div class="card">
                             <ul class="nav nav-tabs nav-tabs-card">
@@ -101,7 +101,8 @@
                                                                 class="form-control"
                                                                 placeholder="Title"
                                                                 name="exam_title"
-                                                                value="">
+                                                                required
+                                                                value="{{section_exam.exam_title}}">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
@@ -113,7 +114,7 @@
                                                                 class="form-control"
                                                                 placeholder="Title"
                                                                 name="exam_description"
-                                                                value="">
+                                                                value="{{section_exam.exam_description}}">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
@@ -124,7 +125,7 @@
                                                                     class="custom-select form-control" name="exam_type">
                                                                 <option value="0" selected>-------------</option>
                                                                 {% for types in exam_types %}
-                                                                <option value="{{types.type_id}}">{{types.exam_type}}</option>
+                                                                <option value="{{types.type_id}}" {% if types == section_exam.exam_type %}selected{% endif %}>{{types.exam_type}}</option>
                                                                 {% endfor %}
                                                                 
                                                             </select>
@@ -138,7 +139,7 @@
                                                                     class="custom-select form-control" name="exam_mode">
                                                                 <option value="0" selected>-------------</option>
                                                                 {% for modes in exam_modes %}
-                                                                <option value="{{modes.mode_id}}">{{modes.mode}}</option>
+                                                                <option value="{{modes.mode_id}}" {% if modes == section_exam.exam_mode %}selected{% endif %}>{{modes.mode}}</option>
                                                                 {% endfor %}
                                                                 
                                                             </select>
@@ -146,7 +147,7 @@
                                                     </div>
                                                     <div class="form-group row">
                                                         <label for="cmn-toggle"
-                                                            class="col-sm-3 col-form-label form-label">Date:</label>
+                                                            class="col-sm-3 col-form-label form-label">Date (Tentative):</label>
                                                         <div class="col-sm-9">
                                                             <div class="form-group ">
                                                                 <div class="custom-control custom-checkbox-toggle" style="width:25%;">
@@ -157,7 +158,8 @@
                                                                     data-toggle="flatpickr"
                                                                     data-flatpickr-alt-input="false"
                                                                     name="exam_date"
-                                                                    value="">
+                                                                    required
+                                                                    value="{{section_exam.exam_date}}">
                                                                     
                                                                 </div>
                                                             </div>
@@ -165,7 +167,7 @@
                                                     </div>
                                                     <div class="form-group row mb-0">
                                                         <div class="col-sm-9 offset-sm-3">
-                                                            <input type="submit" class="btn btn-primary next-tab" value="Save" name="save_exam">
+                                                            <input type="submit" class="btn btn-primary next-tab" {% if edit_exam %}value="Update"{% else %}value="Save"{% endif %} name="save_exam">
                                                         </div>
                                                     </div>
                                                     
@@ -175,6 +177,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% if edit_exam %}
                         <div class="card">
                             <ul class="nav nav-tabs nav-tabs-card">
                                 <li class="nav-item">
@@ -230,10 +233,10 @@
                                      id="third">
                                      <div class="card">
                                         <div class="card-header">
-                                            <h4 class="card-title">Basic</h4>
+                                            <h4 class="card-title">Get Paper</h4>
                                         </div>
                                         <div class="card-body">
-                                                <div class="form-group row">
+                                                {% comment %} <div class="form-group row">
                                                     <label for="quiz_title"
                                                            class="col-sm-3 col-form-label form-label">Quiz Title:</label>
                                                     <div class="col-sm-9">
@@ -301,15 +304,16 @@
                                                     <div class="col-sm-9 offset-sm-3">
                                                         <input type="submit" class="btn btn-primary next-tab" value="Save">
                                                     </div>
-                                                </div>
+                                                </div> {% endcomment %}
                                                 
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
-
+                    {% if edit_exam %}
                     <div class="modal fade" id="editQuiz">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -380,6 +384,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                     {% block footer %}
                         {% include 'footer.html' %}
                     {% endblock footer %}

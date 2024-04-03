@@ -265,6 +265,12 @@ class Load_Courses:
         sec_exam = Section_Exam.objects.filter(section = course_section)
 
         return sec_exam
+    
+    def get_saved_section_exams(exam_id):
+
+        '''This function will return the saved section exams'''
+
+        return Section_Exam.objects.get(pk = exam_id)
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
@@ -395,22 +401,36 @@ class Save:
         return (True,"Successfully Saved!")
 
 
-    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description):
+    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id):
 
         '''This function will save/update the exam for a section'''
 
         course_section = Course_Section.objects.get(pk = course_id)
         exm_type = Exam_Type.objects.get(type_id = exam_type)
         exm_mode = Exam_Mode.objects.get(mode_id = exam_mode)
-        new_instance = Section_Exam.objects.create(section = course_section,
-                                                   exam_title = exam_title,
-                                                   exam_description = exam_description,
-                                                   exam_type = exm_type,
-                                                   exam_mode = exm_mode,
-                                                   exam_date = exam_date)
-        new_instance.save()
-        message = "Exam Created Successfully!"
-        return (True,message)
+        print(exam_id)
+        try:
+            print("here")
+            new_instance = Section_Exam.objects.get(pk = exam_id)
+            #Updating an existing instance
+            new_instance.exam_title = exam_title
+            new_instance.exam_type = exm_type
+            new_instance.exam_mode = exm_mode
+            new_instance.exam_date = exam_date
+            new_instance.exam_description = exam_description
+            new_instance.save()
+            message = "Exam Details Updated!"
+        except:
+            new_instance = Section_Exam.objects.create(section = course_section,
+                                                    exam_title = exam_title,
+                                                    exam_description = exam_description,
+                                                    exam_type = exm_type,
+                                                    exam_mode = exm_mode,
+                                                    exam_date = exam_date)
+            new_instance.save()
+            message = "Exam Created Successfully!"
+        
+        return (True,message,new_instance)
 
 
 

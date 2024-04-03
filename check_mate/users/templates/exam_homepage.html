@@ -77,9 +77,9 @@
                             <div class="card card-sm">
                                 <div class="card-body media">
                                     <div class="media-left">
-                                        <a href="fixed-instructor-review-quiz.html"
+                                        <a href=""
                                            class="avatar avatar-lg avatar-4by3">
-                                            <img src="{% static 'static_pics/Quiz.png' %}"
+                                            <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% endif %}"
                                                  alt="Exam Image"
                                                  class="avatar-img">
                                         </a>
@@ -92,7 +92,7 @@
                                 <div class="card-footer text-center">
                                     <a href=""
                                        class="btn btn-white btn-sm float-left">Review <span class="badge badge-dark ml-2">40 papers</span></a>
-                                    <a href=""
+                                    <a href="{% url 'users:edit_exam' course_id exam.pk %}"
                                        class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
                                     <div class="clearfix"></div>
                                 </div>
