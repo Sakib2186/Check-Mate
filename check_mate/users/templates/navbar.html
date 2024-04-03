@@ -8,16 +8,16 @@
                     class="nav-link">Home</a>
             </li>
             <li class="nav-item dropdown">
-                <a href="#"
+                <a href="{% url 'users:courses' %}"
                     class="nav-link">Courses</a>
             </li>
-            {% if 2 in user_type or 3 in user_type or 4 in user_type%}
+            {% if 2 in user_type or 3 in user_type %}
             <li class="nav-item dropdown">
                 <a href="#"
                     class="nav-link">My Results</a>
             </li>
             {% endif %}
-            {% if 1 in user_type or 4 in user_type%}
+            {% if 1 in user_type or 3 in user_type%}
             <li class="nav-item dropdown">
                 <a href="#"
                     class="nav-link">Take Exam</a>
@@ -27,7 +27,49 @@
                 <a href="#"
                     class="nav-link">Announcements</a>
             </li>
-            
+            {% if 3 in user_type%}
+            <li class="nav-item dropdown">
+                <a href="#"
+                   class="nav-link dropdown-toggle"
+                   data-toggle="dropdown">Admin</a>
+                <div class="dropdown-menu">
+                    {% comment %} <a class="dropdown-item"
+                       href="">Add Course</a>
+                    <a class="dropdown-item"
+                       href="">Add Student</a> {% endcomment %}
+                    <a class="dropdown-item"
+                       href="{% url 'users:all_courses' %}">All Courses</a>
+                    <a class="dropdown-item"
+                       href="">Block User</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Semester</a>
+                <div class="dropdown-menu dropdown-menu-right" style="padding: 10px; width: 200px;">
+                    <form method = "POST" action="{% url 'users:save_semester' %}" class="px-4 py-3">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="type" style="font-size: 14px;">Select Semester:</label>
+                            <select id="type" class="custom-select" name = "selectedSemester" required>
+                                <option value="0">------</option>
+                                <option value="1">Spring</option>
+                                <option value="2">Summer</option>
+                                <option value="3">Fall</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="year" style="font-size: 14px;">Year:<label>&nbsp
+                            <input type="number" class="custom-select" id = "year" name = "year" required>
+                            </div>
+                        <div class="form-group mb-3">
+                        <label for="checkbox" style="font-size: 14px;">Current?<label>&nbsp
+                        <input type="checkbox" id = "checkbox" name = "checkboxChecked" required>
+                        </div>
+                        <input type="submit" name="semeter_submit" class="btn btn-primary" value = "Save">
+                    </form>
+                </div>
+            </li>
+            {% endif %}
         </ul>
     </div>
 

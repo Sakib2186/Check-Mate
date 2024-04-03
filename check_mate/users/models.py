@@ -1,10 +1,31 @@
 from django.db import models
+from django_resized import ResizedImageField
+import os
+
+#funtion for saving image path in os
+def course_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', str(instance.course_code), 'course_cover_picture', filename)
 
 # Create your models here.
+
+class Session(models.Model):
+
+    session_name = models.CharField(max_length = 50,default = "")
+    session_id = models.IntegerField(default = 0)
+    current = models.BooleanField(default = False)
+    year = models.IntegerField(default = 0)
+
+    def __str__(self) -> str:
+        return str(self.session_name)
+    
+    class Meta:
+        verbose_name = "Session"
+
 class Roles(models.Model):
 
     '''This model will save the type of user our system will have apart from Admin'''
-    #only for Instructor, Teaching Assistant and Student
+    #only for Instructor, and Student (Instructor id is 1 and Student is 2)
 
     role_id = models.IntegerField(null=False,blank=False,default = 0,unique = True)
     role_name = models.CharField(max_length = 30, null = False, blank = False)
@@ -23,7 +44,7 @@ class Roles(models.Model):
 class School_Users(models.Model):
 
     '''This model will hold all the users of our system other than admins'''
-    #only for  Instructor, Teaching Assistant and Student
+    #only for  Instructor and Student (Student can be TA)
 
     user_id = models.CharField(max_length = 20,null=False,blank=False,unique = True)
     user_role = models.ManyToManyField(Roles)  
@@ -32,7 +53,7 @@ class School_Users(models.Model):
     user_last_name = models.CharField(max_length = 50,null=True,blank=True)
     user_email = models.EmailField(null = True,blank = True)
     user_phone_number = models.CharField(null=True,blank=True,max_length=16)
-    user_profile_picture=models.ImageField(null=True,blank=True,upload_to='School_User/user_profile_pictures/')
+    user_profile_picture=ResizedImageField(null=True,blank=True,upload_to='School_User/user_profile_pictures/')
     user_otp_verified = models.BooleanField(null=True,blank=True,default = False)
 
     #This function will return the id of the user object when called.
@@ -45,4 +66,141 @@ class School_Users(models.Model):
         #as default
         verbose_name = "Registered Members"
 
+
+class Course(models.Model):
+
+    '''This model will hold the course details'''
+
+    course_code = models.CharField(max_length = 50,null=True,blank=True,default="")
+    course_name = models.CharField(max_length = 200,null=True,blank=True,default="")
+    course_picture = ResizedImageField(size=[500, 300], upload_to=course_picture_upload_path, blank=True, null=True)
+    course_description = models.TextField(null=True,blank=True,default="")
+
+    def __str__(self) -> str:
+        return str(self.course_code)
+    
+    class Meta:
+
+        verbose_name = "Courses"
+
+class Student(models.Model):
+    
+    student_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course)
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
+    year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
+    
+    def __str__(self) -> str:
+        return str(self.student_id)
+    
+    class Meta:
+
+        verbose_name = "Student Courses"
+
+class Instructor(models.Model):
+
+    instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course)
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
+    year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
+
+    def __str__(self) -> str:
+        return str(self.instructor_id.user_id)
+    
+    class Meta:
+
+        verbose_name = "Instructor Courses"
+
+class Teaching_Assistant(models.Model):
+
+    teaching_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course)
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
+    year = models.IntegerField(default = 0)
+    section = models.IntegerField(default = 1)
+
+    def __str__(self) -> str:
+        return str(self.teaching_id.user_id)
+    
+    class Meta:
+
+        verbose_name = "Teaching Assistant Courses"
+
+class Course_Section(models.Model):
+
+    course_id = models.ForeignKey(Course,on_delete=models.CASCADE)
+    section_number = models.IntegerField(default=1)
+    instructor = models.ForeignKey(Instructor, on_delete=models.SET_NULL, null=True, blank=True)
+    students = models.ManyToManyField(Student)
+    teaching_assistant = models.ManyToManyField(Teaching_Assistant)
+    semester = models.ForeignKey(Session,on_delete = models.CASCADE)
+    year = models.IntegerField(default = 0)
+
+    def __str__(self) -> str:
+        return str(self.course_id)
+    
+    class Meta:
+
+        verbose_name = "Course Section"
+        ordering = ['-section_number']
+
+class Exam_Type(models.Model):
+
+    type_id = models.IntegerField(default = 0)
+    exam_type = models.CharField(max_length=50,default="",null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.exam_type)
+    
+    class Meta:
+
+        verbose_name = "Exam Type"
+    
+class Exam_Mode(models.Model):
+
+    mode_id = models.IntegerField(default = 0)
+    mode = models.CharField(max_length = 50,null=True,blank=True,default="")
+
+    def __str__(self) -> str:
+        return str(self.mode)
+    
+    class Meta:
+
+        verbose_name = "Exam Mode"
+
+class Section_Exam(models.Model):
+
+    section = models.ForeignKey(Course_Section,on_delete = models.CASCADE)
+    exam_title = models.CharField(max_length = 200,null=True,blank=True)
+    exam_description = models.TextField(null=True,blank=True,default="")
+    exam_type = models.ForeignKey(Exam_Type,on_delete = models.CASCADE)
+    exam_mode = models.ForeignKey(Exam_Mode,on_delete = models.CASCADE)
+    exam_date = models.DateField(null=True,blank=True)
+    exam_time = models.CharField(max_length = 50,null=True,blank=True)
+    exam_set = models.IntegerField(default = 0)
+
+    def __str__(self) -> str:
+        return str(self.section)
+    
+    class Meta:
+
+        verbose_name = "Section Exam"
+    
+
+class Question(models.Model):
+
+    questions_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    question = models.TextField(null=True,blank=True)
+    answer_field_length = models.CharField(max_length=100,null=True,blank=True)#short,medium,long
+    marks = models.IntegerField(default = 0)
+    question_set = models.CharField(max_length=10,null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.questions_of)
+    
+    class Meta:
+
+        verbose_name = "Questions"
 

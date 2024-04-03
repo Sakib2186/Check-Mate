@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Dashboard</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+        
+        <link type="text/css"
+              href="{% static 'css/flatpickr.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/flatpickr-airbnb.css' %}"
+              rel="stylesheet">
+
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="page__header">
+                    <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
+                        <div class="container">
+
+                            {% block navbar %}
+                                {% include 'navbar.html' %}
+                            {% endblock navbar %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page ">
+
+                    <div class="container page__container">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'users:course' course_id %}">Exams</a></li>
+                            <li class="breadcrumb-item active">{% if edit_exam %}Edit Exam{% else %}Add Exam{% endif %}</li>
+                        </ol>
+                        <div class="card">
+                            <ul class="nav nav-tabs nav-tabs-card">
+                                <li class="nav-item">
+                                    <a class="nav-link active"
+                                       href="#first"
+                                       data-toggle="tab">Exam Details</a>
+                                </li>
+                            </ul>
+                            <div class="card-body tab-content">
+                                
+                                <div class="tab-pane active"
+                                     id="first">
+                                    <form method="POST" id="Form2"> 
+                                    {% csrf_token %}
+                                     <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Details</h4>
+                                        </div>
+                                            <div class="card-body">
+                                                    <div class="form-group row">
+                                                        <label for="quiz_title"
+                                                            class="col-sm-3 col-form-label form-label">Title:</label>
+                                                        <div class="col-sm-9">
+                                                            <input id="quiz_title"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="Title"
+                                                                name="exam_title"
+                                                                required
+                                                                value="{{section_exam.exam_title}}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="quiz_title"
+                                                            class="col-sm-3 col-form-label form-label">Description (if any):</label>
+                                                        <div class="col-sm-9">
+                                                            <input id="quiz_title"
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="Small description about the exam"
+                                                                name="exam_description"
+                                                                value="{{section_exam.exam_description}}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="course_title"
+                                                            class="col-sm-3 col-form-label form-label">Exam Type:</label>
+                                                        <div class="col-sm-9 col-md-4">
+                                                            <select id="course_title"
+                                                                    class="custom-select form-control" name="exam_type">
+                                                                <option value="0" selected>-------------</option>
+                                                                {% for types in exam_types %}
+                                                                <option value="{{types.type_id}}" {% if types == section_exam.exam_type %}selected{% endif %}>{{types.exam_type}}</option>
+                                                                {% endfor %}
+                                                                
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="course_title"
+                                                            class="col-sm-3 col-form-label form-label">Exam Mode:</label>
+                                                        <div class="col-sm-9 col-md-4">
+                                                            <select id="course_title"
+                                                                    class="custom-select form-control" name="exam_mode">
+                                                                <option value="0" selected>-------------</option>
+                                                                {% for modes in exam_modes %}
+                                                                <option value="{{modes.mode_id}}" {% if modes == section_exam.exam_mode %}selected{% endif %}>{{modes.mode}}</option>
+                                                                {% endfor %}
+                                                                
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="quiz_title"
+                                                            class="col-sm-3 col-form-label form-label">Number of sets (if any):</label>
+                                                        <div class="col-sm-9">
+                                                            <input id="quiz_title"
+                                                                type="number"
+                                                                class="form-control"
+                                                                placeholder="Exmaple: 2"
+                                                                name="exam_set"
+                                                                value="{% if section_exam.exam_set == 0 %}None{% else %}{{section_exam.exam_set}}{% endif %}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="cmn-toggle"
+                                                            class="col-sm-3 col-form-label form-label">Date (Tentative):</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="form-group ">
+                                                                <div class="custom-control custom-checkbox-toggle" style="width:25%;">
+                                                                    <input id="flatpickr"
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    placeholder="Select dates"
+                                                                    data-toggle="flatpickr"
+                                                                    data-flatpickr-alt-input="false"
+                                                                    name="exam_date"
+                                                                    required
+                                                                    value="{{section_exam.exam_date}}">
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row mb-0">
+                                                        <div class="col-sm-9 offset-sm-3">
+                                                            <input type="submit" class="btn btn-primary next-tab" {% if edit_exam %}value="Update"{% else %}value="Save"{% endif %} name="save_exam">
+                                                            {% if edit_exam %}
+                                                            <input type="hidden" name="delete_section_exam" id="delete_section_exam" value="0">
+                                                            <button type="button"
+                                                                class="btn btn-danger" id="deleteBtn2">Delete</button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% if edit_exam %}                    
+                        <div class="card">
+                            <ul class="nav nav-tabs nav-tabs-card">
+                                {% if question_set|length == 0 %}
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#second" data-toggle="tab">Questions</a>
+                                </li>
+                                {% else %}
+                                {% for i in question_set %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}" href="#second_{{ i.0 }}" data-toggle="tab">Set {{ i.0 }}</a>
+                                </li>
+                                {% endfor %}
+                                {% endif %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#third" data-toggle="tab">Get Question</a>
+                                </li>
+                            </ul>
+                            
+                            <div class="card-body tab-content">
+                                {% if question_set|length == 0 %}
+                                <div class="tab-pane active" id="second">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Questions</h4>
+                                        </div>
+                                        <div class="card-header">
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+                                            <ul class="list-group list-group-fit nestable-list-plain mb-0">
+                                                <li class="list-group-item nestable-item">
+                                                    {% for questions in none_set_questions.A %}
+                                                    <div class="media align-items-center">
+                                                        <div class="media-left">
+                                                            <span>{{forloop.counter}}.</span>
+                                                        </div>
+                                                        <div class="media-body">
+                                                            {{questions.question}}
+                                                        </div>
+                                                        <div class="media-right text-right">
+                                                            <div style="width:100px">
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    {% endfor %}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                {% for i in question_set %}
+                                <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="second_{{ i.0 }}">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Questions</h4>
+                                        </div>
+                                        <div class="card-header">
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+                                            <ul class="list-group list-group-fit nestable-list-plain mb-0">
+                                                <li class="list-group-item nestable-item">
+                                                    {% for key,value in i.1.items %}
+                                                    {% for question in value %}
+                                                    <div class="media align-items-center">
+                                                        <div class="media-left">
+                                                            <span>{{forloop.counter}}.</span>
+                                                        </div>
+                                                        <div class="media-body">
+                                                            {{question.question}}
+                                                        </div>
+                                                        <div class="media-right text-right">
+                                                            <div style="width:100px">
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                <div class="tab-pane" id="third">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Get Paper</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Form for creating a new quiz -->
+                                            {% comment %} <form id="quiz_form">
+                                                <div class="form-group row">
+                                                    <label for="quiz_title" class="col-sm-3 col-form-label form-label">Quiz Title:</label>
+                                                    <div class="col-sm-9">
+                                                        <input id="quiz_title" type="text" class="form-control" placeholder="Title" value="Vue.js Introduction">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="quiz_image" class="col-sm-3 col-form-label form-label">Quiz Image:</label>
+                                                    <div class="col-sm-9 col-md-4">
+                                                        <p><img src="assets/images/vuejs.png" alt="" width="150" class="rounded"></p>
+                                                        <div class="custom-file">
+                                                            <input type="file" id="quiz_image" class="custom-file-input">
+                                                            <label for="quiz_image" class="custom-file-label">Choose file</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="cmn-toggle" class="col-sm-3 col-form-label form-label">Timeframe</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="form-group">
+                                                            <div class="custom-control custom-checkbox-toggle">
+                                                                <input id="cmn-toggle" type="checkbox" aria-checked="false" class="custom-control-input" role="switch">
+                                                                <label class="custom-control-label" for="cmn-toggle"><span class="sr-only">Timeframe</span></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-inline">
+                                                            <div class="form-group mr-2">
+                                                                <input type="number" class="form-control text-center" value="4" style="width:50px;">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <select class="custom-select">
+                                                                    <option value="hour" selected>Hours</option>
+                                                                    <option value="minutes">Minutes</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row mb-0">
+                                                    <div class="col-sm-9 offset-sm-3">
+                                                        <input type="submit" class="btn btn-primary next-tab" value="Save">
+                                                    </div>
+                                                </div>
+                                            </form> {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if edit_exam %}
+                    <div class="modal fade" id="add_question">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary">
+                                    <h4 class="modal-title text-white">Add Question</h4>
+                                    <button type="button"
+                                            class="close text-white"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-group row">
+                                            <label for="qtitle"
+                                                class="col-form-label form-label col-md-3">Question:</label>
+                                            <div class="col-md-9">
+                                                <input type="hidden" id="question_adding" name="question_set">
+                                                <input id="qtitle"
+                                                    type="text"
+                                                    class="form-control"
+                                                    value=""
+                                                    placeholder="Question"
+                                                    required
+                                                    name="question">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="type"
+                                                class="col-form-label form-label col-md-3">Answering field:</label>
+                                            <div class="col-md-4">
+                                                <select id="type"
+                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                    <option value="0">----------</option>
+                                                    <option value="Short">Short</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="touch-spin-2"
+                                                class="col-form-label form-label col-md-3">Marks:</label>
+                                            <div class="col-md-4">
+                                                <input id="touch-spin-2"
+                                                    data-toggle="touch-spin"
+                                                    data-min="0"
+                                                    data-max="100"
+                                                    data-step="5"
+                                                    type="number"
+                                                    value=""
+                                                    name="marks"
+                                                    required
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-0">
+                                            <div class="col-md-8 offset-md-3">
+                                                <input type="submit"
+                                                        class="btn btn-success" value="Save" name="save_question">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
+
+                    <div class="modal fade" id="edit_quiz">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary">
+                                    <h4 class="modal-title text-white">Edit Question</h4>
+                                    <button type="button"
+                                            class="close text-white"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" id="Form" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="form-group row">
+                                            <label for="qtitle"
+                                                class="col-form-label form-label col-md-3">Question:</label>
+                                            <div class="col-md-9">
+                                                <input type="hidden" id="question_set" name="question_set">
+                                                <input id="question"
+                                                    type="text"
+                                                    class="form-control"
+                                                    value=""
+                                                    placeholder="Question"
+                                                    required
+                                                    name="question">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="type"
+                                                class="col-form-label form-label col-md-3">Answering field:</label>
+                                            <div class="col-md-4">
+                                                <select id="answer_size"
+                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                    <option value="0">----------</option>
+                                                    <option value="Short">Short</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="touch-spin-2"
+                                                class="col-form-label form-label col-md-3">Marks:</label>
+                                            <div class="col-md-4">
+                                                <input id="marks"
+                                                    data-toggle="touch-spin"
+                                                    data-min="0"
+                                                    data-max="100"
+                                                    data-step="5"
+                                                    type="number"
+                                                    value=""
+                                                    name="marks"
+                                                    required
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-0">
+                                            <div class="col-md-8 offset-md-3">
+                                                <input type="submit"
+                                                        class="btn btn-success" value="Update" name="edit_question">
+                                                <input type="hidden" name="delete_question" id="deleteCourseFlag" value="0">
+                                                <input type="hidden" id="pk" name="question_pk">
+                                                <button type="button"
+                                                        class="btn btn-danger" id="deleteBtn">Delete</button>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <script>
+            flatpickr("#flatpickr", {enableTime: true,
+                dateFormat: "Y-m-d",});
+        </script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+
+            function openModal(set_name) {
+                // Set data in the modal
+                var inputElement = document.getElementById('question_adding');
+                inputElement.value=set_name;
+            
+              }
+
+            function openModal2(id,question_set,question,answering_field,marks) {
+                // Set data in the modal
+                var pk = document.getElementById('pk');
+                pk.value = id;
+                var quest = document.getElementById('question');
+                quest.value = question;
+                var quest_set = document.getElementById('question_set');
+                quest_set.value = question_set;
+                var answ = document.getElementById('answer_size');
+                answ.value = answering_field;
+                var mrk = document.getElementById('marks');
+                mrk.value = marks;
+                
+              }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('deleteBtn').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+            
+                    swal({
+                        title: "Are you sure?",
+                        text: "Once deleted, you will not be able to recover this course!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => { 
+                        if (willDelete) {
+                            document.getElementById('deleteCourseFlag').value = "1";
+                            document.getElementById('Form').submit(); 
+                        } else {
+                            swal("Your question is safe!");
+                        }
+                    });
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('deleteBtn2').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+            
+                    swal({
+                        title: "Are you sure?",
+                        text: "Once deleted, you will not be able to recover this course!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => { 
+                        if (willDelete) {
+                            document.getElementById('delete_section_exam').value = "1";
+                            document.getElementById('Form2').submit(); 
+                        } else {
+                            swal("Your question is safe!");
+                        }
+                    });
+                });
+            });
+
+        </script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/flatpickr.js' %}"></script>
+        <script src="{% static 'js/flatpickr.min.js' %}"></script>
+
+    </body>
+
+</html>

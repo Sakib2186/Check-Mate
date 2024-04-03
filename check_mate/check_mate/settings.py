@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'system_administrator',
+    'sass_processor',
 ]
 
 MIDDLEWARE = [
@@ -145,6 +147,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+
 STATIC_URL = 'static/'
 #static directory
 STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
@@ -173,3 +176,10 @@ EMAIL_PORT=587
 EMAIL_HOST_USER=os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD=os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS=True
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Sessions expire when the browser is closed
+# SESSION_COOKIE_AGE = 3600  # Set the session cookie to expire after a specific time (in seconds)
+
+LOGIN_URL = '/users/login/'
+LOGOUT_REDIRECT_URL='users:logoutUser'
+LOGIN_URL='users:login'

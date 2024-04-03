@@ -23,10 +23,17 @@
               href="{% static 'css/perfect-scrollbar.css' %}"
               rel="stylesheet">
 
+        <link type="text/css"
+            href="{% static 'css/spinkit.css' %}"
+            rel="stylesheet">
 
     </head>
 
     <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
 
         <div class="mdk-header-layout js-mdk-header-layout">
 
@@ -68,16 +75,23 @@
                         </div>
                     </div>
 
-                    <div class="container page__container">
-                        {% comment %} <div class="footer">
-                            Copyright &copy; 2016 - <a href="">Purchase LearnPlus</a>
-                        </div> {% endcomment %}
-                    </div>
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
                 </div>
             </div>
 
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
