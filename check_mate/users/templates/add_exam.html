@@ -199,7 +199,7 @@
                                 {% else %}
                                 {% for i in question_set %}
                                 <li class="nav-item">
-                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}" href="#second_{{ i }}" data-toggle="tab">Questions {{ i }}</a>
+                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}" href="#second_{{ i }}" data-toggle="tab">Set {{ i }}</a>
                                 </li>
                                 {% endfor %}
                                 {% endif %}
@@ -216,7 +216,7 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#editQuiz" class="btn btn-outline-secondary">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('none')">Add Question <i class="fa-solid fa-plus"></i></a>
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -247,7 +247,7 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#editQuiz" class="btn btn-outline-secondary">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i}}')">Add Question <i class="fa-solid fa-plus"></i></a>
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -332,11 +332,11 @@
                         {% endif %}
                     </div>
                     {% if edit_exam %}
-                    <div class="modal fade" id="editQuiz">
+                    <div class="modal fade" id="add_question">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header bg-primary">
-                                    <h4 class="modal-title text-white">Edit Question</h4>
+                                    <h4 class="modal-title text-white">Add Question</h4>
                                     <button type="button"
                                             class="close text-white"
                                             data-dismiss="modal"
@@ -345,56 +345,55 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="#">
+                                    <form method="POST">
+                                        {% csrf_token %}
                                         <div class="form-group row">
                                             <label for="qtitle"
-                                                class="col-form-label form-label col-md-3">Title:</label>
+                                                class="col-form-label form-label col-md-3">Question:</label>
                                             <div class="col-md-9">
+                                                <input type="text" id="question_adding" name="question_set">
                                                 <input id="qtitle"
                                                     type="text"
                                                     class="form-control"
-                                                    value="Database Access">
+                                                    value=""
+                                                    placeholder="Question"
+                                                    required
+                                                    name="question">
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="type"
-                                                class="col-form-label form-label col-md-3">Type:</label>
+                                                class="col-form-label form-label col-md-3">Answering field:</label>
                                             <div class="col-md-4">
                                                 <select id="type"
-                                                        class="custom-control custom-select form-control">
-                                                    <option value="1">Input</option>
-                                                    <option value="2">Textarea</option>
-                                                    <option value="3">Checkbox</option>
-                                                    <option value="3">Radio</option>
+                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                    <option value="0">----------</option>
+                                                    <option value="Short">Short</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-form-label form-label col-md-3">Answers:</label>
-                                            <div class="col-md-9">
-                                                <a href="#"
-                                                class="btn btn-default"><i class="material-icons">add</i> Add Answer</a>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
                                             <label for="touch-spin-2"
-                                                class="col-form-label form-label col-md-3">Question Score:</label>
+                                                class="col-form-label form-label col-md-3">Marks:</label>
                                             <div class="col-md-4">
                                                 <input id="touch-spin-2"
                                                     data-toggle="touch-spin"
                                                     data-min="0"
                                                     data-max="100"
                                                     data-step="5"
-                                                    type="text"
-                                                    value="50"
-                                                    name="demo2"
+                                                    type="number"
+                                                    value=""
+                                                    name="marks"
+                                                    required
                                                     class="form-control" />
                                             </div>
                                         </div>
                                         <div class="form-group row mb-0">
                                             <div class="col-md-8 offset-md-3">
-                                                <button type="submit"
-                                                        class="btn btn-success">Save</button>
+                                                <input type="submit"
+                                                        class="btn btn-success" value="Save" name="save_question">
                                             </div>
                                         </div>
                                     </form>
@@ -423,6 +422,13 @@
             swal("Done!", "{{message}}", "success");
             {% endif %}
             {% endfor %}
+
+            function openModal(set_name) {
+                // Set data in the modal
+                var inputElement = document.getElementById('question_adding');
+                inputElement.value=set_name;
+            
+              }
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>

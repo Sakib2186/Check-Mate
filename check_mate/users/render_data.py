@@ -434,7 +434,19 @@ class Save:
         
         return (True,message,new_instance)
 
+    def save_question_for_exam(exam_id,question_set,question,answer_size,marks):
 
+        '''This function will save the questions for a particular exam'''
+
+        section_exm = Section_Exam.objects.get(pk = exam_id)
+        question_exam = Question.objects.create(questions_of = section_exm,
+                                                question = question,
+                                                answer_field_length = answer_size,
+                                                marks = marks,
+                                                question_set = question_set)
+        question_exam.save()
+        message = "Question Saved!"
+        return (True,message)
 
 
 class Delete:

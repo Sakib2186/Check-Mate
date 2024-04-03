@@ -735,9 +735,27 @@ def edit_exam(request,course_id,exam_id):
                     return redirect('users:edit_exam',course_id,result[2].pk)
                 else:
                     messages.error(request,"Could not save! Try again!")
-                    return redirect('users:take_exam',course_id)
+                    return redirect('users:edit_exam',course_id,result[2].pk)
 
-                
+            if request.POST.get('save_question'):
+
+                question_set = request.POST.get('question_set')
+                question = request.POST.get('question')
+                answer_size = request.POST.get('answer_size')
+                marks = request.POST.get('marks')
+
+                if answer_size == "0":
+                    messages.error(request,"Select Answer Field!")
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
+
+                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks)
+
+                if result[0]:
+                    messages.success(request,result[1])
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
+                else:
+                    messages.error(request,"Error occured! Try again later.")
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
 
         if logged_in_user == None:
             user = request.user.username

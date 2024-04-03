@@ -189,3 +189,18 @@ class Section_Exam(models.Model):
         verbose_name = "Section Exam"
     
 
+class Question(models.Model):
+
+    questions_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    question = models.TextField(null=True,blank=True)
+    answer_field_length = models.CharField(max_length=100,null=True,blank=True)#short,medium,long
+    marks = models.IntegerField(default = 0)
+    question_set = models.CharField(max_length=10,null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.questions_of)
+    
+    class Meta:
+
+        verbose_name = "Questions"
+

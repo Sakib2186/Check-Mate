@@ -63,3 +63,8 @@ class Section_Exam_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set'
     ]
+@admin.register(Question)
+class Question_Admin_panel(admin.ModelAdmin):
+    list_display = [
+        'questions_of','question','answer_field_length','marks','question_set'
+    ]
