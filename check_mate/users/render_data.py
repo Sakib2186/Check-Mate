@@ -401,7 +401,7 @@ class Save:
         return (True,"Successfully Saved!")
 
 
-    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id):
+    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id):
 
         '''This function will save/update the exam for a section'''
 
@@ -418,6 +418,7 @@ class Save:
             new_instance.exam_mode = exm_mode
             new_instance.exam_date = exam_date
             new_instance.exam_description = exam_description
+            new_instance.exam_set = exam_set
             new_instance.save()
             message = "Exam Details Updated!"
         except:
@@ -426,7 +427,8 @@ class Save:
                                                     exam_description = exam_description,
                                                     exam_type = exm_type,
                                                     exam_mode = exm_mode,
-                                                    exam_date = exam_date)
+                                                    exam_date = exam_date,
+                                                    exam_set = 0)
             new_instance.save()
             message = "Exam Created Successfully!"
         

@@ -643,6 +643,10 @@ def take_exam(request,course_id):
                 exam_mode = int(request.POST.get('exam_mode'))
                 exam_date = request.POST.get('exam_date')
                 exam_description = request.POST.get('exam_description')
+                exam_set = request.POST.get('exam_set')
+
+                if exam_set == "":
+                    exam_set=0
 
                 if exam_mode == 0:
                     messages.error(request,"Please select Exam Mode!")
@@ -655,7 +659,7 @@ def take_exam(request,course_id):
                     messages.error(request,"Please provide Exam date!")
                     return redirect('users:take_exam',course_id)
 
-                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id=None)
+                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None)
                 if result[0]:
                     messages.success(request,result[1])
                     return redirect('users:edit_exam',course_id,result[2].pk)
@@ -705,6 +709,14 @@ def edit_exam(request,course_id,exam_id):
                 exam_mode = int(request.POST.get('exam_mode'))
                 exam_date = request.POST.get('exam_date')
                 exam_description = request.POST.get('exam_description')
+                exam_set = request.POST.get('exam_set')
+
+                if exam_set == "" or exam_set=="0":
+                    exam_set=0
+                
+                if exam_set=="1":
+                    messages.error(request,"Exam set must be 2 or 3 !")
+                    return redirect('users:edit_exam',course_id,exam_id)
 
                 if exam_mode == 0:
                     messages.error(request,"Please select Exam Mode!")
@@ -717,7 +729,7 @@ def edit_exam(request,course_id,exam_id):
                     messages.error(request,"Please provide Exam date!")
                     return redirect('users:edit_exam',course_id,exam_id)
 
-                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_id)
+                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id)
                 if result[0]:
                     messages.success(request,result[1])
                     return redirect('users:edit_exam',course_id,result[2].pk)
@@ -731,6 +743,12 @@ def edit_exam(request,course_id,exam_id):
             user = request.user.username
         else:
             user = logged_in_user.user_id
+        
+        sets = []
+        for i in range(section_exam.exam_set):
+            ascii_value = ord('A') + i
+            letter = chr(ascii_value)
+            sets.append(letter)
 
         context = {
                 'page_title':'Check Mate',
@@ -745,6 +763,7 @@ def edit_exam(request,course_id,exam_id):
                 'exam_types':exam_type,
                 'edit_exam':True,
                 'section_exam':section_exam,
+                'question_set':sets,
             }
 
         return render(request,"add_exam.html",context)

@@ -179,6 +179,7 @@ class Section_Exam(models.Model):
     exam_mode = models.ForeignKey(Exam_Mode,on_delete = models.CASCADE)
     exam_date = models.DateField(null=True,blank=True)
     exam_time = models.CharField(max_length = 50,null=True,blank=True)
+    exam_set = models.IntegerField(default = 0)
 
     def __str__(self) -> str:
         return str(self.section)
