@@ -341,7 +341,15 @@ def all_courses(request):
 
             return render(request,"all_courses.html",context)
         else:
-            return HttpResponse("Not Allowed")
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
 
     except Exception as e:
         #saving error information in database if error occured
@@ -394,7 +402,15 @@ def add_course(request):
             }
             return render(request,"course_edit.html",context)
         else:
-            return HttpResponse("Not Allowed")
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
 
     except Exception as e:
         #saving error information in database if error occured
@@ -461,7 +477,15 @@ def edit_course_details(request,course_id):
             }
             return render(request,"course_edit.html",context)
         else:
-            return HttpResponse("Not Allowed")
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
 
 
     except Exception as e:
@@ -576,7 +600,15 @@ def course_edit(request,course_id):
 
             return render(request,"course_edit2.html",context)
         else:
-            return HttpResponse("Now Allowed")
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
 
     except Exception as e:
         #saving error information in database if error occured
@@ -633,55 +665,67 @@ def take_exam(request,course_id):
             user = request.user.username
         else:
             user = logged_in_user.user_id
+    
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
 
-        if request.method == "POST":
+            if request.method == "POST":
 
-            if request.POST.get('save_exam'):
+                if request.POST.get('save_exam'):
 
-                exam_title = request.POST.get('exam_title')
-                exam_type = int(request.POST.get('exam_type'))
-                exam_mode = int(request.POST.get('exam_mode'))
-                exam_date = request.POST.get('exam_date')
-                exam_description = request.POST.get('exam_description')
-                exam_set = request.POST.get('exam_set')
-
-                if exam_set == "":
-                    exam_set=0
-
-                if exam_mode == 0:
-                    messages.error(request,"Please select Exam Mode!")
-                    return redirect('users:take_exam',course_id)
-                if exam_type == 0:
-                    messages.error(request,"Please select Exam Type!")
-                    return redirect('users:take_exam',course_id)
-
-                if exam_date == "":
-                    messages.error(request,"Please provide Exam date!")
-                    return redirect('users:take_exam',course_id)
-
-                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None)
-                if result[0]:
-                    messages.success(request,result[1])
-                    return redirect('users:edit_exam',course_id,result[2].pk)
-                else:
-                    messages.error(request,"Could not save! Try again!")
-                    return redirect('users:take_exam',course_id)
-
-        context = {
-                'page_title':'Check Mate',
-                'user_type':type_of_logged_in_user,
-                'media_url':settings.MEDIA_URL,
-                'logged_in_user':logged_in_user,
-                'year':datetime.now().year,
-                'current_semester':current_semester,
-
-                'course_id':course_id,
-                'exam_modes':exam_modes,
-                'exam_types':exam_type,
-
-            }
+                    exam_title = request.POST.get('exam_title')
+                    exam_type = int(request.POST.get('exam_type'))
+                    exam_mode = int(request.POST.get('exam_mode'))
+                    exam_date = request.POST.get('exam_date')
+                    exam_description = request.POST.get('exam_description')
+                    exam_set = request.POST.get('exam_set')
         
-        return render(request,"add_exam.html",context)
+                    if exam_set == "":
+                        exam_set=0
+
+                    if exam_mode == 0:
+                        messages.error(request,"Please select Exam Mode!")
+                        return redirect('users:take_exam',course_id)
+                    if exam_type == 0:
+                        messages.error(request,"Please select Exam Type!")
+                        return redirect('users:take_exam',course_id)
+
+                    if exam_date == "":
+                        messages.error(request,"Please provide Exam date!")
+                        return redirect('users:take_exam',course_id)
+
+                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None)
+                    if result[0]:
+                        messages.success(request,result[1])
+                        return redirect('users:edit_exam',course_id,result[2].pk)
+                    else:
+                        messages.error(request,"Could not save! Try again!")
+                        return redirect('users:take_exam',course_id)
+
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+
+                    'course_id':course_id,
+                    'exam_modes':exam_modes,
+                    'exam_types':exam_type,
+
+                }
+            
+            return render(request,"add_exam.html",context)
+        else:
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
@@ -704,116 +748,142 @@ def edit_exam(request,course_id,exam_id):
             user = request.user.username
         else:
             user = logged_in_user.user_id
+        
 
-        if request.method == "POST":
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
 
-            if request.POST.get('save_exam'):
+            if request.method == "POST":
 
-                exam_title = request.POST.get('exam_title')
-                exam_type = int(request.POST.get('exam_type'))
-                exam_mode = int(request.POST.get('exam_mode'))
-                exam_date = request.POST.get('exam_date')
-                exam_description = request.POST.get('exam_description')
-                exam_set = request.POST.get('exam_set')
+                if request.POST.get('save_exam'):
 
-                if exam_set == "" or exam_set=="0":
-                    exam_set=0
-                
-                if exam_set=="1":
-                    messages.error(request,"Exam set must be 2 or 3 !")
-                    return redirect('users:edit_exam',course_id,exam_id)
+                    exam_title = request.POST.get('exam_title')
+                    exam_type = int(request.POST.get('exam_type'))
+                    exam_mode = int(request.POST.get('exam_mode'))
+                    exam_date = request.POST.get('exam_date')
+                    exam_description = request.POST.get('exam_description')
+                    exam_set = request.POST.get('exam_set')
 
-                if exam_mode == 0:
-                    messages.error(request,"Please select Exam Mode!")
-                    return redirect('users:edit_exam',course_id,exam_id)
-                if exam_type == 0:
-                    messages.error(request,"Please select Exam Type!")
-                    return redirect('users:edit_exam',course_id,exam_id)
-
-                if exam_date == "":
-                    messages.error(request,"Please provide Exam date!")
-                    return redirect('users:edit_exam',course_id,exam_id)
-
-                result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id)
-                if result[0]:
-                    messages.success(request,result[1])
-                    return redirect('users:edit_exam',course_id,result[2].pk)
-                else:
-                    messages.error(request,"Could not save! Try again!")
-                    return redirect('users:edit_exam',course_id,result[2].pk)
-
-            if request.POST.get('save_question'):
-
-                question_set = request.POST.get('question_set')
-                question = request.POST.get('question')
-                answer_size = request.POST.get('answer_size')
-                marks = request.POST.get('marks')
-
-                if answer_size == "0":
-                    messages.error(request,"Select Answer Field!")
-                    return redirect('users:edit_exam',course_id,section_exam.pk)
-
-                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id=None)
-
-                if result[0]:
-                    messages.success(request,result[1])
-                    return redirect('users:edit_exam',course_id,section_exam.pk)
-                else:
-                    messages.error(request,"Error occured! Try again later.")
-                    return redirect('users:edit_exam',course_id,section_exam.pk)
-                
-            if request.POST.get('delete_question'):
+                    if exam_set == "" or exam_set=="0":
+                        exam_set=0
                     
-                    flag = str(request.POST.get('delete_question'))
-                    pk = request.POST.get('question_pk')
-    
-                    if flag == "1":
+                    if exam_set=="1":
+                        messages.error(request,"Exam set must be 2 or 3 !")
+                        return redirect('users:edit_exam',course_id,exam_id)
 
-                        if Delete.delete_question(pk):
-                            messages.success(request,"Question Deleted Successfully!")
-                            return redirect('users:edit_exam',course_id,section_exam.pk)
-                        else:
-                            messages.error(request,"Error occured! Try again later.")
-                            return redirect('users:edit_exam',course_id,section_exam.pk)
+                    if exam_mode == 0:
+                        messages.error(request,"Please select Exam Mode!")
+                        return redirect('users:edit_exam',course_id,exam_id)
+                    if exam_type == 0:
+                        messages.error(request,"Please select Exam Type!")
+                        return redirect('users:edit_exam',course_id,exam_id)
+
+                    if exam_date == "":
+                        messages.error(request,"Please provide Exam date!")
+                        return redirect('users:edit_exam',course_id,exam_id)
+
+                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id)
+                    if result[0]:
+                        messages.success(request,result[1])
+                        return redirect('users:edit_exam',course_id,result[2].pk)
+                    else:
+                        messages.error(request,"Could not save! Try again!")
+                        return redirect('users:edit_exam',course_id,result[2].pk)
+
+                if request.POST.get('save_question'):
+
+                    question_set = request.POST.get('question_set')
+                    question = request.POST.get('question')
+                    answer_size = request.POST.get('answer_size')
+                    marks = request.POST.get('marks')
+
+                    if answer_size == "0":
+                        messages.error(request,"Select Answer Field!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id=None)
+
+                    if result[0]:
+                        messages.success(request,result[1])
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    else:
+                        messages.error(request,"Error occured! Try again later.")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
+                if request.POST.get('delete_question'):
                         
-            if request.POST.get('edit_question'):
+                        flag = str(request.POST.get('delete_question'))
+                        pk = request.POST.get('question_pk')
+        
+                        if flag == "1":
 
-                question_pk = request.POST.get('question_pk')
-                question_set = request.POST.get('question_set')
-                question = request.POST.get('question')
-                answer_size = request.POST.get('answer_size')
-                marks = request.POST.get('marks')
+                            if Delete.delete_question(pk):
+                                messages.success(request,"Question Deleted Successfully!")
+                                return redirect('users:edit_exam',course_id,section_exam.pk)
+                            else:
+                                messages.error(request,"Error occured! Try again later.")
+                                return redirect('users:edit_exam',course_id,section_exam.pk)
+                            
+                if request.POST.get('edit_question'):
 
-                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_pk)
-                if result[0]:
-                    messages.success(request,result[1])
-                    return redirect('users:edit_exam',course_id,section_exam.pk)
-                else:
-                    messages.error(request,"Could not update! Try again later")
-                    return redirect('users:edit_exam',course_id,section_exam.pk)
+                    question_pk = request.POST.get('question_pk')
+                    question_set = request.POST.get('question_set')
+                    question = request.POST.get('question')
+                    answer_size = request.POST.get('answer_size')
+                    marks = request.POST.get('marks')
+
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_pk)
+                    if result[0]:
+                        messages.success(request,result[1])
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    else:
+                        messages.error(request,"Could not update! Try again later")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
+                if request.POST.get('delete_section_exam'):
+                        
+                        flag = str(request.POST.get('delete_section_exam'))
+        
+                        if flag == "1":
+                            if Delete.delete_section_exam(exam_id):
+                                messages.success(request,"Deleted Successfully!")
+                                return redirect('users:course',course_id)
+                            else:
+                                messages.error(request,"Could not delete! Try again later")
+                                return redirect('users:course',course_id)
 
 
-        none_set_questions = Load_Courses.get_set_questions_for_none(exam_id)
-        sets = Load_Courses.get_set_questions_not_none(exam_id)
 
-        context = {
-                'page_title':'Check Mate',
-                'user_type':type_of_logged_in_user,
-                'media_url':settings.MEDIA_URL,
-                'logged_in_user':logged_in_user,
-                'year':datetime.now().year,
-                'current_semester':current_semester,
-                
-                'course_id':course_id,
-                'exam_modes':exam_modes,
-                'exam_types':exam_type,
-                'edit_exam':True,
-                'section_exam':section_exam,
-                'question_set':sets,
-                'none_set_questions':none_set_questions,
+            none_set_questions = Load_Courses.get_set_questions_for_none(exam_id)
+            sets = Load_Courses.get_set_questions_not_none(exam_id)
+
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+                    
+                    'course_id':course_id,
+                    'exam_modes':exam_modes,
+                    'exam_types':exam_type,
+                    'edit_exam':True,
+                    'section_exam':section_exam,
+                    'question_set':sets,
+                    'none_set_questions':none_set_questions,
+                }
+
+            return render(request,"add_exam.html",context)
+        else:
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
             }
-
-        return render(request,"add_exam.html",context)
+            return render(request,"access_denied.html",context)
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)

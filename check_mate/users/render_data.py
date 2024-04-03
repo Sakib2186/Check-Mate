@@ -279,8 +279,8 @@ class Load_Courses:
         dic={}
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         if section_exam.exam_set == 0:
-            questions = Question.objects.filter(questions_of = section_exam,question_set='none')
-            dic['none'] = questions
+            questions = Question.objects.filter(questions_of = section_exam,question_set='A')
+            dic['A'] = questions
 
         return dic
     
@@ -437,9 +437,9 @@ class Save:
         course_section = Course_Section.objects.get(pk = course_id)
         exm_type = Exam_Type.objects.get(type_id = exam_type)
         exm_mode = Exam_Mode.objects.get(mode_id = exam_mode)
-        print(exam_id)
+
         try:
-            print("here")
+
             new_instance = Section_Exam.objects.get(pk = exam_id)
             #Updating an existing instance
             new_instance.exam_title = exam_title
@@ -457,7 +457,7 @@ class Save:
                                                     exam_type = exm_type,
                                                     exam_mode = exm_mode,
                                                     exam_date = exam_date,
-                                                    exam_set = 0)
+                                                    exam_set = exam_set)
             new_instance.save()
             message = "Exam Created Successfully!"
         
@@ -512,5 +512,14 @@ class Delete:
 
         question = Question.objects.get(pk=pk)
         question.delete()
+
+        return True
+
+    def delete_section_exam(exam_id):
+
+        '''This function will delete the exam of a section'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        section_exam.delete()
 
         return True

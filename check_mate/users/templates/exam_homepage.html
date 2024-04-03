@@ -67,10 +67,12 @@
                             <div class="media-body">
                                 <h1 class="h2">Exams</h1>
                             </div>
+                            {% if 1 in user_type or 3 in user_type %}
                             <div class="media-right d-flex align-items-center">
                                 <a href="{% url 'users:take_exam' course_id %}"
                                    class="btn btn-success mr-2">Take Exam</a>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="card-columns">
                             {% for exam in section_exams %}
@@ -79,7 +81,7 @@
                                     <div class="media-left">
                                         <a href=""
                                            class="avatar avatar-lg avatar-4by3">
-                                            <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% endif %}"
+                                            <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
                                                  alt="Exam Image"
                                                  class="avatar-img">
                                         </a>
@@ -90,11 +92,17 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-center">
+                                    {% if 1 in user_type or 3 in user_type %}
                                     <a href=""
                                        class="btn btn-white btn-sm float-left">Review <span class="badge badge-dark ml-2">40 papers</span></a>
-                                    <a href="{% url 'users:edit_exam' course_id exam.pk %}"
+                                    {% endif %}
+                                       <p
+                                       class="btn btn-white btn-sm float-left">Exam: <span class="badge badge-dark ml-2">{{exam.exam_type.exam_type}}</span></p>
+                                       {% if 1 in user_type or 3 in user_type %}
+                                       <a href="{% url 'users:edit_exam' course_id exam.pk %}"
                                        class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
-                                    <div class="clearfix"></div>
+                                        {% endif %}
+                                       <div class="clearfix"></div>
                                 </div>
                             </div>
                             {% endfor %}

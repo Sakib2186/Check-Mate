@@ -85,7 +85,7 @@
                                 
                                 <div class="tab-pane active"
                                      id="first">
-                                    <form method="POST"> 
+                                    <form method="POST" id="Form2"> 
                                     {% csrf_token %}
                                      <div class="card">
                                         <div class="card-header">
@@ -112,7 +112,7 @@
                                                             <input id="quiz_title"
                                                                 type="text"
                                                                 class="form-control"
-                                                                placeholder="Samll description about the exam"
+                                                                placeholder="Small description about the exam"
                                                                 name="exam_description"
                                                                 value="{{section_exam.exam_description}}">
                                                         </div>
@@ -180,6 +180,11 @@
                                                     <div class="form-group row mb-0">
                                                         <div class="col-sm-9 offset-sm-3">
                                                             <input type="submit" class="btn btn-primary next-tab" {% if edit_exam %}value="Update"{% else %}value="Save"{% endif %} name="save_exam">
+                                                            {% if edit_exam %}
+                                                            <input type="hidden" name="delete_section_exam" id="delete_section_exam" value="0">
+                                                            <button type="button"
+                                                                class="btn btn-danger" id="deleteBtn2">Delete</button>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                     
@@ -216,12 +221,12 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('none')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
                                                 <li class="list-group-item nestable-item">
-                                                    {% for questions in none_set_questions.none %}
+                                                    {% for questions in none_set_questions.A %}
                                                     <div class="media align-items-center">
                                                         <div class="media-left">
                                                             <span>{{forloop.counter}}.</span>
@@ -542,6 +547,27 @@
                         if (willDelete) {
                             document.getElementById('deleteCourseFlag').value = "1";
                             document.getElementById('Form').submit(); 
+                        } else {
+                            swal("Your question is safe!");
+                        }
+                    });
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('deleteBtn2').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+            
+                    swal({
+                        title: "Are you sure?",
+                        text: "Once deleted, you will not be able to recover this course!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => { 
+                        if (willDelete) {
+                            document.getElementById('delete_section_exam').value = "1";
+                            document.getElementById('Form2').submit(); 
                         } else {
                             swal("Your question is safe!");
                         }
