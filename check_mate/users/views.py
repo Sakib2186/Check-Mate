@@ -700,6 +700,11 @@ def edit_exam(request,course_id,exam_id):
         exam_type = Exam_Type.objects.all()
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
 
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
         if request.method == "POST":
 
             if request.POST.get('save_exam'):
@@ -748,7 +753,7 @@ def edit_exam(request,course_id,exam_id):
                     messages.error(request,"Select Answer Field!")
                     return redirect('users:edit_exam',course_id,section_exam.pk)
 
-                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks)
+                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id=None)
 
                 if result[0]:
                     messages.success(request,result[1])
@@ -756,17 +761,40 @@ def edit_exam(request,course_id,exam_id):
                 else:
                     messages.error(request,"Error occured! Try again later.")
                     return redirect('users:edit_exam',course_id,section_exam.pk)
+                
+            if request.POST.get('delete_question'):
+                    
+                    flag = str(request.POST.get('delete_question'))
+                    pk = request.POST.get('question_pk')
+    
+                    if flag == "1":
 
-        if logged_in_user == None:
-            user = request.user.username
-        else:
-            user = logged_in_user.user_id
-        
-        sets = []
-        for i in range(section_exam.exam_set):
-            ascii_value = ord('A') + i
-            letter = chr(ascii_value)
-            sets.append(letter)
+                        if Delete.delete_question(pk):
+                            messages.success(request,"Question Deleted Successfully!")
+                            return redirect('users:edit_exam',course_id,section_exam.pk)
+                        else:
+                            messages.error(request,"Error occured! Try again later.")
+                            return redirect('users:edit_exam',course_id,section_exam.pk)
+                        
+            if request.POST.get('edit_question'):
+
+                question_pk = request.POST.get('question_pk')
+                question_set = request.POST.get('question_set')
+                question = request.POST.get('question')
+                answer_size = request.POST.get('answer_size')
+                marks = request.POST.get('marks')
+
+                result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_pk)
+                if result[0]:
+                    messages.success(request,result[1])
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
+                else:
+                    messages.error(request,"Could not update! Try again later")
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
+
+
+        none_set_questions = Load_Courses.get_set_questions_for_none(exam_id)
+        sets = Load_Courses.get_set_questions_not_none(exam_id)
 
         context = {
                 'page_title':'Check Mate',
@@ -782,6 +810,7 @@ def edit_exam(request,course_id,exam_id):
                 'edit_exam':True,
                 'section_exam':section_exam,
                 'question_set':sets,
+                'none_set_questions':none_set_questions,
             }
 
         return render(request,"add_exam.html",context)

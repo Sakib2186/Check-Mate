@@ -199,7 +199,7 @@
                                 {% else %}
                                 {% for i in question_set %}
                                 <li class="nav-item">
-                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}" href="#second_{{ i }}" data-toggle="tab">Set {{ i }}</a>
+                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}" href="#second_{{ i.0 }}" data-toggle="tab">Set {{ i.0 }}</a>
                                 </li>
                                 {% endfor %}
                                 {% endif %}
@@ -221,19 +221,22 @@
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
                                                 <li class="list-group-item nestable-item">
+                                                    {% for questions in none_set_questions.none %}
                                                     <div class="media align-items-center">
                                                         <div class="media-left">
-                                                            <span>1.</span>
+                                                            <span>{{forloop.counter}}.</span>
                                                         </div>
                                                         <div class="media-body">
-                                                            Installation
+                                                            {{questions.question}}
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#editQuiz" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <br>
+                                                    {% endfor %}
                                                 </li>
                                             </ul>
                                         </div>
@@ -241,30 +244,35 @@
                                 </div>
                                 {% else %}
                                 {% for i in question_set %}
-                                <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="second_{{ i }}">
+                                <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="second_{{ i.0 }}">
                                     <div class="card">
                                         <div class="card-header">
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i}}')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
                                                 <li class="list-group-item nestable-item">
+                                                    {% for key,value in i.1.items %}
+                                                    {% for question in value %}
                                                     <div class="media align-items-center">
                                                         <div class="media-left">
-                                                            <span>1.</span>
+                                                            <span>{{forloop.counter}}.</span>
                                                         </div>
                                                         <div class="media-body">
-                                                            Installation
+                                                            {{question.question}}
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#editQuiz" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <br>
+                                                    {% endfor %}
+                                                    {% endfor %}
                                                 </li>
                                             </ul>
                                         </div>
@@ -351,7 +359,7 @@
                                             <label for="qtitle"
                                                 class="col-form-label form-label col-md-3">Question:</label>
                                             <div class="col-md-9">
-                                                <input type="text" id="question_adding" name="question_set">
+                                                <input type="hidden" id="question_adding" name="question_set">
                                                 <input id="qtitle"
                                                     type="text"
                                                     class="form-control"
@@ -405,6 +413,81 @@
                     {% block footer %}
                         {% include 'footer.html' %}
                     {% endblock footer %}
+
+                    <div class="modal fade" id="edit_quiz">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary">
+                                    <h4 class="modal-title text-white">Edit Question</h4>
+                                    <button type="button"
+                                            class="close text-white"
+                                            data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" id="Form" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="form-group row">
+                                            <label for="qtitle"
+                                                class="col-form-label form-label col-md-3">Question:</label>
+                                            <div class="col-md-9">
+                                                <input type="hidden" id="question_set" name="question_set">
+                                                <input id="question"
+                                                    type="text"
+                                                    class="form-control"
+                                                    value=""
+                                                    placeholder="Question"
+                                                    required
+                                                    name="question">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="type"
+                                                class="col-form-label form-label col-md-3">Answering field:</label>
+                                            <div class="col-md-4">
+                                                <select id="answer_size"
+                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                    <option value="0">----------</option>
+                                                    <option value="Short">Short</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Large">Large</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="touch-spin-2"
+                                                class="col-form-label form-label col-md-3">Marks:</label>
+                                            <div class="col-md-4">
+                                                <input id="marks"
+                                                    data-toggle="touch-spin"
+                                                    data-min="0"
+                                                    data-max="100"
+                                                    data-step="5"
+                                                    type="number"
+                                                    value=""
+                                                    name="marks"
+                                                    required
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-0">
+                                            <div class="col-md-8 offset-md-3">
+                                                <input type="submit"
+                                                        class="btn btn-success" value="Update" name="edit_question">
+                                                <input type="hidden" name="delete_question" id="deleteCourseFlag" value="0">
+                                                <input type="hidden" id="pk" name="question_pk">
+                                                <button type="button"
+                                                        class="btn btn-danger" id="deleteBtn">Delete</button>
+                                                
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -429,6 +512,43 @@
                 inputElement.value=set_name;
             
               }
+
+            function openModal2(id,question_set,question,answering_field,marks) {
+                // Set data in the modal
+                var pk = document.getElementById('pk');
+                pk.value = id;
+                var quest = document.getElementById('question');
+                quest.value = question;
+                var quest_set = document.getElementById('question_set');
+                quest_set.value = question_set;
+                var answ = document.getElementById('answer_size');
+                answ.value = answering_field;
+                var mrk = document.getElementById('marks');
+                mrk.value = marks;
+                
+              }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('deleteBtn').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+            
+                    swal({
+                        title: "Are you sure?",
+                        text: "Once deleted, you will not be able to recover this course!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => { 
+                        if (willDelete) {
+                            document.getElementById('deleteCourseFlag').value = "1";
+                            document.getElementById('Form').submit(); 
+                        } else {
+                            swal("Your question is safe!");
+                        }
+                    });
+                });
+            });
+
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>

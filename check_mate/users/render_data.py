@@ -271,6 +271,35 @@ class Load_Courses:
         '''This function will return the saved section exams'''
 
         return Section_Exam.objects.get(pk = exam_id)
+    
+    def get_set_questions_for_none(exam_id):
+
+        '''This function will load question set of none type'''
+
+        dic={}
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        if section_exam.exam_set == 0:
+            questions = Question.objects.filter(questions_of = section_exam,question_set='none')
+            dic['none'] = questions
+
+        return dic
+    
+    def get_set_questions_not_none(exam_id):
+
+        '''This function will load questions sets of not none type'''
+
+        sets = []
+        dic={}
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        for i in range(section_exam.exam_set):
+            ascii_value = ord('A') + i
+            letter = chr(ascii_value)
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter)
+            dic={}
+            dic[letter]=questions
+            sets.append((letter,dic))
+
+        return sets
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
@@ -434,18 +463,28 @@ class Save:
         
         return (True,message,new_instance)
 
-    def save_question_for_exam(exam_id,question_set,question,answer_size,marks):
+    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id):
 
         '''This function will save the questions for a particular exam'''
 
         section_exm = Section_Exam.objects.get(pk = exam_id)
-        question_exam = Question.objects.create(questions_of = section_exm,
-                                                question = question,
-                                                answer_field_length = answer_size,
-                                                marks = marks,
-                                                question_set = question_set)
-        question_exam.save()
-        message = "Question Saved!"
+        try:
+            quest = Question.objects.get(id = question_id)
+            quest.question = question
+            quest.answer_field_length = answer_size
+            quest.marks = marks
+            quest.question_set = question_set
+            quest.save()
+            message = "Question Updated!"
+        except:
+            
+            question_exam = Question.objects.create(questions_of = section_exm,
+                                                    question = question,
+                                                    answer_field_length = answer_size,
+                                                    marks = marks,
+                                                    question_set = question_set)
+            question_exam.save()
+            message = "Question Saved!"
         return (True,message)
 
 
@@ -467,3 +506,11 @@ class Delete:
         course.delete()
         return True
             
+    def delete_question(pk):
+
+        '''Thus function will delete the question for the specific set'''
+
+        question = Question.objects.get(pk=pk)
+        question.delete()
+
+        return True
