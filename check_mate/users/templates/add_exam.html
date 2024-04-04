@@ -157,6 +157,27 @@
                                                                 value="{% if section_exam.exam_set == 0 %}None{% else %}{{section_exam.exam_set}}{% endif %}">
                                                         </div>
                                                     </div>
+                                                    {% if edit_exam %}
+                                                    <div class="form-group row">
+                                                        <label for="cmn-toggle"
+                                                               class="col-sm-3 col-form-label form-label">Available to TA:</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="form-group">
+                                                                <div class="custom-control custom-checkbox-toggle">
+                                                                    <input id="cmn-toggle"
+                                                                           type="checkbox"
+                                                                           aria-checked="false"
+                                                                           class="custom-control-input"
+                                                                           role="switch"
+                                                                           name="ta_available"
+                                                                           {% if section_exam.ta_available %}checked{% endif %}>
+                                                                    <label class="custom-control-label"
+                                                                           for="cmn-toggle"><span class="sr-only">Available to Teaching Assistant</span></label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
                                                     <div class="form-group row">
                                                         <label for="cmn-toggle"
                                                             class="col-sm-3 col-form-label form-label">Date (Tentative):</label>

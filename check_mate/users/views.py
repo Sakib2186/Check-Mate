@@ -693,7 +693,7 @@ def take_exam(request,course_id):
                         messages.error(request,"Please provide Exam date!")
                         return redirect('users:take_exam',course_id)
 
-                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None)
+                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None,ta_available=None)
                     if result[0]:
                         messages.success(request,result[1])
                         return redirect('users:edit_exam',course_id,result[2].pk)
@@ -762,6 +762,12 @@ def edit_exam(request,course_id,exam_id):
                     exam_date = request.POST.get('exam_date')
                     exam_description = request.POST.get('exam_description')
                     exam_set = request.POST.get('exam_set')
+                    ta_available = request.POST.get('ta_available')
+
+                    if ta_available == "on":
+                        ta_available= True
+                    else:
+                        ta_available=False
 
                     if exam_set == "" or exam_set=="0":
                         exam_set=0
@@ -781,7 +787,7 @@ def edit_exam(request,course_id,exam_id):
                         messages.error(request,"Please provide Exam date!")
                         return redirect('users:edit_exam',course_id,exam_id)
 
-                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id)
+                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id,ta_available)
                     if result[0]:
                         messages.success(request,result[1])
                         return redirect('users:edit_exam',course_id,result[2].pk)
