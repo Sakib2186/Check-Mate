@@ -12,6 +12,12 @@ import pyotp
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from check_mate import settings
+from docx import Document
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
 
 logger=logging.getLogger(__name__)
@@ -895,3 +901,89 @@ def edit_exam(request,course_id,exam_id):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request") 
+    
+@login_required
+def generate_qp(request,course_id,exam_id):
+
+    # try:
+    #     logged_in_user = Login.logged_in_user(request)
+
+    #     if logged_in_user == None:
+    #         user = request.user.username
+    #     else:
+    #         user = logged_in_user.user_id
+
+        #Create a new Document
+        doc = Document()
+
+        # Set page margins
+        for section in doc.sections:
+            section.top_margin = Inches(1)  # Adjust margin as needed
+            section.bottom_margin = Inches(1)
+            section.left_margin = Inches(1)
+            section.right_margin = Inches(1)
+
+        # Sample questions and answers (you can replace this with your data source)
+        questions = ["Question 1", "Question 2", "Question 3"]
+        answers = ["", "", ""]  # Blank answers initially
+        marks = ["5", "8", "10"]
+
+        # Iterate through questions and answers
+        for q, a, m in zip(questions, answers,marks):
+            # Add the question
+            p = doc.add_paragraph()
+            p.add_run(q).bold = True
+            p.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+            
+            p = doc.add_paragraph()
+            p.add_run(f"[{m}]")
+            p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+            # doc.add_picture("test1.png",width=Inches(6), height=Inches(4))
+
+            # table = doc.add_table(rows=2, cols=2)
+            # table.style = 'Table Grid'  
+            # table.border_style = "dotted"
+            # table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+            # for i in range(2):
+            #     table.rows[0].cells[i].text = ""
+
+    
+            table = doc.add_table(rows=1, cols=1)
+            table.autofit = False
+            table.columns[0].width = Pt(50)
+            table.rows[0].height = Pt(50) 
+            
+            cell = table.cell(0, 0)
+            tc_pr = cell._element.get_or_add_tcPr()
+            borders = OxmlElement('w:tcBorders')
+            tc_pr.append(borders)
+            
+            for border_type in ['top', 'left', 'bottom', 'right']:
+                border_elm = OxmlElement(f'w:{border_type}')
+                border_elm.set(qn('w:val'), 'dotted')
+                border_elm.set(qn('w:sz'), '15')
+                border_elm.set(qn('w:space'), '0')
+                border_elm.set(qn('w:color'), '000000')
+                border_elm.set(qn('w:rounded'), 'true') 
+                borders.append(border_elm)
+            
+            doc.add_paragraph()
+
+        doc.save("test.docx")
+
+        # # Save the document to a BytesIO object
+        # doc_stream = BytesIO()
+        # doc.save(doc_stream)
+        # doc_stream.seek(0)
+
+        # # Return the Word document as an attachment
+        # response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        # response['Content-Disposition'] = 'attachment; filename=questions.docx'
+        # return response
+
+    # except Exception as e:
+    #     #saving error information in database if error occured
+    #     logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+    #     ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+    #     return HttpResponse("Bad Request") 
