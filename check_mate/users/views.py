@@ -13,12 +13,12 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from check_mate import settings
 from docx import Document
-from docx.shared import Inches
-from docx.shared import Pt
+from docx.shared import Pt,Inches
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-
+from io import BytesIO
+from django.template import loader
 
 logger=logging.getLogger(__name__)
 
@@ -923,13 +923,68 @@ def generate_qp(request,course_id,exam_id):
             section.left_margin = Inches(1)
             section.right_margin = Inches(1)
 
-        # Sample questions and answers (you can replace this with your data source)
+    
+        doc.add_picture('graduation (1).png', width=Inches(2)) 
+        last_paragraph = doc.paragraphs[-1]
+        last_paragraph.alignment = 1  # Center alignment   
+        doc.add_paragraph() 
+        # Add Exam type, Name, ID, Section
+        x = doc.add_heading('Exam type:', level=1)
+        x.alignment = 1
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+        doc.add_paragraph()
+        
+        x = doc.add_heading('Name:', level=1)
+
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+        x = doc.add_heading('ID:', level=1)
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+        x = doc.add_heading('Section:', level=1)
+
+        doc.add_paragraph()
+        doc.add_paragraph()
+        doc.add_paragraph()
+
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+
+        x =  doc.add_heading('Title:', level=1)
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+
+        # Add Date
+        x = doc.add_heading('Semester:', level=1)
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+
+        # Add Date
+        x = doc.add_heading('Date:', level=1)
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+
+        # Add Date
+        x = doc.add_heading('Signature:', level=1)
+        for run in x.runs:
+            run.font.color.rgb = None  # Clear any existing color
+            run.font.color.theme_color = 0  # Set the font color to black
+
+        # Add a page break to start the main content on a new page
+        doc.add_page_break()
         questions = ["Question 1", "Question 2", "Question 3"]
-        answers = ["", "", ""]  # Blank answers initially
         marks = ["5", "8", "10"]
 
         # Iterate through questions and answers
-        for q, a, m in zip(questions, answers,marks):
+        for q, m in zip(questions, marks):
             # Add the question
             p = doc.add_paragraph()
             p.add_run(q).bold = True
@@ -938,15 +993,6 @@ def generate_qp(request,course_id,exam_id):
             p = doc.add_paragraph()
             p.add_run(f"[{m}]")
             p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-            # doc.add_picture("test1.png",width=Inches(6), height=Inches(4))
-
-            # table = doc.add_table(rows=2, cols=2)
-            # table.style = 'Table Grid'  
-            # table.border_style = "dotted"
-            # table.alignment = WD_TABLE_ALIGNMENT.CENTER
-
-            # for i in range(2):
-            #     table.rows[0].cells[i].text = ""
 
     
             table = doc.add_table(rows=1, cols=1)
@@ -967,20 +1013,48 @@ def generate_qp(request,course_id,exam_id):
                 border_elm.set(qn('w:color'), '000000')
                 border_elm.set(qn('w:rounded'), 'true') 
                 borders.append(border_elm)
+
+            # # Add nested table in the top right corner
+            # nested_table = cell.add_table(rows=2, cols=2)
+            # nested_table.columns[0].width = Inches(0.5)
+            # nested_table.columns[1].width = Inches(0.5)
+            # nested_table.rows[0].height = Pt(5)
+            # nested_table.rows[1].height = Pt(5)
+
+            # # Add content to the top right cell of the nested table
+            # top_right_cell = nested_table.cell(0, 1)
+            # p = top_right_cell.add_paragraph()
+            # p.add_run("Small Box").bold = True
+            # p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+            
+            # # Add borders to the nested table cells
+            # for row in nested_table.rows:
+                
+            #     for cell in row.cells:
+            #         tc_pr = cell._element.get_or_add_tcPr()
+            #         borders2 = OxmlElement('w:tcBorders')
+            #         tc_pr.append(borders2)
+            #         for border_type in ['top', 'left', 'bottom', 'right']:
+            #             border = OxmlElement(f'w:{border_type}')
+            #             border.set(qn('w:val'), 'single')
+            #             border.set(qn('w:sz'), '15')
+            #             border.set(qn('w:space'), '0')
+            #             border.set(qn('w:color'), '000000')
+            #             border.set(qn('w:rounded'), 'true') 
+            #             borders2.append(border)
             
             doc.add_paragraph()
 
-        doc.save("test.docx")
+        # Save the document to a BytesIO object
+        doc_stream = BytesIO()
+        doc.save(doc_stream)
+        doc_stream.seek(0)
 
-        # # Save the document to a BytesIO object
-        # doc_stream = BytesIO()
-        # doc.save(doc_stream)
-        # doc_stream.seek(0)
-
-        # # Return the Word document as an attachment
-        # response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        # response['Content-Disposition'] = 'attachment; filename=questions.docx'
-        # return response
+        # Return the Word document as an attachment
+        response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename=questions.docx'
+        return response
+        
 
     # except Exception as e:
     #     #saving error information in database if error occured

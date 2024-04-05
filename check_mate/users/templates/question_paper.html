@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Document</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+    <div id="document-container"></div>
+
+    <script>
+        // Embed Word document using Office Online Viewer
+        Office.initialize = function () {
+            var element = document.getElementById('document-container');
+            Word.run(function (context) {
+                var doc = context.application.createDocument();
+                doc.open('<your_document_stream_here>');
+                return context.sync().then(function () {
+                    console.log('Document opened');
+                });
+            });
+        };
+    </script>
+</body>
+</html>
