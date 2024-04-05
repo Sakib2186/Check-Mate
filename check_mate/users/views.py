@@ -18,7 +18,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
-from django.template import loader
+
 
 logger=logging.getLogger(__name__)
 
@@ -952,34 +952,40 @@ def generate_qp(request,course_id,exam_id):
         doc.add_paragraph()
 
         for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
+            run.font.color.rgb = None  
+            run.font.color.theme_color = 0 
 
         x =  doc.add_heading('Title:', level=1)
         for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
+            run.font.color.rgb = None 
+            run.font.color.theme_color = 0  
 
         # Add Date
         x = doc.add_heading('Semester:', level=1)
         for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
+            run.font.color.rgb = None
+            run.font.color.theme_color = 0  
 
         # Add Date
         x = doc.add_heading('Date:', level=1)
         for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
+            run.font.color.rgb = None
+            run.font.color.theme_color = 0 
 
         # Add Date
         x = doc.add_heading('Signature:', level=1)
         for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
+            run.font.color.rgb = None  
+            run.font.color.theme_color = 0  
 
         # Add a page break to start the main content on a new page
         doc.add_page_break()
+        p = doc.add_paragraph()
+        x = p.add_run(f"Set A")
+        x.bold = True
+        doc.add_paragraph()
+        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
         questions = ["Question 1", "Question 2", "Question 3"]
         marks = ["5", "8", "10"]
 
