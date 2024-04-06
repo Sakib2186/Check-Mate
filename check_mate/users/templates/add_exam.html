@@ -312,26 +312,54 @@
                                             <h4 class="card-title">Get Paper</h4>
                                         </div>
                                         <div class="card-body">
-                                            {% comment %} <div class="nestable" id="nestable">
+                                            <div class="nestable" id="nestable">
                                                 <ul class="list-group list-group-fit nestable-list-plain mb-0">
+                                                    {% if question_set|length == 0 %}
                                                     <li class="list-group-item nestable-item">
+                                                        <form method="POST">
+                                                        {% csrf_token %}
                                                         <div class="media align-items-center">
                                                             <div class="media-left">
-                                                                <span>Set A</span>
+                                                                <span>Question Paper</span>
                                                             </div>
                                                             <div class="media-body">
                                                                
                                                             </div>
                                                             <div class="media-right text-right">
                                                                 <div style="width:100px">
-                                                                    <a href="{% url 'users:generate_qp' course_id 2 %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download">
+                                                                    <input type="hidden" name="question_set" value="A">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <br>
+                                                        </form>
                                                     </li>
+                                                    {% endif %}
+                                                    {% for x in question_set %}
+                                                    <li class="list-group-item nestable-item">
+                                                        <form method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="media align-items-center">
+                                                            <div class="media-left">
+                                                                <span>Set {{x.0}}</span>
+                                                            </div>
+                                                            <div class="media-body">
+                                                               
+                                                            </div>
+                                                            <div class="media-right text-right">
+                                                                <div style="width:100px">
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download">
+                                                                    <input type="hidden" name="question_set" value="{{x.0}}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        </form>
+                                                    </li>
+                                                    {% endfor %}
                                                 </ul>
-                                            </div> {% endcomment %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

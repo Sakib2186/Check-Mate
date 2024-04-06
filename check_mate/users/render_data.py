@@ -279,7 +279,7 @@ class Load_Courses:
         dic={}
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         if section_exam.exam_set == 0:
-            questions = Question.objects.filter(questions_of = section_exam,question_set='A')
+            questions = Question.objects.filter(questions_of = section_exam,question_set='A').order_by('-pk')
             dic['A'] = questions
 
         return dic
@@ -294,12 +294,27 @@ class Load_Courses:
         for i in range(section_exam.exam_set):
             ascii_value = ord('A') + i
             letter = chr(ascii_value)
-            questions = Question.objects.filter(questions_of = section_exam,question_set=letter)
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-pk')
             dic={}
             dic[letter]=questions
             sets.append((letter,dic))
 
         return sets
+    
+    def get_questions_and_marks_list(exam_id,question_set):
+
+        '''This function will return the a list containing two lists of questions and marks'''
+
+        question_list = []
+        marks_list = []
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
+        for q in questions:
+            question_list.append(str(q.question))
+            marks_list.append(str(q.marks))
+
+        return (question_list,marks_list)
+    
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''

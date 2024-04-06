@@ -866,11 +866,163 @@ def edit_exam(request,course_id,exam_id):
                                 messages.error(request,"Could not delete! Try again later")
                                 return redirect('users:course',course_id)
 
+                if request.POST.get('download_question'):
 
+
+                    set_number = request.POST.get('question_set')
+
+                    questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
+                    doc = Document()
+
+                    # Set page margins
+                    for section in doc.sections:
+                        section.top_margin = Inches(1)  # Adjust margin as needed
+                        section.bottom_margin = Inches(1)
+                        section.left_margin = Inches(1)
+                        section.right_margin = Inches(1)
+
+                
+                    doc.add_picture('graduation (1).png', width=Inches(2)) 
+                    last_paragraph = doc.paragraphs[-1]
+                    last_paragraph.alignment = 1  # Center alignment   
+                    doc.add_paragraph() 
+                    # Add Exam type, Name, ID, Section
+                    x = doc.add_heading('Exam type:', level=1)
+                    x.alignment = 1
+                    for run in x.runs:
+                        run.font.color.rgb = None  # Clear any existing color
+                        run.font.color.theme_color = 0  # Set the font color to black
+                    doc.add_paragraph()
+                    
+                    x = doc.add_heading('Name:', level=1)
+
+                    for run in x.runs:
+                        run.font.color.rgb = None  # Clear any existing color
+                        run.font.color.theme_color = 0  # Set the font color to black
+                    x = doc.add_heading('ID:', level=1)
+                    for run in x.runs:
+                        run.font.color.rgb = None  # Clear any existing color
+                        run.font.color.theme_color = 0  # Set the font color to black
+                    x = doc.add_heading('Section:', level=1)
+
+                    doc.add_paragraph()
+                    doc.add_paragraph()
+                    doc.add_paragraph()
+
+                    for run in x.runs:
+                        run.font.color.rgb = None  
+                        run.font.color.theme_color = 0 
+
+                    x =  doc.add_heading('Title:', level=1)
+                    for run in x.runs:
+                        run.font.color.rgb = None 
+                        run.font.color.theme_color = 0  
+
+                    # Add Date
+                    x = doc.add_heading('Semester:', level=1)
+                    for run in x.runs:
+                        run.font.color.rgb = None
+                        run.font.color.theme_color = 0  
+
+                    # Add Date
+                    x = doc.add_heading('Date:', level=1)
+                    for run in x.runs:
+                        run.font.color.rgb = None
+                        run.font.color.theme_color = 0 
+
+                    # Add Date
+                    x = doc.add_heading('Signature:', level=1)
+                    for run in x.runs:
+                        run.font.color.rgb = None  
+                        run.font.color.theme_color = 0  
+
+                    # Add a page break to start the main content on a new page
+                    doc.add_page_break()
+                    p = doc.add_paragraph()
+                    x = p.add_run(f"Set {set_number}")
+                    x.bold = True
+                    doc.add_paragraph()
+                    p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+
+                    # Iterate through questions and answers
+                    for q, m in zip(questions[0], questions[1]):
+                        # Add the question
+                        p = doc.add_paragraph()
+                        p.add_run("Q. ").bold=True
+                        p.add_run(q).bold = True
+                        p.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+                        
+                        p = doc.add_paragraph()
+                        p.add_run(f"[{m}]")
+                        p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+
+                
+                        table = doc.add_table(rows=1, cols=1)
+                        table.autofit = False
+                        table.columns[0].width = Pt(50)
+                        table.rows[0].height = Pt(50) 
+                        
+                        cell = table.cell(0, 0)
+                        tc_pr = cell._element.get_or_add_tcPr()
+                        borders = OxmlElement('w:tcBorders')
+                        tc_pr.append(borders)
+                        
+                        for border_type in ['top', 'left', 'bottom', 'right']:
+                            border_elm = OxmlElement(f'w:{border_type}')
+                            border_elm.set(qn('w:val'), 'dotted')
+                            border_elm.set(qn('w:sz'), '15')
+                            border_elm.set(qn('w:space'), '0')
+                            border_elm.set(qn('w:color'), '000000')
+                            border_elm.set(qn('w:rounded'), 'true') 
+                            borders.append(border_elm)
+
+                        # # Add nested table in the top right corner
+                        # nested_table = cell.add_table(rows=2, cols=2)
+                        # nested_table.columns[0].width = Inches(0.5)
+                        # nested_table.columns[1].width = Inches(0.5)
+                        # nested_table.rows[0].height = Pt(5)
+                        # nested_table.rows[1].height = Pt(5)
+
+                        # # Add content to the top right cell of the nested table
+                        # top_right_cell = nested_table.cell(0, 1)
+                        # p = top_right_cell.add_paragraph()
+                        # p.add_run("Small Box").bold = True
+                        # p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+                        
+                        # # Add borders to the nested table cells
+                        # for row in nested_table.rows:
+                            
+                        #     for cell in row.cells:
+                        #         tc_pr = cell._element.get_or_add_tcPr()
+                        #         borders2 = OxmlElement('w:tcBorders')
+                        #         tc_pr.append(borders2)
+                        #         for border_type in ['top', 'left', 'bottom', 'right']:
+                        #             border = OxmlElement(f'w:{border_type}')
+                        #             border.set(qn('w:val'), 'single')
+                        #             border.set(qn('w:sz'), '15')
+                        #             border.set(qn('w:space'), '0')
+                        #             border.set(qn('w:color'), '000000')
+                        #             border.set(qn('w:rounded'), 'true') 
+                        #             borders2.append(border)
+                        
+                        doc.add_paragraph()
+
+                    # Save the document to a BytesIO object
+                    doc_stream = BytesIO()
+                    doc.save(doc_stream)
+                    doc_stream.seek(0)
+
+                    # Return the Word document as an attachment
+                    response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                    response['Content-Disposition'] = 'attachment; filename=questions.docx'
+                    return response
+                    
+                
 
             none_set_questions = Load_Courses.get_set_questions_for_none(exam_id)
             sets = Load_Courses.get_set_questions_not_none(exam_id)
-
+            
             context = {
                     'page_title':'Check Mate',
                     'user_type':type_of_logged_in_user,
@@ -904,169 +1056,3 @@ def edit_exam(request,course_id,exam_id):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request") 
-    
-@login_required
-def generate_qp(request,course_id,exam_id):
-
-    # try:
-    #     logged_in_user = Login.logged_in_user(request)
-
-    #     if logged_in_user == None:
-    #         user = request.user.username
-    #     else:
-    #         user = logged_in_user.user_id
-
-        #Create a new Document
-        doc = Document()
-
-        # Set page margins
-        for section in doc.sections:
-            section.top_margin = Inches(1)  # Adjust margin as needed
-            section.bottom_margin = Inches(1)
-            section.left_margin = Inches(1)
-            section.right_margin = Inches(1)
-
-    
-        doc.add_picture('graduation (1).png', width=Inches(2)) 
-        last_paragraph = doc.paragraphs[-1]
-        last_paragraph.alignment = 1  # Center alignment   
-        doc.add_paragraph() 
-        # Add Exam type, Name, ID, Section
-        x = doc.add_heading('Exam type:', level=1)
-        x.alignment = 1
-        for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
-        doc.add_paragraph()
-        
-        x = doc.add_heading('Name:', level=1)
-
-        for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
-        x = doc.add_heading('ID:', level=1)
-        for run in x.runs:
-            run.font.color.rgb = None  # Clear any existing color
-            run.font.color.theme_color = 0  # Set the font color to black
-        x = doc.add_heading('Section:', level=1)
-
-        doc.add_paragraph()
-        doc.add_paragraph()
-        doc.add_paragraph()
-
-        for run in x.runs:
-            run.font.color.rgb = None  
-            run.font.color.theme_color = 0 
-
-        x =  doc.add_heading('Title:', level=1)
-        for run in x.runs:
-            run.font.color.rgb = None 
-            run.font.color.theme_color = 0  
-
-        # Add Date
-        x = doc.add_heading('Semester:', level=1)
-        for run in x.runs:
-            run.font.color.rgb = None
-            run.font.color.theme_color = 0  
-
-        # Add Date
-        x = doc.add_heading('Date:', level=1)
-        for run in x.runs:
-            run.font.color.rgb = None
-            run.font.color.theme_color = 0 
-
-        # Add Date
-        x = doc.add_heading('Signature:', level=1)
-        for run in x.runs:
-            run.font.color.rgb = None  
-            run.font.color.theme_color = 0  
-
-        # Add a page break to start the main content on a new page
-        doc.add_page_break()
-        p = doc.add_paragraph()
-        x = p.add_run(f"Set A")
-        x.bold = True
-        doc.add_paragraph()
-        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        questions = ["Question 1", "Question 2", "Question 3"]
-        marks = ["5", "8", "10"]
-
-        # Iterate through questions and answers
-        for q, m in zip(questions, marks):
-            # Add the question
-            p = doc.add_paragraph()
-            p.add_run(q).bold = True
-            p.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
-            
-            p = doc.add_paragraph()
-            p.add_run(f"[{m}]")
-            p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-
-    
-            table = doc.add_table(rows=1, cols=1)
-            table.autofit = False
-            table.columns[0].width = Pt(50)
-            table.rows[0].height = Pt(50) 
-            
-            cell = table.cell(0, 0)
-            tc_pr = cell._element.get_or_add_tcPr()
-            borders = OxmlElement('w:tcBorders')
-            tc_pr.append(borders)
-            
-            for border_type in ['top', 'left', 'bottom', 'right']:
-                border_elm = OxmlElement(f'w:{border_type}')
-                border_elm.set(qn('w:val'), 'dotted')
-                border_elm.set(qn('w:sz'), '15')
-                border_elm.set(qn('w:space'), '0')
-                border_elm.set(qn('w:color'), '000000')
-                border_elm.set(qn('w:rounded'), 'true') 
-                borders.append(border_elm)
-
-            # # Add nested table in the top right corner
-            # nested_table = cell.add_table(rows=2, cols=2)
-            # nested_table.columns[0].width = Inches(0.5)
-            # nested_table.columns[1].width = Inches(0.5)
-            # nested_table.rows[0].height = Pt(5)
-            # nested_table.rows[1].height = Pt(5)
-
-            # # Add content to the top right cell of the nested table
-            # top_right_cell = nested_table.cell(0, 1)
-            # p = top_right_cell.add_paragraph()
-            # p.add_run("Small Box").bold = True
-            # p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-            
-            # # Add borders to the nested table cells
-            # for row in nested_table.rows:
-                
-            #     for cell in row.cells:
-            #         tc_pr = cell._element.get_or_add_tcPr()
-            #         borders2 = OxmlElement('w:tcBorders')
-            #         tc_pr.append(borders2)
-            #         for border_type in ['top', 'left', 'bottom', 'right']:
-            #             border = OxmlElement(f'w:{border_type}')
-            #             border.set(qn('w:val'), 'single')
-            #             border.set(qn('w:sz'), '15')
-            #             border.set(qn('w:space'), '0')
-            #             border.set(qn('w:color'), '000000')
-            #             border.set(qn('w:rounded'), 'true') 
-            #             borders2.append(border)
-            
-            doc.add_paragraph()
-
-        # Save the document to a BytesIO object
-        doc_stream = BytesIO()
-        doc.save(doc_stream)
-        doc_stream.seek(0)
-
-        # Return the Word document as an attachment
-        response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename=questions.docx'
-        return response
-        
-
-    # except Exception as e:
-    #     #saving error information in database if error occured
-    #     logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
-    #     ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
-    #     return HttpResponse("Bad Request") 
