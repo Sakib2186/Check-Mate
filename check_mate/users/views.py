@@ -386,9 +386,12 @@ def add_course(request):
                     course_name = request.POST.get('course_name')
                     course_code = request.POST.get('course_code')
                     course_description = request.POST.get('course_description')
-                    cover_picture = request.FILES['cover_picture']
+                    try:
+                        cover_picture = request.FILES['cover_picture']
+                    except:
+                        cover_picture = None
                     
-                    result = Save.save_course(course_code,course_name,course_description,cover_picture,course=None)
+                    result = Save.save_course(course_code,course_name,course_description,cover_picture,course_existing = None)
                     if result[0]:
                         messages.success(request,'Course Added Successfully!')
                         return redirect('users:edit_course_details',result[1].pk)

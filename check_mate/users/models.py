@@ -5,7 +5,7 @@ import os
 #funtion for saving image path in os
 def course_picture_upload_path(instance, filename):
     # Generate file path dynamically
-    return os.path.join('Courses', str(instance.course_code), 'course_cover_picture', filename)
+    return os.path.join('Courses', f'{str(instance.course_code)}','cover_picture', filename)
 
 # Create your models here.
 
