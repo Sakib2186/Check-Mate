@@ -810,12 +810,17 @@ def edit_exam(request,course_id,exam_id):
                     question = request.POST.get('question')
                     answer_size = request.POST.get('answer_size')
                     marks = request.POST.get('marks')
+                    box_height = int(request.POST.get('box_height'))
 
                     if answer_size == "0":
                         messages.error(request,"Select Answer Field!")
                         return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
+                    if box_height == 0:
+                        messages.error(request,"Box Height cannot be 0!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
 
-                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id=None)
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_id=None)
 
                     if result[0]:
                         messages.success(request,result[1])
@@ -843,10 +848,20 @@ def edit_exam(request,course_id,exam_id):
                     question_pk = request.POST.get('question_pk')
                     question_set = request.POST.get('question_set')
                     question = request.POST.get('question')
-                    answer_size = request.POST.get('answer_size')
+                    answer_size = request.POST.get('answer_size2')
                     marks = request.POST.get('marks')
+                    box_height = int(request.POST.get('box_height2'))
 
-                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_pk)
+
+                    if answer_size == "0":
+                        messages.error(request,"Select Answer Field!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+
+                    if box_height == 0:
+                        messages.error(request,"Box Height cannot be 0!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_pk)
                     if result[0]:
                         messages.success(request,result[1])
                         return redirect('users:edit_exam',course_id,section_exam.pk)
@@ -872,6 +887,7 @@ def edit_exam(request,course_id,exam_id):
                     set_number = request.POST.get('question_set')
 
                     questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
+                    section_exam = Load_Courses.get_saved_section_exams(exam_id)
                     doc = Document()
 
                     # Set page margins
@@ -887,7 +903,7 @@ def edit_exam(request,course_id,exam_id):
                     last_paragraph.alignment = 1  # Center alignment   
                     doc.add_paragraph() 
                     # Add Exam type, Name, ID, Section
-                    x = doc.add_heading('Exam type:', level=1)
+                    x = doc.add_heading(f'{section_exam.exam_type}', level=1)
                     x.alignment = 1
                     for run in x.runs:
                         run.font.color.rgb = None  # Clear any existing color
@@ -946,7 +962,7 @@ def edit_exam(request,course_id,exam_id):
 
 
                     # Iterate through questions and answers
-                    for q, m in zip(questions[0], questions[1]):
+                    for q, m, l in zip(questions[0], questions[1],questions[2]):
                         # Add the question
                         p = doc.add_paragraph()
                         p.add_run("Q. ").bold=True
@@ -961,7 +977,7 @@ def edit_exam(request,course_id,exam_id):
                         table = doc.add_table(rows=1, cols=1)
                         table.autofit = False
                         table.columns[0].width = Pt(50)
-                        table.rows[0].height = Pt(50) 
+                        table.rows[0].height = Pt(l) 
                         
                         cell = table.cell(0, 0)
                         tc_pr = cell._element.get_or_add_tcPr()
@@ -1015,7 +1031,7 @@ def edit_exam(request,course_id,exam_id):
 
                     # Return the Word document as an attachment
                     response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-                    response['Content-Disposition'] = 'attachment; filename=questions.docx'
+                    response['Content-Disposition'] = f'attachment; filename=Questions.docx'
                     return response
                     
                 

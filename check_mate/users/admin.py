@@ -66,5 +66,5 @@ class Section_Exam_Admin_Panel(admin.ModelAdmin):
 @admin.register(Question)
 class Question_Admin_panel(admin.ModelAdmin):
     list_display = [
-        'questions_of','question','answer_field_length','marks','question_set'
+        'questions_of','question','answer_field_length','answer_field_length_number','marks','question_set'
     ]

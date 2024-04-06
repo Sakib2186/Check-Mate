@@ -195,6 +195,7 @@ class Question(models.Model):
     questions_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
     question = models.TextField(null=True,blank=True)
     answer_field_length = models.CharField(max_length=100,null=True,blank=True)#short,medium,long
+    answer_field_length_number = models.IntegerField(default = 0)
     marks = models.IntegerField(default = 0)
     question_set = models.CharField(max_length=10,null=True,blank=True)
 

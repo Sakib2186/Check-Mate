@@ -307,13 +307,15 @@ class Load_Courses:
 
         question_list = []
         marks_list = []
+        answer_length = []
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
         for q in questions:
             question_list.append(str(q.question))
             marks_list.append(str(q.marks))
+            answer_length.append(q.answer_field_length_number)
 
-        return (question_list,marks_list)
+        return (question_list,marks_list,answer_length)
     
 class Save:
 
@@ -480,7 +482,7 @@ class Save:
         
         return (True,message,new_instance)
 
-    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id):
+    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_id):
 
         '''This function will save the questions for a particular exam'''
 
@@ -491,6 +493,7 @@ class Save:
             quest.answer_field_length = answer_size
             quest.marks = marks
             quest.question_set = question_set
+            quest.answer_field_length_number = box_height
             quest.save()
             message = "Question Updated!"
         except:
@@ -499,6 +502,7 @@ class Save:
                                                     question = question,
                                                     answer_field_length = answer_size,
                                                     marks = marks,
+                                                    answer_field_length_number = box_height,
                                                     question_set = question_set)
             question_exam.save()
             message = "Question Saved!"

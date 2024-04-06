@@ -257,7 +257,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}','{{questions.answer_field_length_number}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -292,7 +292,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}','{{question.answer_field_length_number}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -327,7 +327,7 @@
                                                             </div>
                                                             <div class="media-right text-right">
                                                                 <div style="width:100px">
-                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download">
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download Docx">
                                                                     <input type="hidden" name="question_set" value="A">
                                                                 </div>
                                                             </div>
@@ -349,7 +349,7 @@
                                                             </div>
                                                             <div class="media-right text-right">
                                                                 <div style="width:100px">
-                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download">
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download Docx">
                                                                     <input type="hidden" name="question_set" value="{{x.0}}">
                                                                 </div>
                                                             </div>
@@ -401,13 +401,26 @@
                                             <label for="type"
                                                 class="col-form-label form-label col-md-3">Answering field:</label>
                                             <div class="col-md-4">
-                                                <select id="type"
+                                                <select id="answer_size"
                                                         class="custom-control custom-select form-control" name="answer_size" required>
                                                     <option value="0">----------</option>
                                                     <option value="Short">Short</option>
                                                     <option value="Medium">Medium</option>
                                                     <option value="Large">Large</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt"
+                                                class="col-form-label form-label col-md-3">Box Height:</label>
+                                            <div class="col-md-4">
+                                                <input id="bx-hgt"
+                                                    data-toggle="touch-spin"
+                                                    type="number"
+                                                    value=""
+                                                    name="box_height"
+                                                    required
+                                                    class="form-control" />
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -475,13 +488,25 @@
                                             <label for="type"
                                                 class="col-form-label form-label col-md-3">Answering field:</label>
                                             <div class="col-md-4">
-                                                <select id="answer_size"
-                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                <select id="answer_size2"
+                                                        class="custom-control custom-select form-control" name="answer_size2" required>
                                                     <option value="0">----------</option>
                                                     <option value="Short">Short</option>
                                                     <option value="Medium">Medium</option>
                                                     <option value="Large">Large</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt2"
+                                                class="col-form-label form-label col-md-3">Box Height:</label>
+                                            <div class="col-md-4">
+                                                <input id="bx-hgt2"
+                                                    data-toggle="touch-spin"
+                                                    type="number"
+                                                    name="box_height2"
+                                                    required
+                                                    class="form-control" />
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -541,7 +566,7 @@
             
               }
 
-            function openModal2(id,question_set,question,answering_field,marks) {
+            function openModal2(id,question_set,question,answering_field,marks,hgt) {
                 // Set data in the modal
                 var pk = document.getElementById('pk');
                 pk.value = id;
@@ -549,8 +574,11 @@
                 quest.value = question;
                 var quest_set = document.getElementById('question_set');
                 quest_set.value = question_set;
-                var answ = document.getElementById('answer_size');
+                var answ = document.getElementById('answer_size2');
                 answ.value = answering_field;
+                var bx_hgt = document.getElementById('bx-hgt2');
+                console.log(bx_hgt.value)
+                bx_hgt.value = hgt;
                 var mrk = document.getElementById('marks');
                 mrk.value = marks;
                 
@@ -598,6 +626,38 @@
                 });
             });
 
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var selectField = document.getElementById('answer_size');
+                var inputField = document.getElementById('bx-hgt');
+        
+                selectField.addEventListener('change', function() {
+                    var selectedValue = selectField.value;
+                    if (selectedValue === 'Short') {
+                        inputField.value = 100;
+                    } else if (selectedValue === 'Medium') {
+                        inputField.value = 200;
+                    } else if (selectedValue === 'Large') {
+                        inputField.value = 400;
+                    } 
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                var selectField = document.getElementById('answer_size2');
+                var inputField = document.getElementById('bx-hgt2');
+        
+                selectField.addEventListener('change', function() {
+                    var selectedValue = selectField.value;
+                    if (selectedValue === 'Short') {
+                        inputField.value = 100;
+                    } else if (selectedValue === 'Medium') {
+                        inputField.value = 200;
+                    } else if (selectedValue === 'Large') {
+                        inputField.value = 400;
+                    }
+                });
+            });
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
