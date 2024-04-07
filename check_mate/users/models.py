@@ -6,6 +6,9 @@ import os
 def course_picture_upload_path(instance, filename):
     # Generate file path dynamically
     return os.path.join('Courses', f'{str(instance.course_code)}','cover_picture', filename)
+def question_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.questions_of.section.course_id.course_code)}',f'{str(instance.questions_of.section.section_number)}',f'{str(instance.questions_of.exam_type)}_{str(instance.questions_of.exam_title)}', filename)
 
 # Create your models here.
 
@@ -198,6 +201,7 @@ class Question(models.Model):
     answer_field_length_number = models.IntegerField(default = 0)
     marks = models.IntegerField(default = 0)
     question_set = models.CharField(max_length=10,null=True,blank=True)
+    question_image =  ResizedImageField(size=[500, 300], upload_to=question_picture_upload_path, blank=True, null=True)
 
     def __str__(self) -> str:
         return str(self.questions_of)

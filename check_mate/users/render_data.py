@@ -308,14 +308,19 @@ class Load_Courses:
         question_list = []
         marks_list = []
         answer_length = []
+        question_images = []
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
         for q in questions:
             question_list.append(str(q.question))
             marks_list.append(str(q.marks))
             answer_length.append(q.answer_field_length_number)
+            if q.question_image:
+                question_images.append(q.question_image)
+            else:
+                question_images.append(None)
 
-        return (question_list,marks_list,answer_length)
+        return (question_list,marks_list,answer_length,question_images)
     
 class Save:
 
@@ -482,7 +487,7 @@ class Save:
         
         return (True,message,new_instance)
 
-    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_id):
+    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_image,question_id):
 
         '''This function will save the questions for a particular exam'''
 
@@ -494,16 +499,22 @@ class Save:
             quest.marks = marks
             quest.question_set = question_set
             quest.answer_field_length_number = box_height
+            if question_image != None:
+                path = settings.MEDIA_ROOT+str(quest.question_image)
+                if os.path.isfile(path):
+                    os.remove(path)
+            quest.question_image = question_image
             quest.save()
             message = "Question Updated!"
         except:
-            
+  
             question_exam = Question.objects.create(questions_of = section_exm,
                                                     question = question,
                                                     answer_field_length = answer_size,
                                                     marks = marks,
                                                     answer_field_length_number = box_height,
-                                                    question_set = question_set)
+                                                    question_set = question_set,
+                                                    question_image = question_image)
             question_exam.save()
             message = "Question Saved!"
         return (True,message)

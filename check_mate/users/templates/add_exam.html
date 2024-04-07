@@ -257,7 +257,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}','{{questions.answer_field_length_number}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}','{{questions.answer_field_length_number}}','{{questions.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -292,7 +292,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}','{{question.answer_field_length_number}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}','{{question.answer_field_length_number}}','{{question.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -381,7 +381,7 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST">
+                                    <form method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="form-group row">
                                             <label for="qtitle"
@@ -421,6 +421,16 @@
                                                     name="box_height"
                                                     required
                                                     class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt-2"
+                                                class="col-form-label form-label col-md-3">Image (if any):</label>
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <input type="file" id="question_image_add" class="custom-file-input" name="question_image_add" accept="image/*">
+                                                    <label for="question_image_add" class="custom-file-label">Select</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -510,6 +520,19 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
+                                            <label for="bx-hgt"
+                                                class="col-form-label form-label col-md-3">Image (if any):</label>
+                                                <div class="col-md-4">
+                                                <p><img id = "question_image_modal" src="" alt="" width="150" class="rounded"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <input type="file" id="question_image_2" class="custom-file-input" name="question_image_edit" accept="image/*">
+                                                    <label for="quiz_image" class="custom-file-label">Select</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
                                             <label for="touch-spin-2"
                                                 class="col-form-label form-label col-md-3">Marks:</label>
                                             <div class="col-md-4">
@@ -566,7 +589,7 @@
             
               }
 
-            function openModal2(id,question_set,question,answering_field,marks,hgt) {
+            function openModal2(id,question_set,question,answering_field,marks,hgt,question_image) {
                 // Set data in the modal
                 var pk = document.getElementById('pk');
                 pk.value = id;
@@ -581,6 +604,8 @@
                 bx_hgt.value = hgt;
                 var mrk = document.getElementById('marks');
                 mrk.value = marks;
+                var img = document.getElementById('question_image_modal');
+                img.src = "{{ media_url }}" + question_image;
                 
               }
 

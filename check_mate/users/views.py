@@ -811,6 +811,11 @@ def edit_exam(request,course_id,exam_id):
                     answer_size = request.POST.get('answer_size')
                     marks = request.POST.get('marks')
                     box_height = int(request.POST.get('box_height'))
+                    question_image = request.FILES.get('question_image_add')
+
+
+                    if question_image == "":
+                        question_image = None
 
                     if answer_size == "0":
                         messages.error(request,"Select Answer Field!")
@@ -820,7 +825,7 @@ def edit_exam(request,course_id,exam_id):
                         messages.error(request,"Box Height cannot be 0!")
                         return redirect('users:edit_exam',course_id,section_exam.pk)
 
-                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_id=None)
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_image,question_id=None)
 
                     if result[0]:
                         messages.success(request,result[1])
@@ -851,6 +856,10 @@ def edit_exam(request,course_id,exam_id):
                     answer_size = request.POST.get('answer_size2')
                     marks = request.POST.get('marks')
                     box_height = int(request.POST.get('box_height2'))
+                    question_image = request.FILES.get('question_image_edit')
+
+                    if question_image == "":
+                        question_image = None
 
 
                     if answer_size == "0":
@@ -861,7 +870,7 @@ def edit_exam(request,course_id,exam_id):
                         messages.error(request,"Box Height cannot be 0!")
                         return redirect('users:edit_exam',course_id,section_exam.pk)
                     
-                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_pk)
+                    result = Save.save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_image,question_pk)
                     if result[0]:
                         messages.success(request,result[1])
                         return redirect('users:edit_exam',course_id,section_exam.pk)
@@ -962,7 +971,7 @@ def edit_exam(request,course_id,exam_id):
 
 
                     # Iterate through questions and answers
-                    for q, m, l in zip(questions[0], questions[1],questions[2]):
+                    for q, m, l, img in zip(questions[0], questions[1],questions[2],questions[3]):
                         # Add the question
                         p = doc.add_paragraph()
                         p.add_run("Q. ").bold=True
@@ -972,7 +981,10 @@ def edit_exam(request,course_id,exam_id):
                         p = doc.add_paragraph()
                         p.add_run(f"[{m}]")
                         p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-
+                      
+                        doc.add_picture(os.path.join(settings.MEDIA_URL,img.path),height = Inches(3))
+                        last_paragraph = doc.paragraphs[-1]
+                        last_paragraph.alignment = 1
                 
                         table = doc.add_table(rows=1, cols=1)
                         table.autofit = False
@@ -1031,7 +1043,7 @@ def edit_exam(request,course_id,exam_id):
 
                     # Return the Word document as an attachment
                     response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-                    response['Content-Disposition'] = f'attachment; filename=Questions.docx'
+                    response['Content-Disposition'] = f'attachment; filename=Set:{set_number}_{section_exam.section.course_id.course_name}.{section_exam.section.section_number}.docx'
                     return response
                     
                 
