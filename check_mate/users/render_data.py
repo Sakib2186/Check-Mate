@@ -156,12 +156,13 @@ class Load_Courses:
         elif 2 in roles:
             try:
                 #getting students courses
-                student_courses = Student.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
+                student_courses = Student.objects.filter(student_id = logged_in_user,semester = semester,year = semester.year)
 
-                for course in student_courses.courses.all():
-                    
-                    course_obj = Course.objects.get(id = course.pk)
-                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year)
+                for course in student_courses:
+
+                    course_obj = Course.objects.get(id = course.courses.pk)
+                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year,section_number = course.section)
+
                     #checking which course section belongs to this student
                     for i in specific_course:
                         try:
@@ -169,22 +170,22 @@ class Load_Courses:
                             stud = i.students.get(student_id = logged_in_user)
                             if stud:
                                 all_courses.append(i)
-                                break
+                                
                         except:
                             pass
-                    print(all_courses)
+   
                 try:
                     #if the student is also a TA then loading those courses as well
-                    ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
-                    for course in ta_courses.courses.all():
-                        specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                    ta_courses = Teaching_Assistant.objects.filter(teaching_id = logged_in_user,semester = semester,year = semester.year)
+                    for course in ta_courses:
+                        specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
                         for i in specific_course:
                             try:
                                 ta = None
                                 ta = i.teaching_assistant.get(teaching_id = logged_in_user)
-                                if ta and i not in all_courses:
-                                    all_courses.append(i)
-                                    break
+                                if ta:
+                                    if i not in all_courses:
+                                        all_courses.append(i)
                             except:
                                 pass
                 except:
@@ -195,9 +196,9 @@ class Load_Courses:
         elif 1 in roles:
             try:
                 #loading instructors courses
-                instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester = semester,year = semester.year)
-                for course in instructor_courses.courses.all():
-                    specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                instructor_courses = Instructor.objects.filter(instructor_id = logged_in_user,semester = semester,year = semester.year)
+                for course in instructor_courses:
+                    specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
                     for i in specific_course:
                         all_courses.append(i)
             except:
@@ -421,14 +422,14 @@ class Save:
                 i.delete()
 
         ta = Teaching_Assistant.objects.create(teaching_id = ta,semester = session,year = session.year)
-        ta.courses.add(courses)
+        ta.courses = courses
         ta.semester = session
         ta.year = session.year
         ta.section = section
         ta.save()
 
         instructor = Instructor.objects.create(instructor_id = instructor,semester = session,year = session.year)
-        instructor.courses.add(courses)
+        instructor.courses = courses
         instructor.semester = session
         instructor.year = session.year
         instructor.section = section
@@ -438,7 +439,7 @@ class Save:
         for i in students:
             inst = School_Users.objects.get(user_id = i)
             stud = Student.objects.create(student_id = inst,semester = session,year = session.year)
-            stud.courses.add(courses)
+            stud.courses = courses
             stud.semester = session
             stud.year = session.year
             stud.section = section

@@ -89,7 +89,7 @@ class Course(models.Model):
 class Student(models.Model):
     
     student_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
@@ -104,7 +104,7 @@ class Student(models.Model):
 class Instructor(models.Model):
 
     instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
@@ -119,7 +119,7 @@ class Instructor(models.Model):
 class Teaching_Assistant(models.Model):
 
     teaching_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
