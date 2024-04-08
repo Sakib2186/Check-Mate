@@ -229,12 +229,60 @@
                                 </li>
                                 {% endfor %}
                                 {% endif %}
+                                {% if section_exam.exam_mode.mode_id == 1 %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="#third" data-toggle="tab">Get Question</a>
                                 </li>
+                                {% else%}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#fourth" data-toggle="tab">Time</a>
+                                </li>
+                                {% endif %}
+                                
                             </ul>
                             
                             <div class="card-body tab-content">
+                                <div class="tab-pane" id="fourth">
+                                    <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Set Timer</h4>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+
+                                            <div class="col">
+                                                <label for="cmn-toggle"
+                                               class="col-sm-3 col-form-label form-label">Timeframe</label>
+                                                <div class="form-inline">
+                                                    <div class="form-group mr-2">
+                                                        <input type="number"
+                                                               class="form-control text-center"
+                                                               value="1"
+                                                               name="time_number"
+                                                               style="width:100px;">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <select class="custom-select" name="time_second_number">
+                                                            <option value="hour"
+                                                                    selected>Hours</option>
+                                                            <option value="minutes">Minutes</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="Save" name="save_time">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+                                            
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
                                 {% if question_set|length == 0 %}
                                 <div class="tab-pane active" id="second">
                                     <div class="card">

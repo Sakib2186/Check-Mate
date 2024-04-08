@@ -184,6 +184,8 @@ class Section_Exam(models.Model):
     exam_time = models.CharField(max_length = 50,null=True,blank=True)
     exam_set = models.IntegerField(default = 0)
     ta_available = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default = False)
+    is_checked = models.BooleanField(default  = False)
 
     def __str__(self) -> str:
         return str(self.section)

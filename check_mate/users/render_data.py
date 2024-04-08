@@ -259,12 +259,17 @@ class Load_Courses:
     
     def get_section_exams(course_id):
 
-        '''This function will return all the exams of a section'''
+        '''This function will return all the exams of a section along with the number of students
+            in each section'''
 
         course_section = Course_Section.objects.get(pk = course_id)
         sec_exam = Section_Exam.objects.filter(section = course_section)
+        dic={}
+        for sec in sec_exam:
+            total_student_enrollment = sec.section.students.all().count()
+            dic[sec] = total_student_enrollment
 
-        return sec_exam
+        return dic
     
     def get_saved_section_exams(exam_id):
 

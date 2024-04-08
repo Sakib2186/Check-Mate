@@ -61,7 +61,8 @@ class Exam_Mode_Admin_Panel(admin.ModelAdmin):
 @admin.register(Section_Exam)
 class Section_Exam_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set','ta_available'
+        'section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set','ta_available',
+        'is_completed','is_checked'
     ]
 @admin.register(Question)
 class Question_Admin_panel(admin.ModelAdmin):

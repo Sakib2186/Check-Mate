@@ -277,7 +277,6 @@ def courses(request):
             user = request.user.username
         else:
             user = logged_in_user.user_id
-
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
@@ -634,6 +633,8 @@ def course(request,course_id):
         current_semester = Session.objects.get(current=True)
         section_exams = Load_Courses.get_section_exams(course_id)
 
+        
+
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -889,6 +890,18 @@ def edit_exam(request,course_id,exam_id):
                             else:
                                 messages.error(request,"Could not delete! Try again later")
                                 return redirect('users:course',course_id)
+                            
+                if request.POST.get('save_time'):
+
+                    time_number = request.POST.get('time_number')
+                    time_second_number = request.POST.get('time_second_number')
+
+                    time = time_number +" "+  time_second_number
+                    section_exam.exam_time = time
+                    section_exam.save()
+                    messages.success(request,"Time Saved!")
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
 
                 if request.POST.get('download_question'):
 
@@ -981,10 +994,11 @@ def edit_exam(request,course_id,exam_id):
                         p = doc.add_paragraph()
                         p.add_run(f"[{m}]")
                         p.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-                      
-                        doc.add_picture(os.path.join(settings.MEDIA_URL,img.path),height = Inches(3))
-                        last_paragraph = doc.paragraphs[-1]
-                        last_paragraph.alignment = 1
+
+                        if img:
+                            doc.add_picture(os.path.join(settings.MEDIA_URL,img.path),height = Inches(3))
+                            last_paragraph = doc.paragraphs[-1]
+                            last_paragraph.alignment = 1
                 
                         table = doc.add_table(rows=1, cols=1)
                         table.autofit = False
