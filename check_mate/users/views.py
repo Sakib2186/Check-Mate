@@ -1098,3 +1098,38 @@ def edit_exam(request,course_id,exam_id):
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
         return HttpResponse("Bad Request") 
+    
+@login_required
+def exam(request,course_id,exam_type,exam_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
+        questions = Load_Courses.get_question_and_marks(exam_id,'A')
+       
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+
+                    'questions':questions[0],
+                    'total_marks':questions[1],
+        }
+        return render(request,"exam.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")

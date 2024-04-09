@@ -328,6 +328,33 @@ class Load_Courses:
 
         return (question_list,marks_list,answer_length,question_images)
     
+    def get_question_and_marks(exam_id,set_number):
+
+        '''This function will return a questions of that set'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        total_marks = 0
+        question =  Question.objects.filter(questions_of = section_exam,question_set=set_number).order_by('-pk')
+        for mark in question:
+            total_marks += mark.marks
+
+        return (question,total_marks)
+    
+    def load_updated_time(exam_id):
+
+        '''This function will return the updated time each time the page is loaded'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+
+        current_date = datetime.now()
+        time = section_exam.exam_time
+        time = time.split(' ')
+        number = time[0]
+        minute_or_hour = time[1]
+
+        
+
+    
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
