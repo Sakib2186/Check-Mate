@@ -8,8 +8,11 @@ def course_picture_upload_path(instance, filename):
     return os.path.join('Courses', f'{str(instance.course_code)}','cover_picture', filename)
 def question_picture_upload_path(instance, filename):
     # Generate file path dynamically
-    return os.path.join('Courses', f'{str(instance.questions_of.section.course_id.course_code)}',f'{str(instance.questions_of.section.section_number)}',f'{str(instance.questions_of.exam_type)}_{str(instance.questions_of.exam_title)}', filename)
+    return os.path.join('Courses', f'{str(instance.questions_of.section.course_id.course_code)}',f'{str(instance.questions_of.section.section_number)}',f'{str(instance.questions_of.exam_type)}_{str(instance.questions_of.exam_title)}','questions', filename)
 
+def answer_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',{str(instance.uploaded_by)}, filename)
 # Create your models here.
 
 class Session(models.Model):
@@ -212,3 +215,29 @@ class Question(models.Model):
 
         verbose_name = "Questions"
 
+class Answer(models.Model):
+
+    answer_of = models.ForeignKey(Question,on_delete=models.CASCADE)
+    uploaded_by = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    answer_textfield = models.TextField(blank=True,null=True)
+    answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
+    marks_obtained = models.IntegerField(default = 0)
+
+    def __str__(self) -> str:
+        return str(self.answer_of)
+    
+    class Meta:
+
+        verbose_name = "Answers"
+
+class Shuffled_Papers(models.Model):
+
+    student = models.ForeignKey(School_Users,on_delete = models.CASCADE)
+    set_name = models.CharField(max_length=10,null=True,blank=True,default="A")
+
+    def __str__(self) -> str:
+        return str(self.student)
+    
+    class Meta:
+
+        verbose_name = "Shuffled Papers Student Info"

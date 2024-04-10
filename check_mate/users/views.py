@@ -1126,6 +1126,7 @@ def exam(request,course_id,exam_type,exam_id):
 
                     'questions':questions[0],
                     'total_marks':questions[1],
+                    'type_of_logged_in_user':type_of_logged_in_user,
         }
         return render(request,"exam.html",context)
     except Exception as e:

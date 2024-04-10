@@ -67,6 +67,11 @@
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
                                     <li class="breadcrumb-item active">Quiz</li>
                                 </ol>
+                                <div class="media align-items-center mb-headings">
+                                    <a href="" class="btn btn-info mr-2">Review Papers</a>
+                                    <a href="" class="btn btn-success mr-2">Start Exam</a>
+                                    <a href="" class="btn btn-danger mr-2">Stop</a>
+                                </div>
                                 <div class="card-group">
                                     <div class="card">
                                         <div class="card-body text-center">
@@ -114,7 +119,7 @@
                                         <div class="countdown sidebar-p-x"
                                              data-value="8"
                                              data-unit="hour"></div>
-    
+                                        {% if 2 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
                                         <div class="sidebar-heading">Submit (PDF)</div>
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
@@ -132,6 +137,24 @@
                                                 <input type="submit" class="btn btn-success" value="Submit" style="width:50%;"> <!-- Removed float-right class -->
                                             </li>
                                         </ul>
+                                        {% endif %}
+                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
+                                        <div class="sidebar-heading">Submited By</div>
+                                        <ul class="list-group list-group-fit">
+                                            <li class="list-group-item">
+                                                <a href="#">
+                                                    <span class="media align-items-center">
+                                                        <span class="media-left">
+                                                            <span class="btn btn-white btn-circle">#1</span>
+                                                        </span>
+                                                        <span class="media-body">
+                                                            MD.Sakib Sami
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
