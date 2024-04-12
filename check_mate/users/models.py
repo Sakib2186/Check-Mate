@@ -187,6 +187,8 @@ class Section_Exam(models.Model):
     exam_time = models.CharField(max_length = 50,null=True,blank=True)
     exam_set = models.IntegerField(default = 0)
     ta_available = models.BooleanField(default=False)
+    is_started = models.BooleanField(default= False)
+    is_stopped = models.BooleanField(default = False)
     is_completed = models.BooleanField(default = False)
     is_checked = models.BooleanField(default  = False)
 
@@ -232,7 +234,8 @@ class Answer(models.Model):
 
 class Shuffled_Papers(models.Model):
 
-    student = models.ForeignKey(School_Users,on_delete = models.CASCADE)
+    student = models.ForeignKey(Student,on_delete = models.CASCADE)
+    course_id = models.ForeignKey(Course_Section,on_delete=models.CASCADE,null=True)
     set_name = models.CharField(max_length=10,null=True,blank=True,default="A")
 
     def __str__(self) -> str:

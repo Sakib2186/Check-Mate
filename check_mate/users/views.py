@@ -901,6 +901,15 @@ def edit_exam(request,course_id,exam_id):
                     section_exam.save()
                     messages.success(request,"Time Saved!")
                     return redirect('users:edit_exam',course_id,section_exam.pk)
+                
+                if request.POST.get('shuffle_papers'):
+
+                    if Save.shuffled_papers(course_id):
+                        messages.success(request,"Papers Shuffled!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    else:
+                        messages.error(request,"Error Occured")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
                     
 
                 if request.POST.get('download_question'):
@@ -1107,15 +1116,40 @@ def exam(request,course_id,exam_type,exam_id):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
-
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
         questions = Load_Courses.get_question_and_marks(exam_id,'A')
-       
+        
 
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
 
+        if request.method == "POST":
+
+            if request.POST.get('shuffle_papers'):
+
+                if Save.shuffled_papers(course_id):
+                    messages.success(request,"Papers Shuffled!")
+                else:
+                    messages.error(request,"Error Occured")
+
+            if request.POST.get('start_exam'):
+
+                if Save.start_exam(exam_id,course_id):
+                    messages.success(request,"Exam Started!")
+                else:
+                    messages.error(request,"Failed to Start the Exam")
+
+            if request.POST.get('stop_exam'):
+
+                section_exam = Load_Courses.get_saved_section_exams(exam_id)
+                section_exam.is_stopped=True
+                section_exam.is_started = False
+                section_exam.save()
+                messages.success(request,"Exam Stopped!")
+
+                
         context = {
                     'page_title':'Check Mate',
                     'user_type':type_of_logged_in_user,
@@ -1127,6 +1161,7 @@ def exam(request,course_id,exam_type,exam_id):
                     'questions':questions[0],
                     'total_marks':questions[1],
                     'type_of_logged_in_user':type_of_logged_in_user,
+                    'section_exam':section_exam,
         }
         return render(request,"exam.html",context)
     except Exception as e:

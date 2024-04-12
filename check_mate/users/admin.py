@@ -62,7 +62,7 @@ class Exam_Mode_Admin_Panel(admin.ModelAdmin):
 class Section_Exam_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'pk','section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set','ta_available',
-        'is_completed','is_checked'
+        'is_started','is_stopped','is_completed','is_checked'
     ]
 @admin.register(Question)
 class Question_Admin_panel(admin.ModelAdmin):
@@ -77,5 +77,5 @@ class Answer_Admin_Panel(admin.ModelAdmin):
 @admin.register(Shuffled_Papers)
 class Suffple_Papers_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'student','set_name'
+        'student','course_id','set_name'
     ]

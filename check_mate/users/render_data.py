@@ -7,6 +7,7 @@ from datetime import datetime,timedelta
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import os
+import random
 class Login:
 
     '''This class will hold all the functionalities to log in and regsitration of new user'''
@@ -340,6 +341,9 @@ class Load_Courses:
 
         return (question,total_marks)
     
+    def load_set_of_student():
+        pass
+    
     def load_updated_time(exam_id):
 
         '''This function will return the updated time each time the page is loaded'''
@@ -552,7 +556,57 @@ class Save:
             message = "Question Saved!"
         return (True,message)
 
+    def shuffled_papers(course_id):
 
+        '''This function will shuffle the papers everytime the instructor clicks start'''
+        
+        course_section = Load_Courses.get_specific_course_section(course_id)
+
+        try:
+            shuffled_papers_of_this_section = Shuffled_Papers.objects.filter(course_id = course_section)
+            shuffled_papers_of_this_section.delete()
+        except:
+            pass
+
+        
+        all_students = course_section.students.all()
+
+        all_sets = Question.objects.values_list('question_set',flat=True).distinct()
+        all_sets = list(all_sets)
+        all_sets_length = len(all_sets)
+
+
+        if all_sets_length==1:
+            for student in all_students:
+                shuffled_paper = Shuffled_Papers.objects.create( student = student,course_id = course_section,set_name = all_sets[0])
+                shuffled_paper.save()
+        else:
+            student_list = list(all_students)
+            random.shuffle(student_list)
+            shuffled_students = Student.objects.filter(pk__in=[obj.pk for obj in student_list])
+            for student in shuffled_students:
+                random_set = random.randint(0, all_sets_length-1)
+
+                shuffled_paper = Shuffled_Papers.objects.create(student = student,course_id = course_section,set_name = all_sets[random_set])
+                shuffled_paper.save()
+
+        return True
+
+    def start_exam(exam_id,course_id):
+
+        '''This function will start the exam'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        
+        if section_exam.is_stopped:
+            if Save.shuffled_papers(course_id):
+                section_exam.is_started = True
+                section_exam.is_stopped = False
+                section_exam.save()
+        else:
+            section_exam.is_started=True
+            section_exam.save()
+        return True
 class Delete:
 
     '''This class will hold all the delete functionalities'''
