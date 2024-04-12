@@ -553,6 +553,10 @@ class Save:
                                                     question_set = question_set,
                                                     question_image = question_image)
             question_exam.save()
+            all_students = section_exm.section.students.all()
+            for student in all_students:
+                answer = Answer.objects.create(answer_of = question_exam,uploaded_by =student.student_id)
+                answer.save()
             message = "Question Saved!"
         return (True,message)
 
@@ -592,20 +596,13 @@ class Save:
 
         return True
 
-    def start_exam(exam_id,course_id):
+    def start_exam(exam_id):
 
         '''This function will start the exam'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        
-        if section_exam.is_stopped:
-            if Save.shuffled_papers(course_id):
-                section_exam.is_started = True
-                section_exam.is_stopped = False
-                section_exam.save()
-        else:
-            section_exam.is_started=True
-            section_exam.save()
+        section_exam.is_started=True
+        section_exam.save()
         return True
 class Delete:
 
@@ -630,6 +627,12 @@ class Delete:
         '''Thus function will delete the question for the specific set'''
 
         question = Question.objects.get(pk=pk)
+        answer = Answer.objects.filter(answer_of = question)
+        for ans in answer:
+            path = settings.MEDIA_ROOT+str(ans.answer_image)
+            if os.path.isfile(path):
+                os.remove(path)
+            ans.delete()
         question.delete()
 
         return True

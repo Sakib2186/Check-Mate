@@ -72,12 +72,17 @@
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
                                     <a href="" class="btn btn-info mr-2">Review Papers</a>
-                                    <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Papers">
-                                    {% if not section_exam.is_started %}
+                                    {% if not section_exam.is_completed and not section_exam.is_started and not section_exam.is_stopped %}
+                                    <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Questions">
+                                    {% endif %}
+                                    {% if not section_exam.is_started and not section_exam.is_stopped %}
                                     <input type="submit" name="start_exam" class="btn btn-success mr-2" value="Start Exam">
                                     {% endif %}
                                     {% if section_exam.is_started %}
                                     <input type="submit" name="stop_exam" class="btn btn-danger mr-2" value="Stop Exam">
+                                    {% endif %}
+                                    {% if section_exam.is_stopped and not section_exam.is_completed %}
+                                    <input type="submit" name="complete_exam" class="btn btn-success mr-2" value="Complete Exam">
                                     {% endif %}
                                 </div>
                                 </form>

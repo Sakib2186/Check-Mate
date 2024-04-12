@@ -703,7 +703,7 @@ def take_exam(request,course_id):
                         messages.error(request,"Please provide Exam date!")
                         return redirect('users:take_exam',course_id)
 
-                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None,ta_available=None)
+                    result= Save.save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id=None,ta_available=False)
                     if result[0]:
                         messages.success(request,result[1])
                         return redirect('users:edit_exam',course_id,result[2].pk)
@@ -1131,15 +1131,19 @@ def exam(request,course_id,exam_type,exam_id):
 
                 if Save.shuffled_papers(course_id):
                     messages.success(request,"Papers Shuffled!")
+                    return redirect("users:exam",course_id,exam_type,exam_id)
                 else:
                     messages.error(request,"Error Occured")
+                    return redirect("users:exam",course_id,exam_type,exam_id)
 
             if request.POST.get('start_exam'):
 
-                if Save.start_exam(exam_id,course_id):
+                if Save.start_exam(exam_id):
                     messages.success(request,"Exam Started!")
+                    return redirect("users:exam",course_id,exam_type,exam_id)
                 else:
                     messages.error(request,"Failed to Start the Exam")
+                    return redirect("users:exam",course_id,exam_type,exam_id)
 
             if request.POST.get('stop_exam'):
 
@@ -1148,6 +1152,16 @@ def exam(request,course_id,exam_type,exam_id):
                 section_exam.is_started = False
                 section_exam.save()
                 messages.success(request,"Exam Stopped!")
+                return redirect("users:exam",course_id,exam_type,exam_id)
+
+            if request.POST.get('complete_exam'):
+
+                section_exam = Load_Courses.get_saved_section_exams(exam_id)
+                section_exam.is_completed=True
+                section_exam.save()
+                messages.success(request,"Exam Completed!")
+                return redirect("users:exam",course_id,exam_type,exam_id)
+
 
                 
         context = {

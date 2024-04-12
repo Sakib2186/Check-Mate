@@ -79,7 +79,7 @@
                             <div class="card card-sm">
                                 <div class="card-body media">
                                     <div class="media-left">
-                                        <a href=""
+                                        <a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}"
                                            class="avatar avatar-lg avatar-4by3">
                                             <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
                                                  alt="Exam Image"
@@ -87,7 +87,7 @@
                                         </a>
                                     </div>
                                     <div class="media-body">
-                                        <h4 class="card-title mb-0"><a href="">{{exam.exam_title}}</a></h4>
+                                        <h4 class="card-title mb-0"><a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}">{{exam.exam_title}}</a></h4>
                                         <small class="text-muted">{{exam.exam_description}}</small>
                                     </div>
                                 </div>
