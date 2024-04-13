@@ -65,7 +65,7 @@
                             <div class="container-fluid page__container">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                                    <li class="breadcrumb-item active">Quiz</li>
+                                    <li class="breadcrumb-item active">{{exam_type}}</li>
                                 </ol>
                                 {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
                                 <form method="POST">
@@ -135,6 +135,8 @@
                                              data-value="8"
                                              data-unit="hour"></div>
                                         {% if 2 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
+                                        <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
+                                            {% csrf_token %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
@@ -142,16 +144,20 @@
                                                     <div class="custom-file">
                                                         <input type="file"
                                                                id="file"
-                                                               class="custom-file-input">
+                                                               class="custom-file-input"
+                                                               name = "pdf_file">
                                                         <label for="file"
                                                                class="custom-file-label">Choose file</label>
                                                     </div>
                                                 </div>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-center"> <!-- Added d-flex and justify-content-center classes -->
-                                                <input type="submit" class="btn btn-success" value="Submit" style="width:50%;"> <!-- Removed float-right class -->
+                                                <button id="submitBtn" class="btn btn-success" type="submit" style="width:50%;">Submit</button>
+                                                <input type="hidden" id="submitCourseFlag" name="submitCourseFlag" value="">
+                                                
                                             </li>
                                         </ul>
+                                        </form>
                                         {% endif %}
                                         {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
                                         <div class="sidebar-heading">Submited By</div>
@@ -209,6 +215,31 @@
         <script src="{% static 'js/countdown.js' %}"></script>
         <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
         <script src="{% static 'js/moment.min.js' %}"></script>
+
+        <script>
+    
+            // Event listener for delete button click
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('submitBtn').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+    
+                    swal({
+                        title: "Are you sure?",
+                        text: "Ready to submit?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            document.getElementById('submitCourseFlag').value = "1";
+                            document.getElementById('pdf_upload_form').submit();
+                        } else {
+                            swal("Safe!");
+                        }
+                    });
+                });
+            });
+        </script>
 
         <script>
 

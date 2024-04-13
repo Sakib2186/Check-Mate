@@ -13,6 +13,10 @@ def question_picture_upload_path(instance, filename):
 def answer_picture_upload_path(instance, filename):
     # Generate file path dynamically
     return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',{str(instance.uploaded_by)}, filename)
+
+def file_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.exam_of.section.course_id.course_code)}',f'{str(instance.exam_of.section.section_number)}',f'{str(instance.exam_of.exam_type.exam_type)}_{str(instance.exam_of.exam_title)}','answers',{str(instance.student)}, filename)
 # Create your models here.
 
 class Session(models.Model):
@@ -224,6 +228,7 @@ class Answer(models.Model):
     answer_textfield = models.TextField(blank=True,null=True)
     answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
     marks_obtained = models.IntegerField(default = 0)
+    is_uploaded = models.BooleanField(default = False)
 
     def __str__(self) -> str:
         return str(self.answer_of)

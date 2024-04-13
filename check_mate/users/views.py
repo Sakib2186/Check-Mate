@@ -1117,7 +1117,8 @@ def exam(request,course_id,exam_type,exam_id):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        questions = Load_Courses.get_question_and_marks(exam_id,'A')
+        sets = Load_Courses.load_set_of_student(logged_in_user,course_id)
+        questions = Load_Courses.get_question_and_marks(exam_id,sets)
         
 
         if logged_in_user == None:
@@ -1125,59 +1126,90 @@ def exam(request,course_id,exam_type,exam_id):
         else:
             user = logged_in_user.user_id
 
-        if request.method == "POST":
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
 
-            if request.POST.get('shuffle_papers'):
+            if request.method == "POST":
 
-                if Save.shuffled_papers(course_id):
-                    messages.success(request,"Papers Shuffled!")
+                if request.POST.get('shuffle_papers'):
+
+                    if Save.shuffled_papers(course_id):
+                        messages.success(request,"Papers Shuffled!")
+                        return redirect("users:exam",course_id,exam_type,exam_id)
+                    else:
+                        messages.error(request,"Error Occured")
+                        return redirect("users:exam",course_id,exam_type,exam_id)
+
+                if request.POST.get('start_exam'):
+
+                    if Save.start_exam(exam_id):
+                        if Save.shuffled_papers(course_id):
+                            messages.success(request,"Exam Started!")
+                            return redirect("users:exam",course_id,exam_type,exam_id)
+                    else:
+                        messages.error(request,"Failed to Start the Exam")
+                        return redirect("users:exam",course_id,exam_type,exam_id)
+
+                if request.POST.get('stop_exam'):
+
+                    section_exam = Load_Courses.get_saved_section_exams(exam_id)
+                    section_exam.is_stopped=True
+                    section_exam.is_started = False
+                    section_exam.save()
+                    messages.success(request,"Exam Stopped!")
                     return redirect("users:exam",course_id,exam_type,exam_id)
-                else:
-                    messages.error(request,"Error Occured")
+
+                if request.POST.get('complete_exam'):
+
+                    section_exam = Load_Courses.get_saved_section_exams(exam_id)
+                    section_exam.is_completed=True
+                    section_exam.save()
+                    messages.success(request,"Exam Completed!")
                     return redirect("users:exam",course_id,exam_type,exam_id)
 
-            if request.POST.get('start_exam'):
+                if request.POST.get('submitCourseFlag'):
 
-                if Save.start_exam(exam_id):
-                    messages.success(request,"Exam Started!")
-                    return redirect("users:exam",course_id,exam_type,exam_id)
-                else:
-                    messages.error(request,"Failed to Start the Exam")
-                    return redirect("users:exam",course_id,exam_type,exam_id)
+                    value = request.POST.get('submitCourseFlag')
+                    
+                    if value == "1":
+                        #logic of ML to separate papers
+                        uploaded_file = request.FILES.get('pdf_file')
 
-            if request.POST.get('stop_exam'):
-
-                section_exam = Load_Courses.get_saved_section_exams(exam_id)
-                section_exam.is_stopped=True
-                section_exam.is_started = False
-                section_exam.save()
-                messages.success(request,"Exam Stopped!")
-                return redirect("users:exam",course_id,exam_type,exam_id)
-
-            if request.POST.get('complete_exam'):
-
-                section_exam = Load_Courses.get_saved_section_exams(exam_id)
-                section_exam.is_completed=True
-                section_exam.save()
-                messages.success(request,"Exam Completed!")
-                return redirect("users:exam",course_id,exam_type,exam_id)
+                        if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id,questions[0]):
+                            messages.success(request,"File Uploaded!")
+                            #TODO:Redirect to page where uploaded file i viewed
+                            return redirect("users:exam",course_id,exam_type,exam_id)
+                        else:
+                            messages.error(request,"Error Occured while uploaded!")
+                            return redirect("users:exam",course_id,exam_type,exam_id)
 
 
-                
-        context = {
+
+                    
+            context = {
+                        'page_title':'Check Mate',
+                        'user_type':type_of_logged_in_user,
+                        'media_url':settings.MEDIA_URL,
+                        'logged_in_user':logged_in_user,
+                        'year':datetime.now().year,
+                        'current_semester':current_semester,
+
+                        'questions':questions[0],
+                        'total_marks':questions[1],
+                        'type_of_logged_in_user':type_of_logged_in_user,
+                        'section_exam':section_exam,
+                        'exam_type':exam_type,
+            }
+            return render(request,"exam.html",context)
+        else:
+            context = {
                     'page_title':'Check Mate',
                     'user_type':type_of_logged_in_user,
                     'media_url':settings.MEDIA_URL,
                     'logged_in_user':logged_in_user,
                     'year':datetime.now().year,
                     'current_semester':current_semester,
-
-                    'questions':questions[0],
-                    'total_marks':questions[1],
-                    'type_of_logged_in_user':type_of_logged_in_user,
-                    'section_exam':section_exam,
-        }
-        return render(request,"exam.html",context)
+            }
+            return render(request,"access_denied.html",context)
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)

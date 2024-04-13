@@ -335,14 +335,29 @@ class Load_Courses:
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         total_marks = 0
-        question =  Question.objects.filter(questions_of = section_exam,question_set=set_number).order_by('-pk')
-        for mark in question:
-            total_marks += mark.marks
+        if set_number == "all":
+            question =  Question.objects.filter(questions_of = section_exam).order_by('-pk')
+            for mark in question:
+                total_marks += mark.marks
+        else:
+            question =  Question.objects.filter(questions_of = section_exam,question_set=set_number).order_by('-pk')
+            for mark in question:
+                total_marks += mark.marks
 
         return (question,total_marks)
     
-    def load_set_of_student():
-        pass
+    def load_set_of_student(user,course_id):
+        
+        '''This function will return the students set for the exam
+        if admin or instructor then can view all'''
+        
+        course_section = Course_Section.objects.get(pk = course_id)
+        try:
+            student = Student.objects.get(student_id = user)
+            set_student = Shuffled_Papers.objects.get(student = student,course_id = course_section)
+            return set_student.set_name
+        except:
+            return "all"
     
     def load_updated_time(exam_id):
 
@@ -582,7 +597,7 @@ class Save:
 
         if all_sets_length==1:
             for student in all_students:
-                shuffled_paper = Shuffled_Papers.objects.create( student = student,course_id = course_section,set_name = all_sets[0])
+                shuffled_paper = Shuffled_Papers.objects.create(student = student,course_id = course_section,set_name = all_sets[0])
                 shuffled_paper.save()
         else:
             student_list = list(all_students)
@@ -604,6 +619,22 @@ class Save:
         section_exam.is_started=True
         section_exam.save()
         return True
+    
+    def uploaded_answer_file(user,file,exam_id,questions):
+
+        '''This method will save the file uploaded by the user'''
+
+        if user == None:
+            return False
+
+        for question in questions:
+            papers = Answer.objects.get(answer_of = question,uploaded_by = user)
+            papers.is_uploaded = True
+            papers.save()
+
+        return True
+
+
 class Delete:
 
     '''This class will hold all the delete functionalities'''
