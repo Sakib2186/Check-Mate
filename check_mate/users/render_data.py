@@ -371,6 +371,15 @@ class Load_Courses:
         number = time[0]
         minute_or_hour = time[1]
 
+    def get_exam_uploaded_students(exam_id):
+
+        '''This function will return the students who have uploaded their work'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        submitted_exam = Exam_Submitted.objects.filter(exam_of = section_exam,is_uploaded = True)
+
+        return submitted_exam
+
         
 
     
@@ -535,6 +544,10 @@ class Save:
                                                     exam_set = exam_set,
                                                     ta_available = ta_available)
             new_instance.save()
+            all_students = new_instance.section.students.all()
+            for student in all_students:
+                exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
+                exm_submit.save()
             message = "Exam Created Successfully!"
         
         return (True,message,new_instance)
@@ -620,17 +633,18 @@ class Save:
         section_exam.save()
         return True
     
-    def uploaded_answer_file(user,file,exam_id,questions):
+    def uploaded_answer_file(user,file,exam_id):
 
         '''This method will save the file uploaded by the user'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
 
         if user == None:
             return False
 
-        for question in questions:
-            papers = Answer.objects.get(answer_of = question,uploaded_by = user)
-            papers.is_uploaded = True
-            papers.save()
+        exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
+        exm_submit.is_uploaded = True
+        exm_submit.save()
 
         return True
 

@@ -203,6 +203,18 @@ class Section_Exam(models.Model):
 
         verbose_name = "Section Exam"
     
+class Exam_Submitted(models.Model):
+
+    exam_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    student = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    is_uploaded  = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.exam_of)
+    
+    class Meta:
+
+        verbose_name = "Exam Submitted"
 
 class Question(models.Model):
 
@@ -228,7 +240,7 @@ class Answer(models.Model):
     answer_textfield = models.TextField(blank=True,null=True)
     answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
     marks_obtained = models.IntegerField(default = 0)
-    is_uploaded = models.BooleanField(default = False)
+
 
     def __str__(self) -> str:
         return str(self.answer_of)

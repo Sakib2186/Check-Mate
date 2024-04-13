@@ -72,10 +72,15 @@ class Question_Admin_panel(admin.ModelAdmin):
 @admin.register(Answer)
 class Answer_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained','is_uploaded'
+        'answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained'
     ]
 @admin.register(Shuffled_Papers)
 class Suffple_Papers_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'student','course_id','set_name'
+    ]
+@admin.register(Exam_Submitted)
+class Exam_Submitted_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'exam_of','student','is_uploaded'
     ]

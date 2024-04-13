@@ -71,7 +71,9 @@
                                 <form method="POST">
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
+                                    {% if section_exam.is_completed %}
                                     <a href="" class="btn btn-info mr-2">Review Papers</a>
+                                    {% endif %}
                                     {% if not section_exam.is_completed and not section_exam.is_started and not section_exam.is_stopped %}
                                     <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Questions">
                                     {% endif %}
@@ -161,6 +163,7 @@
                                         {% endif %}
                                         {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
                                         <div class="sidebar-heading">Submited By</div>
+                                        {% for student in students_exam_material_during_exam %}
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
                                                 <a href="#">
@@ -169,12 +172,13 @@
                                                             <span class="btn btn-white btn-circle">#1</span>
                                                         </span>
                                                         <span class="media-body">
-                                                            MD.Sakib Sami
+                                                            {{student.student.user_id}} - {{student.student.user_first_name}} {{student.student.user_last_name}}
                                                         </span>
                                                     </span>
                                                 </a>
                                             </li>
                                         </ul>
+                                        {% endfor %}
                                         {% endif %}
                                     </div>
                                 </div>

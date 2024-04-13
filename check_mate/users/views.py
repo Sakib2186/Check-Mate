@@ -1119,6 +1119,7 @@ def exam(request,course_id,exam_type,exam_id):
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         sets = Load_Courses.load_set_of_student(logged_in_user,course_id)
         questions = Load_Courses.get_question_and_marks(exam_id,sets)
+        students_exam_material_during_exam = Load_Courses.get_exam_uploaded_students(exam_id)
         
 
         if logged_in_user == None:
@@ -1174,7 +1175,7 @@ def exam(request,course_id,exam_type,exam_id):
                         #logic of ML to separate papers
                         uploaded_file = request.FILES.get('pdf_file')
 
-                        if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id,questions[0]):
+                        if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id):
                             messages.success(request,"File Uploaded!")
                             #TODO:Redirect to page where uploaded file i viewed
                             return redirect("users:exam",course_id,exam_type,exam_id)
@@ -1198,6 +1199,7 @@ def exam(request,course_id,exam_type,exam_id):
                         'type_of_logged_in_user':type_of_logged_in_user,
                         'section_exam':section_exam,
                         'exam_type':exam_type,
+                        'students_exam_material_during_exam':students_exam_material_during_exam,
             }
             return render(request,"exam.html",context)
         else:
