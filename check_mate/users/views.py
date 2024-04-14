@@ -1120,14 +1120,18 @@ def exam(request,course_id,exam_type,exam_id):
         sets = Load_Courses.load_set_of_student(logged_in_user,course_id)
         questions = Load_Courses.get_question_and_marks(exam_id,sets)
         students_exam_material_during_exam = Load_Courses.get_exam_uploaded_students(exam_id)
+
+        
         
 
         if logged_in_user == None:
             user = request.user.username
+            user_submmited = False
         else:
             user = logged_in_user.user_id
+            user_submmited = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
 
-        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or user_submmited.is_uploaded :
 
             if request.method == "POST":
 
@@ -1200,8 +1204,111 @@ def exam(request,course_id,exam_type,exam_id):
                         'section_exam':section_exam,
                         'exam_type':exam_type,
                         'students_exam_material_during_exam':students_exam_material_during_exam,
+                        'course_id':course_id,
+                        'exam_id':exam_id,
+                        'user_submitted':user_submmited,
             }
             return render(request,"exam.html",context)
+        else:
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
+        
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+@login_required
+def review_paper_all(request,course_id,exam_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+        all_students_papers = Load_Courses.get_all_students_submission(exam_id)
+        
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
+            context = {
+                            'page_title':'Check Mate',
+                            'user_type':type_of_logged_in_user,
+                            'media_url':settings.MEDIA_URL,
+                            'logged_in_user':logged_in_user,
+                            'year':datetime.now().year,
+                            'current_semester':current_semester,
+
+                            'all_students_papers':all_students_papers,
+            }
+
+            return render(request,"review_paper.html",context)
+        else:
+            context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+            }
+            return render(request,"access_denied.html",context)
+        
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def student_paper(request,course_id,exam_id,student_id):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+        question_answer = Load_Courses.get_question_and_answer_of_student(exam_id,student_id)
+
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        allowed_user = None
+
+        if question_answer[1] == logged_in_user:
+            allowed_user = True
+        else:
+            allowed_user = False
+        
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or allowed_user:
+        
+            context = {
+                                'page_title':'Check Mate',
+                                'user_type':type_of_logged_in_user,
+                                'media_url':settings.MEDIA_URL,
+                                'logged_in_user':logged_in_user,
+                                'year':datetime.now().year,
+                                'current_semester':current_semester,
+
+                                'question_answers':question_answer[0],
+                                'user':question_answer[1],
+                }
+        
+            return render(request,"student_exam_submit_page.html",context)
         else:
             context = {
                     'page_title':'Check Mate',

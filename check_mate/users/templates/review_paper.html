@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Review Paper Exam type</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="page__header">
+                    <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
+                        <div class="container">
+
+                            {% block navbar %}
+                                {% include 'navbar.html' %}
+                            {% endblock navbar %}
+
+                        </div>
+                    </div>
+                    <div class="page ">
+
+                        <div class="container page__container p-0">
+                            <div class="row m-0">
+                                <div class="col-lg container-fluid page__container">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                        <li class="breadcrumb-item active">Review Papers</li>
+                                    </ol>
+    
+                                    <h1 class="h2">Review Papers</h1>
+    
+                                    <div class="card border-left-3 border-left-danger card-2by1">
+                                        <div class="card-body">
+                                            <div class="media align-items-center">
+                                                <div class="media-body">
+                                                    Check according to the<strong class="text-danger"> Questions</strong>
+                                                </div>
+                                                <div class="media-right">
+                                                    <a href="fixed-student-pay.html"
+                                                       class="btn btn-success float-right">Speed Grader</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div class="card table-responsive"
+                                         data-toggle="lists"
+                                         data-lists-values='[
+                                        "js-lists-values-document", 
+                                        "js-lists-values-amount",
+                                        "js-lists-values-status",
+                                        "js-lists-values-date"
+                                        ]'
+                                         data-lists-sort-by="js-lists-values-document"
+                                         data-lists-sort-desc="true">
+                                        <table class="table mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th colspan="4">
+                                                        <p>Submitted</p>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="list">
+                                                {% for student in all_students_papers %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <small class="text-uppercase text-muted mr-2">ID</small>
+                                                            <a href=""
+                                                               class="text-body small"><span class="js-lists-values-document">{{student.student.user_id}}</span></a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex align-items-center">
+                                                            <small class="text-uppercase text-muted mr-2">Name</small>
+                                                            <small class="text-uppercase">{{student.student.user_first_name}} {{student.student.user_last_name}}</small>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex align-items-center">
+                                                            <small class="text-uppercase text-muted mr-2">Submitted</small>
+                                                            {% if student.is_uploaded%}
+                                                            <i class="fa-solid fa-check"></i>
+                                                            <small class="text-uppercase js-lists-values-status">submitted</small>
+                                                            {% else %}
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                            <small class="text-uppercase js-lists-values-status">missing</small>
+                                                            {% endif %}      
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div class="d-flex align-items-center">
+                                                            <small class="text-uppercase text-muted mr-2">Marks</small>
+                                                            <small class="text-uppercase">0/10
+                                                                
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+    
+    
+    
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
+                </div>
+            </div>
+
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+        <script src="{% static 'js/list.js' %}"></script>
+        <script src="{% static 'js/list.min.js' %}"></script>
+
+
+    </body>
+
+</html>

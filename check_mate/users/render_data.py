@@ -379,6 +379,35 @@ class Load_Courses:
         submitted_exam = Exam_Submitted.objects.filter(exam_of = section_exam,is_uploaded = True)
 
         return submitted_exam
+    
+    def get_all_students_submission(exam_id):
+
+        '''This function will return all the submission details of student'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        papers = Exam_Submitted.objects.filter(exam_of = section_exam)
+
+        return papers
+
+    def get_question_and_answer_of_student(exam_id,student_id):
+
+        '''This function will return the questions and answer of that question of a student'''
+        
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        student = School_Users.objects.get(user_id = student_id)
+        ins = Student.objects.get(student_id =student,courses = section_exam.section.course_id,section = section_exam.section.section_number)
+        student_set = Shuffled_Papers.objects.get(student = ins, course_id = section_exam.section)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
+        question_answer = {}
+
+        for question in questions:
+
+            answer = Answer.objects.get(answer_of = question,uploaded_by = student)
+            question_answer[question] = answer
+
+        return (question_answer,student)
+
+
 
         
 

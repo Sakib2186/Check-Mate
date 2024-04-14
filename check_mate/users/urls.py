@@ -18,6 +18,8 @@ urlpatterns = [
     path('courses/<int:course_id>/take_exam/',views.take_exam,name="take_exam"),
     path('courses/<int:course_id>/edit_exam/<int:exam_id>',views.edit_exam,name="edit_exam"),
     path('courses/<int:course_id>/<str:exam_type>/<int:exam_id>',views.exam,name="exam"),
+    path('courses/<int:course_id>/<int:exam_id>/review_papers/all',views.review_paper_all,name="review_paper_all"),
+    path('courses/<int:course_id>/<int:exam_id>/paper/<int:student_id>',views.student_paper,name="student_paper"),
 
     path('all_courses/',views.all_courses,name="all_courses"),
     path('all_courses/add_course/',views.add_course,name="add_course"),

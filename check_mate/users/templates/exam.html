@@ -72,7 +72,7 @@
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
                                     {% if section_exam.is_completed %}
-                                    <a href="" class="btn btn-info mr-2">Review Papers</a>
+                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
                                     {% endif %}
                                     {% if not section_exam.is_completed and not section_exam.is_started and not section_exam.is_stopped %}
                                     <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Questions">
@@ -136,7 +136,7 @@
                                         <div class="countdown sidebar-p-x"
                                              data-value="8"
                                              data-unit="hour"></div>
-                                        {% if 2 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
+                                        {% if 3 in type_of_logged_in_user or not user_submitted.is_uploaded %}
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
@@ -160,6 +160,8 @@
                                             </li>
                                         </ul>
                                         </form>
+                                        {% else %}
+                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i></div>
                                         {% endif %}
                                         {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
                                         <div class="sidebar-heading">Submited By</div>

@@ -14,7 +14,7 @@ class Roles_Admin_Panel(admin.ModelAdmin):
 @admin.register(School_Users)
 class School_Users_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'user_id','user_first_name','user_middle_name','user_last_name','user_email',
+        'pk','user_id','user_first_name','user_middle_name','user_last_name','user_email',
         'user_phone_number','user_profile_picture','user_otp_verified'
     ]
 @admin.register(Course)
