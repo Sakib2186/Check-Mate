@@ -400,12 +400,16 @@ class Load_Courses:
         questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
         question_answer = {}
 
+        total_marks = 0
+        score = 0
         for question in questions:
 
             answer = Answer.objects.get(answer_of = question,uploaded_by = student)
             question_answer[question] = answer
+            total_marks += question.marks
+            score += answer.marks_obtained 
 
-        return (question_answer,student)
+        return (question_answer,student,total_marks,score)
 
 
 

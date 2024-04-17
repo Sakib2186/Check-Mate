@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Dashboard</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+        <style>
+            .question-image.fullscreen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                background-color: rgba(0, 0, 0, 0.9);
+                object-fit: contain;
+            }
+        </style>
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="mdk-header-layout__content">
+
+                    <div data-push
+                         data-responsive-width="992px"
+                         class="mdk-drawer-layout js-mdk-drawer-layout">
+                        <div class="mdk-drawer-layout__content page ">
+                            <div class="container page__container">
+                            <div class="container-fluid page__container">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item" active >1</li>
+                                </ol>
+                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                <div class="media align-items-center mb-headings">
+                                    {% if section_exam.is_completed %}
+                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                    {% endif %}
+                                    {% if not section_exam.is_completed and not section_exam.is_started and not section_exam.is_stopped %}
+                                    <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Questions">
+                                    {% endif %}
+                                    {% if not section_exam.is_started and not section_exam.is_stopped %}
+                                    <input type="submit" name="start_exam" class="btn btn-success mr-2" value="Start Exam">
+                                    {% endif %}
+                                    {% if section_exam.is_started %}
+                                    <input type="submit" name="stop_exam" class="btn btn-danger mr-2" value="Stop Exam">
+                                    {% endif %}
+                                    {% if section_exam.is_stopped and not section_exam.is_completed %}
+                                    <input type="submit" name="complete_exam" class="btn btn-success mr-2" value="Complete Exam">
+                                    {% endif %}
+                                </div>
+                                </form>
+                                {% endif %}
+                                <div class="card-group">
+                                    <div class="card">
+                                        <div class="card-body text-center" id="totalMarksSection">
+                                            <h4 class="mb-0"><strong>{{total_marks}}</strong></h4>
+                                            Question: 
+                                        </div>
+                                        <p class="text-center">
+                                            <img class="rounded question-image" src="https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg" alt="" width="150">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card canvas" style="overflow: hidden;">
+                                    <div class="form-inline">
+                                        <label for="penColor">Pen Color:</label>
+                                        <select id="penColor" class="form-control">
+                                            <option value="red">Red</option>
+                                            <option value="blue">Blue</option>
+                                            <option value="green">Green</option>
+                                            <!-- Add more color options as needed -->
+                                        </select>
+
+                                        <label for="penSize">Pen Size:</label>
+                                        <select id="penSize" class="form-control">
+                                            <option value="2">Small</option>
+                                            <option value="5">Medium</option>
+                                            <option value="10">Large</option>
+                                            <!-- Add more size options as needed -->
+                                        </select>
+                                    </div>
+                                    <br>
+                                    <canvas id="annotableCanvas" style="max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                            </div>
+    
+                        </div>
+    
+                        <div class="mdk-drawer js-mdk-drawer"
+                             data-align="end">
+                            <div class="mdk-drawer__content ">
+                                <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
+                                     data-perfect-scrollbar>
+                                    <div class="sidebar-p-y">
+                                        {% if 3 in type_of_logged_in_user or not user_submitted.is_uploaded %}
+                                        <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
+                                            {% csrf_token %}
+                                        <div class="sidebar-heading">Submit (PDF)</div>
+                                        <ul class="list-group list-group-fit">
+                                            <li class="list-group-item">
+                                                <div class="form-group m-0">
+                                                    <div class="custom-file">
+                                                        <input type="file"
+                                                               id="file"
+                                                               class="custom-file-input"
+                                                               name = "pdf_file">
+                                                        <label for="file"
+                                                               class="custom-file-label">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-center"> <!-- Added d-flex and justify-content-center classes -->
+                                                <button id="submitBtn" class="btn btn-success" type="submit" style="width:50%;">Submit</button>
+                                                <input type="hidden" id="submitCourseFlag" name="submitCourseFlag" value="">
+                                                
+                                            </li>
+                                        </ul>
+                                        </form>
+                                        {% else %}
+                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i></div>
+                                        {% endif %}
+                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
+                                        <div class="sidebar-heading">Submited By</div>
+                                        {% for student in students_exam_material_during_exam %}
+                                        <ul class="list-group list-group-fit">
+                                            <li class="list-group-item">
+                                                <a href="#">
+                                                    <span class="media align-items-center">
+                                                        <span class="media-left">
+                                                            <span class="btn btn-white btn-circle">#1</span>
+                                                        </span>
+                                                        <span class="media-body">
+                                                            {{student.student.user_id}} - {{student.student.user_first_name}} {{student.student.user_last_name}}
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                    </div>
+    
+
+    
+                </div>
+            </div>
+
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+        <script src="{% static 'js/list.min.js' %}"></script>
+        <script src="{% static 'js/list.js' %}"></script>
+        <script src="{% static 'js/toggle-check-all.js' %}"></script>
+        <script src="{% static 'js/check-selected-row.js' %}"></script>
+        <script src="{% static 'js/quill.min.js' %}"></script>
+        <script src="{% static 'js/quill.js' %}"></script>
+        <script src="{% static 'js/countdown.js' %}"></script>
+        <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+        <script src="{% static 'js/moment.min.js' %}"></script>
+
+        <script>
+    
+            // Event listener for delete button click
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('submitBtn').addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the button from submitting the form normally
+    
+                    swal({
+                        title: "Are you sure?",
+                        text: "Ready to submit?",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            document.getElementById('submitCourseFlag').value = "1";
+                            document.getElementById('pdf_upload_form').submit();
+                        } else {
+                            swal("Safe!");
+                        }
+                    });
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const images = document.querySelectorAll('.question-image');
+                
+                images.forEach(image => {
+                    image.addEventListener('click', function() {
+                        this.classList.toggle('fullscreen');
+                    });
+                });
+            });
+        </script>
+        <script>
+
+            dvar canvasContainer = document.querySelector('.card.canvas');
+            var canvas = new fabric.Canvas('annotableCanvas');
+            var annotateButton = document.getElementById('annotateButton');
+            var annotateControls = document.getElementById('annotateControls');
+        
+            // Resize canvas function
+            function resizeCanvas() {
+                var canvasWidth = canvasContainer.offsetWidth;
+                var canvasHeight = canvasContainer.offsetHeight;
+        
+                canvas.setWidth(canvasWidth);
+                canvas.setHeight(canvasHeight);
+            }
+        
+            // Call resizeCanvas function on window resize
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+        
+            // Toggle annotation controls and drawing mode on button click
+            annotateButton.addEventListener('click', function() {
+                if (annotateButton.classList.contains('active')) {
+                    annotateButton.classList.remove('active');
+                    annotateControls.style.display = 'none';
+                    canvas.isDrawingMode = false;
+                } else {
+                    annotateButton.classList.add('active');
+                    annotateControls.style.display = 'block';
+                    canvas.isDrawingMode = true;
+                }
+            });
+        });
+        </script>
+        
+        <script>
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                var totalMarksSection = document.getElementById('totalMarksSection');
+                var canvas = new fabric.Canvas('annotableCanvas');
+        
+                // Initialize default pen color and size
+                var penColor = document.getElementById('penColor').value;
+                var penSize = parseInt(document.getElementById('penSize').value);
+        
+                // Add image to canvas
+                fabric.Image.fromURL('https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg', function(img) {
+                    // Set canvas width to match total marks section width
+                    var maxWidth = totalMarksSection.offsetWidth;
+
+                    // Set canvas width and height
+                    canvas.setWidth(maxWidth);
+                    canvas.setHeight(maxWidth * (img.height / img.width));
+
+                    // Scale image to match the canvas width
+                    img.scaleToWidth(maxWidth);
+
+                    // Add scaled image to canvas
+                    canvas.add(img);
+                });
+        
+                // Function to update pen color and size
+                function updatePenOptions() {
+                    penColor = document.getElementById('penColor').value;
+                    penSize = parseInt(document.getElementById('penSize').value);
+                    canvas.freeDrawingBrush.color = penColor;
+                    canvas.freeDrawingBrush.width = penSize;
+                }
+        
+                // Enable drawing mode
+                canvas.isDrawingMode = true;
+        
+                // Set initial pen options
+                updatePenOptions();
+        
+                // Event listener for pen color change
+                document.getElementById('penColor').addEventListener('change', function() {
+                    updatePenOptions();
+                });
+        
+                // Event listener for pen size change
+                document.getElementById('penSize').addEventListener('change', function() {
+                    updatePenOptions();
+                });
+                function resizeCanvas() {
+                    var canvasWidth = footer.offsetWidth;
+                    var canvasHeight = footer.offsetHeight;
+        
+                    canvas.setWidth(canvasWidth);
+                    canvas.setHeight(canvasHeight);
+                }
+        
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+            });
+        </script>
+
+
+    </body>
+
+</html>

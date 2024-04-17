@@ -1306,6 +1306,8 @@ def student_paper(request,course_id,exam_id,student_id):
 
                                 'question_answers':question_answer[0],
                                 'user':question_answer[1],
+                                'total_marks':question_answer[2],
+                                'obtained_marks':question_answer[3],
                 }
         
             return render(request,"student_exam_submit_page.html",context)
@@ -1319,6 +1321,36 @@ def student_paper(request,course_id,exam_id,student_id):
                     'current_semester':current_semester,
             }
             return render(request,"access_denied.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+    
+@login_required
+def paper_view(request,course_id,exam_id,student_id,question_number):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        context = {
+                                'page_title':'Check Mate',
+                                'user_type':type_of_logged_in_user,
+                                'media_url':settings.MEDIA_URL,
+                                'logged_in_user':logged_in_user,
+                                'year':datetime.now().year,
+                                'current_semester':current_semester,
+        }
+
+        return render(request,"paper_view.html",context)
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
