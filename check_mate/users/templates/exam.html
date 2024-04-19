@@ -161,14 +161,25 @@
                                         </ul>
                                         </form>
                                         {% else %}
-                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i> {{user_submitted.student.user_id}} {{user_submitted.student.user_first_name}} {{user_submitted.student.user_last_name}}</div>
+                                        <div class="sidebar-heading">Submitted
+                                            <a href="{% url 'users:student_paper' course_id exam_id user_submitted.student.user_id %}">
+                                                <span class="media align-items-center">
+                                                    <span class="media-left">
+                                                        <span class="btn btn-white btn-circle"><i class="fa-solid fa-check"></i></span>
+                                                    </span>
+                                                    <span class="media-body">
+                                                        {{user_submitted.student.user_id}} - {{user_submitted.student.user_first_name}} {{user_submitted.student.user_last_name}}
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
                                         {% endif %}
                                         {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user or ta_allowed %}
                                         <div class="sidebar-heading">Submited By</div>
                                         {% for student in students_exam_material_during_exam %}
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
-                                                <a href="#">
+                                                <a href="{% url 'users:student_paper' course_id exam_id student.student.user_id %}">
                                                     <span class="media align-items-center">
                                                         <span class="media-left">
                                                             <span class="btn btn-white btn-circle">#1</span>

@@ -1125,6 +1125,7 @@ def exam(request,course_id,exam_type,exam_id):
         
         user_submitted = None
         logged_in_ta = False
+        ta_allowed = False
         if logged_in_user == None:
             user = request.user.username
             user_submmited = False
