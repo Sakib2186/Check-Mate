@@ -566,6 +566,15 @@ class Save:
             new_instance.exam_set = exam_set
             new_instance.ta_available = ta_available
             new_instance.save()
+            all_students = new_instance.section.students.all()
+            for student in all_students:
+                try:
+                    old = Exam_Submitted.objects.get(exam_of = new_instance,student = student.student_id)
+                    if old:
+                        pass
+                except:
+                    exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
+                exm_submit.save()
             message = "Exam Details Updated!"
         except:
             new_instance = Section_Exam.objects.create(section = course_section,
