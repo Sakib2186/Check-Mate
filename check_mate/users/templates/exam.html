@@ -161,9 +161,9 @@
                                         </ul>
                                         </form>
                                         {% else %}
-                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i></div>
+                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i> {{user_submitted.student.user_id}} {{user_submitted.student.user_first_name}} {{user_submitted.student.user_last_name}}</div>
                                         {% endif %}
-                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
+                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user or ta_allowed %}
                                         <div class="sidebar-heading">Submited By</div>
                                         {% for student in students_exam_material_during_exam %}
                                         <ul class="list-group list-group-fit">

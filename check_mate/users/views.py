@@ -1123,15 +1123,26 @@ def exam(request,course_id,exam_type,exam_id):
 
         
         
-
+        user_submitted = None
+        logged_in_ta = False
         if logged_in_user == None:
             user = request.user.username
             user_submmited = False
         else:
             user = logged_in_user.user_id
-            user_submmited = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
+            try:
+                user_submitted = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
+            except:
+                #ta trying to get in
+                ta_allowed = section_exam.ta_available
 
-        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or user_submmited.is_uploaded :
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or user_submmited.is_uploaded or ta_allowed:
+            
+            submitted_by = section_exam.section.teaching_assistant.all()
+            ta = submitted_by[0].teaching_id
+            
+            if ta == logged_in_user:
+                logged_in_ta = True
 
             if request.method == "POST":
 
@@ -1179,13 +1190,17 @@ def exam(request,course_id,exam_type,exam_id):
                         #logic of ML to separate papers
                         uploaded_file = request.FILES.get('pdf_file')
 
-                        if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id):
-                            messages.success(request,"File Uploaded!")
-                            #TODO:Redirect to page where uploaded file i viewed
+                        if logged_in_ta or 1 in type_of_logged_in_user:
+                            messages.error(request,"As an Intructor or TA you can't upload!")
                             return redirect("users:exam",course_id,exam_type,exam_id)
                         else:
-                            messages.error(request,"Error Occured while uploaded!")
-                            return redirect("users:exam",course_id,exam_type,exam_id)
+                            if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id):
+                                messages.success(request,"File Uploaded!")
+                                #TODO:Redirect to page where uploaded file i viewed
+                                return redirect("users:exam",course_id,exam_type,exam_id)
+                            else:
+                                messages.error(request,"Error Occured while uploaded!")
+                                return redirect("users:exam",course_id,exam_type,exam_id)
 
 
 
@@ -1206,7 +1221,8 @@ def exam(request,course_id,exam_type,exam_id):
                         'students_exam_material_during_exam':students_exam_material_during_exam,
                         'course_id':course_id,
                         'exam_id':exam_id,
-                        'user_submitted':user_submmited,
+                        'user_submitted':user_submitted,
+                        'ta_allowed':ta_allowed,
             }
             return render(request,"exam.html",context)
         else:
