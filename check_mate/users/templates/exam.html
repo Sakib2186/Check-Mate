@@ -9,7 +9,7 @@
             content="IE=edge">
         <meta name="viewport"
             content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{{page_title}} - Dashboard</title>
+        <title>{{page_title}} - {{exam_type}}</title>
         <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
 
         <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
@@ -67,7 +67,7 @@
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
                                     <li class="breadcrumb-item active">{{exam_type}}</li>
                                 </ol>
-                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
+                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or ta_allowed %}
                                 <form method="POST">
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
@@ -132,10 +132,15 @@
                                 <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
                                      data-perfect-scrollbar>
                                     <div class="sidebar-p-y">
+                                        {% if section_exam.is_completed %}
+                                        <div class="sidebar-heading">Exam Completed!</div>
+                                        {% endif %}
+                                        {% if not section_exam.is_completed %}
                                         <div class="sidebar-heading">Time left</div>
                                         <div class="countdown sidebar-p-x"
                                              data-value="8"
                                              data-unit="hour"></div>
+                                        {% endif %}     
                                         {% if 3 in type_of_logged_in_user or not user_submitted.is_uploaded %}
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}

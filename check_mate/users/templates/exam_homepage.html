@@ -76,21 +76,53 @@
                         </div>
                         <div class="card-columns">
                             {% for exam,number in section_exams.items %}
-                            {% if exam.is_started or 1 in user_type or 3 in user_type %}
+                            {% if exam.is_started or 1 in user_type or 3 in user_type or exam.is_completed %}
                             <div class="card card-sm">
                                 <div class="card-body media">
                                     <div class="media-left">
+                                        {% if exam.is_completed %}
+                                            {% if 2 in user_type %}
+                                            <a href="{% url 'users:student_paper' course_id exam.pk logged_in_user.user_id %}"
+                                            class="avatar avatar-lg avatar-4by3">
+                                             <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
+                                                  alt="Exam Image"
+                                                  class="avatar-img">
+                                            </a>
+                                            {% elif  1 in user_type or 3 in user_type or exam.ta_allowed %}
+                                            <a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}"
+                                            class="avatar avatar-lg avatar-4by3">
+                                             <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
+                                                  alt="Exam Image"
+                                                  class="avatar-img">
+                                            </a>
+                                            {% endif %}
+                                        {% else %}
                                         <a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}"
                                            class="avatar avatar-lg avatar-4by3">
                                             <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
                                                  alt="Exam Image"
                                                  class="avatar-img">
                                         </a>
+                                        {% endif %}
                                     </div>
+                                    {% if exam.is_completed %}
+                                        {% if 2 in user_type %}
+                                            <div class="media-body">
+                                                <h4 class="card-title mb-0"><a href="{% url 'users:student_paper' course_id exam.pk logged_in_user.user_id %}">{{exam.exam_title}}</a></h4>
+                                                <small class="text-muted">{{exam.exam_description}}</small>
+                                            </div>
+                                        {% elif  1 in user_type or 3 in user_type or exam.ta_allowed %}
+                                            <div class="media-body">
+                                                <h4 class="card-title mb-0"><a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}">{{exam.exam_title}}</a></h4>
+                                                <small class="text-muted">{{exam.exam_description}}</small>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
                                     <div class="media-body">
                                         <h4 class="card-title mb-0"><a href="{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk %}">{{exam.exam_title}}</a></h4>
                                         <small class="text-muted">{{exam.exam_description}}</small>
                                     </div>
+                                    {% endif %}
                                 </div>
                                 <div class="card-footer text-center">
                                     {% if 1 in user_type or 3 in user_type %}

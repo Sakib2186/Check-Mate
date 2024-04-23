@@ -632,6 +632,7 @@ def course(request,course_id):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
         section_exams = Load_Courses.get_section_exams(course_id)
+        
 
         
 
@@ -1128,16 +1129,18 @@ def exam(request,course_id,exam_type,exam_id):
         ta_allowed = False
         if logged_in_user == None:
             user = request.user.username
-            user_submmited = False
+            is_uploaded = False
         else:
             user = logged_in_user.user_id
             try:
                 user_submitted = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
+                is_uploaded = user_submitted.is_uploaded
             except:
                 #ta trying to get in
                 ta_allowed = section_exam.ta_available
+                is_uploaded = False
 
-        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or user_submmited.is_uploaded or ta_allowed:
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or is_uploaded or ta_allowed:
             
             submitted_by = section_exam.section.teaching_assistant.all()
             ta = submitted_by[0].teaching_id
