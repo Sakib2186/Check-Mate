@@ -18,6 +18,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
+from django.http import JsonResponse
 
 
 logger=logging.getLogger(__name__)
@@ -1360,6 +1361,14 @@ def paper_view(request,course_id,exam_id,student_id,question_number):
             user = request.user.username
         else:
             user = logged_in_user.user_id
+
+        if request.method == 'POST':
+            annotated_image = request.POST.get('annotated_image')
+            # Process the annotated image data here
+            # Example: Save the image to a file or database
+            print(annotated_image)
+            return JsonResponse({'message': 'Image saved successfully'})
+
 
         context = {
                                 'page_title':'Check Mate',

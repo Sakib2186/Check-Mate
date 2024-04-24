@@ -22,6 +22,7 @@ urlpatterns = [
     path('courses/<int:course_id>/<int:exam_id>/paper/<int:student_id>',views.student_paper,name="student_paper"),
     path('courses/<int:course_id>/<int:exam_id>/paper/<int:student_id>/<question_number>',views.paper_view,name="paper_view"),
 
+
     path('all_courses/',views.all_courses,name="all_courses"),
     path('all_courses/add_course/',views.add_course,name="add_course"),
     path('all_courses/edit_course_details/<int:course_id>',views.edit_course_details,name = "edit_course_details"),

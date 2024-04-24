@@ -37,6 +37,21 @@
                 background-color: rgba(0, 0, 0, 0.9);
                 object-fit: contain;
             }
+            #imageCanvas {
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+                margin: auto;
+            }
+        
+            .card {
+                max-width: 100%; /* Adjust this value if needed */
+                overflow: hidden; /* Hide overflow content */
+            }
+            #eraseBtn,
+            #saveBtn {
+                display: none;
+            }
         </style>
     </head>
 
@@ -99,29 +114,21 @@
                                         <p class="text-center">
                                             <img class="rounded question-image" src="https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg" alt="" width="150">
                                         </p>
+                                        
                                     </div>
                                 </div>
-                                <div class="card canvas" style="overflow: hidden;">
-                                    <div class="form-inline">
-                                        <label for="penColor">Pen Color:</label>
-                                        <select id="penColor" class="form-control">
-                                            <option value="red">Red</option>
-                                            <option value="blue">Blue</option>
-                                            <option value="green">Green</option>
-                                            <!-- Add more color options as needed -->
-                                        </select>
-
-                                        <label for="penSize">Pen Size:</label>
-                                        <select id="penSize" class="form-control">
-                                            <option value="2">Small</option>
-                                            <option value="5">Medium</option>
-                                            <option value="10">Large</option>
-                                            <!-- Add more size options as needed -->
-                                        </select>
-                                    </div>
-                                    <br>
-                                    <canvas id="annotableCanvas" style="max-width: 100%;"></canvas>
+                                <div class="card">
+                                    <button id="eraseBtn" class="btn btn-danger">Erase Annotations</button>
+                                    <button id="saveBtn">Save Image</button>
+                                    <div class="card-header">
+                                        <div class="media align-items-center">
+                                            
+                                            <canvas id="imageCanvas"></canvas>
+                                            
+                                        </div>
+                                    </div>    
                                 </div>
+                                    
                             </div>
                             </div>
     
@@ -254,102 +261,142 @@
                 });
             });
         </script>
-        <script>
-
-            dvar canvasContainer = document.querySelector('.card.canvas');
-            var canvas = new fabric.Canvas('annotableCanvas');
-            var annotateButton = document.getElementById('annotateButton');
-            var annotateControls = document.getElementById('annotateControls');
-        
-            // Resize canvas function
-            function resizeCanvas() {
-                var canvasWidth = canvasContainer.offsetWidth;
-                var canvasHeight = canvasContainer.offsetHeight;
-        
-                canvas.setWidth(canvasWidth);
-                canvas.setHeight(canvasHeight);
-            }
-        
-            // Call resizeCanvas function on window resize
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-        
-            // Toggle annotation controls and drawing mode on button click
-            annotateButton.addEventListener('click', function() {
-                if (annotateButton.classList.contains('active')) {
-                    annotateButton.classList.remove('active');
-                    annotateControls.style.display = 'none';
-                    canvas.isDrawingMode = false;
-                } else {
-                    annotateButton.classList.add('active');
-                    annotateControls.style.display = 'block';
-                    canvas.isDrawingMode = true;
-                }
-            });
-        });
-        </script>
         
         <script>
+            window.onload = function() {
+                var canvas = document.getElementById('imageCanvas');
+                var ctx = canvas.getContext('2d');
+                var img = new Image();
+                var mousePressed = false;
+                var isAnnotating = false;
+                var lastX, lastY;
             
-            document.addEventListener('DOMContentLoaded', function() {
-                var totalMarksSection = document.getElementById('totalMarksSection');
-                var canvas = new fabric.Canvas('annotableCanvas');
-        
-                // Initialize default pen color and size
-                var penColor = document.getElementById('penColor').value;
-                var penSize = parseInt(document.getElementById('penSize').value);
-        
-                // Add image to canvas
-                fabric.Image.fromURL('https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg', function(img) {
-                    // Set canvas width to match total marks section width
-                    var maxWidth = totalMarksSection.offsetWidth;
-
-                    // Set canvas width and height
-                    canvas.setWidth(maxWidth);
-                    canvas.setHeight(maxWidth * (img.height / img.width));
-
-                    // Scale image to match the canvas width
-                    img.scaleToWidth(maxWidth);
-
-                    // Add scaled image to canvas
-                    canvas.add(img);
+                
+                img.onload = function () {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = "https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg";
+            
+                canvas.addEventListener('mousedown', function (e) {
+                    mousePressed = true;
+                    var rect = canvas.getBoundingClientRect();
+                    lastX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                    lastY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                    draw(lastX, lastY, false);
                 });
-        
-                // Function to update pen color and size
-                function updatePenOptions() {
-                    penColor = document.getElementById('penColor').value;
-                    penSize = parseInt(document.getElementById('penSize').value);
-                    canvas.freeDrawingBrush.color = penColor;
-                    canvas.freeDrawingBrush.width = penSize;
+            
+                canvas.addEventListener('mousemove', function (e) {
+                    if (mousePressed) {
+                        var rect = canvas.getBoundingClientRect();
+                        var mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                        var mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                        draw(mouseX, mouseY, true);
+                        lastX = mouseX;
+                        lastY = mouseY;
+                    }
+                });
+            
+                canvas.addEventListener('mouseup', function() {
+                    mousePressed = false;
+                    isAnnotating = true;
+                    toggleButtonsVisibility();
+
+                });
+            
+                canvas.addEventListener('mouseleave', function() {
+                    mousePressed = false;
+                });
+
+                document.getElementById('eraseBtn').addEventListener('click', function () {
+                    // Clear the canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    // Redraw the image
+                    ctx.drawImage(img, 0, 0);
+                    isAnnotating = false;
+                    toggleButtonsVisibility();
+                });
+            
+                function draw(x, y, isDown) {
+                    if (isDown) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'red'; // Change drawing color here
+                        ctx.lineWidth = 3; // Change drawing line width here
+                        ctx.lineJoin = 'round';
+                        ctx.moveTo(lastX, lastY);
+                        ctx.lineTo(x, y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                    lastX = x; lastY = y;
                 }
-        
-                // Enable drawing mode
-                canvas.isDrawingMode = true;
-        
-                // Set initial pen options
-                updatePenOptions();
-        
-                // Event listener for pen color change
-                document.getElementById('penColor').addEventListener('change', function() {
-                    updatePenOptions();
-                });
-        
-                // Event listener for pen size change
-                document.getElementById('penSize').addEventListener('change', function() {
-                    updatePenOptions();
-                });
-                function resizeCanvas() {
-                    var canvasWidth = footer.offsetWidth;
-                    var canvasHeight = footer.offsetHeight;
-        
-                    canvas.setWidth(canvasWidth);
-                    canvas.setHeight(canvasHeight);
+
+                
+
+                function toggleButtonsVisibility() {
+                    var eraseBtn = document.getElementById('eraseBtn');
+                    var saveBtn = document.getElementById('saveBtn');
+                    if (isAnnotating) {
+                        eraseBtn.style.display = 'block';
+                        saveBtn.style.display = 'block';
+                    } else {
+                        eraseBtn.style.display = 'none';
+                        saveBtn.style.display = 'none';
+                    }
                 }
-        
-                window.addEventListener('resize', resizeCanvas);
-                resizeCanvas();
-            });
+                
+
+            }
         </script>
+        <script>
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                var dataURL = canvas.toDataURL('image/png');
+                var canvas = document.getElementById('imageCanvas');
+                // Create FormData object to send image data
+                var formData = new FormData();
+                formData.append('annotated_image', dataURL);
+                
+                // Get CSRF token value from cookies
+                var csrftoken = getCookie('csrftoken');
+                
+                // Send AJAX request with CSRF token included in headers
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '{% url "users:paper_view" 20 28 2121422 1 %}');
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        console.log('Image saved successfully');
+                        // Handle success response here if needed
+                    } else {
+                        console.error('Error saving image:', xhr.statusText);
+                        // Handle error response here if needed
+                    }
+                };
+                xhr.onerror = function() {
+                    console.error('Error saving image:', xhr.statusText);
+                    // Handle error here if needed
+                };
+                xhr.send(formData);
+            });
+        
+            // Function to retrieve CSRF token value from cookies
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        </script>
+        
 
 
     </body>
