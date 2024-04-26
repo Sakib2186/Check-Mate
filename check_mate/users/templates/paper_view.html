@@ -270,15 +270,15 @@
                 var mousePressed = false;
                 var isAnnotating = false;
                 var lastX, lastY;
-            
                 
+
                 img.onload = function () {
                     canvas.width = img.width;
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                 };
                 img.src = "https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg";
-            
+        
                 canvas.addEventListener('mousedown', function (e) {
                     mousePressed = true;
                     var rect = canvas.getBoundingClientRect();
@@ -286,7 +286,7 @@
                     lastY = (e.clientY - rect.top) * (canvas.height / rect.height);
                     draw(lastX, lastY, false);
                 });
-            
+        
                 canvas.addEventListener('mousemove', function (e) {
                     if (mousePressed) {
                         var rect = canvas.getBoundingClientRect();
@@ -297,32 +297,29 @@
                         lastY = mouseY;
                     }
                 });
-            
+        
                 canvas.addEventListener('mouseup', function() {
                     mousePressed = false;
                     isAnnotating = true;
                     toggleButtonsVisibility();
-
                 });
-            
+        
                 canvas.addEventListener('mouseleave', function() {
                     mousePressed = false;
                 });
-
+        
                 document.getElementById('eraseBtn').addEventListener('click', function () {
-                    // Clear the canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    // Redraw the image
                     ctx.drawImage(img, 0, 0);
                     isAnnotating = false;
                     toggleButtonsVisibility();
                 });
-            
+        
                 function draw(x, y, isDown) {
                     if (isDown) {
                         ctx.beginPath();
-                        ctx.strokeStyle = 'red'; // Change drawing color here
-                        ctx.lineWidth = 3; // Change drawing line width here
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 3;
                         ctx.lineJoin = 'round';
                         ctx.moveTo(lastX, lastY);
                         ctx.lineTo(x, y);
@@ -331,9 +328,7 @@
                     }
                     lastX = x; lastY = y;
                 }
-
-                
-
+        
                 function toggleButtonsVisibility() {
                     var eraseBtn = document.getElementById('eraseBtn');
                     var saveBtn = document.getElementById('saveBtn');
@@ -345,55 +340,42 @@
                         saveBtn.style.display = 'none';
                     }
                 }
-                
-
-            }
-        </script>
-        <script>
-            document.getElementById('saveBtn').addEventListener('click', function() {
-                var dataURL = canvas.toDataURL('image/png');
-                var canvas = document.getElementById('imageCanvas');
-                // Create FormData object to send image data
-                var formData = new FormData();
-                formData.append('annotated_image', dataURL);
-                
-                // Get CSRF token value from cookies
-                var csrftoken = getCookie('csrftoken');
-                
-                // Send AJAX request with CSRF token included in headers
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', '{% url "users:paper_view" 20 28 2121422 1 %}');
-                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        console.log('Image saved successfully');
-                        // Handle success response here if needed
-                    } else {
-                        console.error('Error saving image:', xhr.statusText);
-                        // Handle error response here if needed
-                    }
-                };
-                xhr.onerror = function() {
-                    console.error('Error saving image:', xhr.statusText);
-                    // Handle error here if needed
-                };
-                xhr.send(formData);
-            });
         
-            // Function to retrieve CSRF token value from cookies
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
+                document.getElementById('saveBtn').addEventListener('click', function() {
+                    var dataURL = canvas.toDataURL('image/png');
+                    var formData = new FormData();
+                    formData.append('annotated_image', dataURL);
+                    var csrftoken = getCookie('csrftoken');
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '{% url "users:paper_view" 20 28 2121422 1 %}');
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            console.log('Image saved successfully');
+                        } else {
+                            console.error('Error saving image:', xhr.statusText);
+                        }
+                    };
+                    xhr.onerror = function() {
+                        console.error('Error saving image:', xhr.statusText);
+                    };
+                    xhr.send(formData);
+                });
+        
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
                         }
                     }
+                    return cookieValue;
                 }
-                return cookieValue;
             }
         </script>
         
