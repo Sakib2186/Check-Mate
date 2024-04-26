@@ -80,7 +80,7 @@
                             <div class="container-fluid page__container">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Exam Type</a></li>
                                     <li class="breadcrumb-item" active >1</li>
                                 </ol>
                                 {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
@@ -140,51 +140,49 @@
                                 <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
                                      data-perfect-scrollbar>
                                     <div class="sidebar-p-y">
-                                        {% if 3 in type_of_logged_in_user or not user_submitted.is_uploaded %}
+                                        {% if 3 in user_type or 1 in user_type or logged_in_ta %}
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
-                                        <div class="sidebar-heading">Submit (PDF)</div>
-                                        <ul class="list-group list-group-fit">
-                                            <li class="list-group-item">
-                                                <div class="form-group m-0">
-                                                    <div class="custom-file">
-                                                        <input type="file"
-                                                               id="file"
-                                                               class="custom-file-input"
-                                                               name = "pdf_file">
-                                                        <label for="file"
-                                                               class="custom-file-label">Choose file</label>
+                                            <div class="card card-body">
+                                                <div class="row">
+                                                    <div class="col-lg-8 d-flex align-items-center">
+                                                            <div class="form-group">
+                                                                <label for="touch-spin-2"
+                                                                       class="form-label">Score</label>
+                                                                <input id="touch-spin-2"
+                                                                       data-toggle="touch-spin"
+                                                                       data-min="-1000000"
+                                                                       data-max="1000000"
+                                                                       data-step="50"
+                                                                       type="number"
+                                                                       value="200"
+                                                                       name="demo2"
+                                                                       class="form-control"
+                                                                       style="width:50%;" />
+                                                                <div class="ml-2" style="font-size:80%;">/200</div>
+                                                            </div>
                                                     </div>
                                                 </div>
-                                            </li>
-                                            <li class="list-group-item d-flex justify-content-center"> <!-- Added d-flex and justify-content-center classes -->
+                                                <div class="row">
+                                                    <div class="col-lg-8 d-flex align-items-center">
+                                                        <div class="form-group">
+                                                        <textarea class="form-control"
+                                                                  rows="2"
+                                                                  placeholder="Write comment (if any)"></textarea>
+                                                        </div>
+                                                            
+                                                    </div>
+                                                    
+                                                </div>
                                                 <button id="submitBtn" class="btn btn-success" type="submit" style="width:50%;">Submit</button>
                                                 <input type="hidden" id="submitCourseFlag" name="submitCourseFlag" value="">
                                                 
-                                            </li>
-                                        </ul>
+                                                    
+                                                    
+                                                
+                                            </div>
+                                            
                                         </form>
-                                        {% else %}
-                                        <div class="sidebar-heading">Submitted <i class="fa-solid fa-check"></i></div>
-                                        {% endif %}
-                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user%}
-                                        <div class="sidebar-heading">Submited By</div>
-                                        {% for student in students_exam_material_during_exam %}
-                                        <ul class="list-group list-group-fit">
-                                            <li class="list-group-item">
-                                                <a href="#">
-                                                    <span class="media align-items-center">
-                                                        <span class="media-left">
-                                                            <span class="btn btn-white btn-circle">#1</span>
-                                                        </span>
-                                                        <span class="media-body">
-                                                            {{student.student.user_id}} - {{student.student.user_first_name}} {{student.student.user_last_name}}
-                                                        </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                        {% endfor %}
                                         {% endif %}
                                     </div>
                                 </div>

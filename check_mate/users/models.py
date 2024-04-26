@@ -240,6 +240,7 @@ class Answer(models.Model):
     answer_textfield = models.TextField(blank=True,null=True)
     answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
     marks_obtained = models.IntegerField(default = 0)
+    comment = models.TextField(null=True,blank=True)
 
 
     def __str__(self) -> str:

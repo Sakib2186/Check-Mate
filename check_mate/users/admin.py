@@ -72,7 +72,7 @@ class Question_Admin_panel(admin.ModelAdmin):
 @admin.register(Answer)
 class Answer_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained'
+        'answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained','comment'
     ]
 @admin.register(Shuffled_Papers)
 class Suffple_Papers_Admin_Panel(admin.ModelAdmin):

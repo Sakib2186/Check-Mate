@@ -1356,11 +1356,20 @@ def paper_view(request,course_id,exam_id,student_id,question_number):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        logged_in_ta = False
+
 
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
+
+        submitted_by = section_exam.section.teaching_assistant.all()
+        ta = submitted_by[0].teaching_id
+            
+        if ta == logged_in_user:
+            logged_in_ta = True
 
         if request.method == 'POST':
             annotated_image = request.POST.get('annotated_image')
@@ -1377,6 +1386,7 @@ def paper_view(request,course_id,exam_id,student_id,question_number):
                                 'logged_in_user':logged_in_user,
                                 'year':datetime.now().year,
                                 'current_semester':current_semester,
+                                'logged_in_ta':logged_in_ta,
         }
 
         return render(request,"paper_view.html",context)
