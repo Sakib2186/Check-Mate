@@ -104,7 +104,7 @@
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             <small class="text-uppercase text-muted mr-2">ID</small>
-                                                            <a href=""
+                                                            <a href="{% url 'users:student_paper' course_id exam_id student.student.user_id  %}"
                                                                class="text-body small"><span class="js-lists-values-document">{{student.student.user_id}}</span></a>
                                                         </div>
                                                     </td>

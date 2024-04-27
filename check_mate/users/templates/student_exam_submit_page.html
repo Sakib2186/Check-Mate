@@ -73,7 +73,7 @@
                                                     View <strong class="text-danger">Answers</strong>
                                                 </div>
                                                 <div class="media-right">
-                                                    <a href="fixed-student-pay.html"
+                                                    <a href="{% url 'users:paper_view' course_id exam_id student_id first_question.pk %}"
                                                        class="btn btn-success float-right">Speed View</a>
                                                 </div>
                                             </div>
@@ -91,13 +91,16 @@
                                          data-lists-sort-by="js-lists-values-document"
                                          data-lists-sort-desc="true">
                                         <table class="table mb-0">
-                                            <thead class="thead-light">
+                                            <thead class="">
                                                 <tr>
                                                     <th colspan="4">
                                                         <p>Submission</p>
                                                     </th>
                                                     <th colspan="4">
                                                         <p>Total Obtained: {{obtained_marks}}/{{total_marks}}</p>
+                                                    </th>
+                                                    <th colspan="4">
+                                                        <p>Set: {{set_number}}</p>
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -107,7 +110,7 @@
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             <small class="text-uppercase text-muted mr-2">Q{{forloop.counter}}. </small>
-                                                            <a href=""
+                                                            <a href="{% url 'users:paper_view' course_id exam_id student_id q.pk  %}"
                                                                class="text-body small"><span class="js-lists-values-document">{{q.question}}</span></a>
                                                         </div>
                                                     </td>

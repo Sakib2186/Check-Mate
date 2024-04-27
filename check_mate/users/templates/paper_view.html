@@ -52,6 +52,7 @@
             #saveBtn {
                 display: none;
             }
+            
         </style>
     </head>
 
@@ -80,8 +81,8 @@
                             <div class="container-fluid page__container">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Exam Type</a></li>
-                                    <li class="breadcrumb-item" active >1</li>
+                                    <li class="breadcrumb-item"><a href="{% url 'users:student_paper' course_id exam_id student_id %}">{{section_exam.exam_type.exam_type}}</a></li>
+                                    <li class="breadcrumb-item" active >Set: {{question.question_set}}</li>
                                 </ol>
                                 {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
                                 <form method="POST">
@@ -109,25 +110,29 @@
                                     <div class="card">
                                         <div class="card-body text-center" id="totalMarksSection">
                                             <h4 class="mb-0"><strong>{{total_marks}}</strong></h4>
-                                            Question: 
+                                            Question: {{question.question}}
                                         </div>
+                                        {% if question.question_image %}
                                         <p class="text-center">
-                                            <img class="rounded question-image" src="https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg" alt="" width="150">
+                                            <img class="rounded question-image" src="{{media_url}}{{question.question_image}}" alt="" width="150">
                                         </p>
+                                        {% endif %}
                                         
                                     </div>
                                 </div>
+                                {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
                                 <div class="card">
                                     <button id="eraseBtn" class="btn btn-danger">Erase Annotations</button>
                                     <button id="saveBtn">Save Image</button>
                                     <div class="card-header">
                                         <div class="media align-items-center">
-                                            
                                             <canvas id="imageCanvas"></canvas>
-                                            
                                         </div>
                                     </div>    
                                 </div>
+                                {% else %}
+                                <p>Written text fied</p>
+                                {% endif %}
                                     
                             </div>
                             </div>
@@ -144,6 +149,18 @@
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                             <div class="card card-body">
+                                                {% if question_next.pk or question_back.pk %}
+                                                <div class="btn-group" role="group" aria-label="Next and Previous Buttons">
+                                                    {% if question_back.pk %}
+                                                    <a href="{% url 'users:paper_view' course_id exam_id student_id question_back.pk %}" class="btn btn-info" style="width: 48%;">Previous</a>
+                                                    {% endif %}
+                                                    {% if question_next.pk %}
+                                                    <a href="{% url 'users:paper_view' course_id exam_id student_id question_next.pk %}" class="btn btn-info" style="width: 48%;">Next</a>
+                                                    {% endif %}
+                                                </div>
+                                                <br><br><br>
+                                                <hr>
+                                                {% endif %}
                                                 <div class="row">
                                                     <div class="col-lg-8 d-flex align-items-center">
                                                             <div class="form-group">
@@ -224,30 +241,7 @@
         <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
         <script src="{% static 'js/moment.min.js' %}"></script>
 
-        <script>
-    
-            // Event listener for delete button click
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('submitBtn').addEventListener('click', function (event) {
-                    event.preventDefault(); // Prevent the button from submitting the form normally
-    
-                    swal({
-                        title: "Are you sure?",
-                        text: "Ready to submit?",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true,
-                    }).then((willDelete) => {
-                        if (willDelete) {
-                            document.getElementById('submitCourseFlag').value = "1";
-                            document.getElementById('pdf_upload_form').submit();
-                        } else {
-                            swal("Safe!");
-                        }
-                    });
-                });
-            });
-        </script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const images = document.querySelectorAll('.question-image');
@@ -259,7 +253,8 @@
                 });
             });
         </script>
-        
+
+        {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
         <script>
             window.onload = function() {
                 var canvas = document.getElementById('imageCanvas');
@@ -275,7 +270,7 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                 };
-                img.src = "https://cdn.photographylife.com/wp-content/uploads/2014/09/Nikon-D750-Image-Samples-2.jpg";
+                img.src = {{ answer.answer_image }}
         
                 canvas.addEventListener('mousedown', function (e) {
                     mousePressed = true;
@@ -376,6 +371,7 @@
                 }
             }
         </script>
+        {% endif %}
         
 
 

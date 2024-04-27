@@ -399,6 +399,8 @@ class Load_Courses:
         student_set = Shuffled_Papers.objects.get(student = ins, course_id = section_exam.section)
         questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
         question_answer = {}
+        set_number = ""
+        first_question = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).first()
 
         total_marks = 0
         score = 0
@@ -406,10 +408,11 @@ class Load_Courses:
 
             answer = Answer.objects.get(answer_of = question,uploaded_by = student)
             question_answer[question] = answer
+            set_number = question.question_set
             total_marks += question.marks
             score += answer.marks_obtained 
 
-        return (question_answer,student,total_marks,score)
+        return (question_answer,student,total_marks,score,set_number,first_question)
 
 
 

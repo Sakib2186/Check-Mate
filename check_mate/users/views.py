@@ -1272,6 +1272,8 @@ def review_paper_all(request,course_id,exam_id):
                             'current_semester':current_semester,
 
                             'all_students_papers':all_students_papers,
+                            'course_id':course_id,
+                            'exam_id':exam_id,
             }
 
             return render(request,"review_paper.html",context)
@@ -1302,7 +1304,6 @@ def student_paper(request,course_id,exam_id,student_id):
         current_semester = Session.objects.get(current=True)
         question_answer = Load_Courses.get_question_and_answer_of_student(exam_id,student_id)
 
-
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -1324,11 +1325,16 @@ def student_paper(request,course_id,exam_id,student_id):
                                 'logged_in_user':logged_in_user,
                                 'year':datetime.now().year,
                                 'current_semester':current_semester,
+                                'course_id':course_id,
+                                'exam_id':exam_id,
+                                'student_id':student_id,
 
                                 'question_answers':question_answer[0],
                                 'user':question_answer[1],
                                 'total_marks':question_answer[2],
                                 'obtained_marks':question_answer[3],
+                                'set_number':question_answer[4],
+                                'first_question':question_answer[5],
                 }
         
             return render(request,"student_exam_submit_page.html",context)
@@ -1349,7 +1355,7 @@ def student_paper(request,course_id,exam_id,student_id):
         return HttpResponse("Bad Request")
     
 @login_required
-def paper_view(request,course_id,exam_id,student_id,question_number):
+def paper_view(request,course_id,exam_id,student_id,question_pk):
 
     try:
         #loading the data to pass them in dictionary, context
@@ -1359,6 +1365,23 @@ def paper_view(request,course_id,exam_id,student_id,question_number):
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         logged_in_ta = False
 
+        question = Question.objects.get(pk = question_pk,questions_of = section_exam)
+        answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
+
+
+        try:
+            question_next = Question.objects.filter(pk__gt=question.pk,questions_of = section_exam,question_set = question.question_set).order_by('pk').first()
+            answer_next = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
+        except:
+            question_next = None
+            answer_next = None
+
+        try:
+            question_back= Question.objects.filter(pk__lt=question.pk,questions_of = section_exam,question_set = question.question_set).order_by('-pk').first()
+            answer_back = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
+        except:
+            question_back = None
+            answer_back = None
 
         if logged_in_user == None:
             user = request.user.username
@@ -1387,6 +1410,18 @@ def paper_view(request,course_id,exam_id,student_id,question_number):
                                 'year':datetime.now().year,
                                 'current_semester':current_semester,
                                 'logged_in_ta':logged_in_ta,
+
+                                'question':question,
+                                'answer':answer,
+                                'question_next':question_next,
+                                'answer_next':answer_next,
+                                'section_exam':section_exam,
+                                'course_id':course_id,
+                                'exam_id':exam_id,
+                                'student_id':student_id,
+                                'question_back':question_back,
+                                'answer_back':answer_back,
+
         }
 
         return render(request,"paper_view.html",context)
