@@ -558,26 +558,50 @@ class Save:
         exm_mode = Exam_Mode.objects.get(mode_id = exam_mode)
 
         try:
-
+     
             new_instance = Section_Exam.objects.get(pk = exam_id)
+      
             #Updating an existing instance
             new_instance.exam_title = exam_title
+    
             new_instance.exam_type = exm_type
+   
             new_instance.exam_mode = exm_mode
+    
             new_instance.exam_date = exam_date
+  
             new_instance.exam_description = exam_description
+
+
+            if new_instance.exam_set != exam_set:
+ 
+                questions = Question.objects.filter(questions_of = new_instance)
+ 
+                for question in questions:
+                    path = settings.MEDIA_ROOT+str(question.question_image)
+
+                    if os.path.isfile(path):
+
+                        os.remove(path)
+
+                    question.delete()
+
             new_instance.exam_set = exam_set
+
             new_instance.ta_available = ta_available
+
             new_instance.save()
             all_students = new_instance.section.students.all()
+
             for student in all_students:
                 try:
                     old = Exam_Submitted.objects.get(exam_of = new_instance,student = student.student_id)
+ 
                     if old:
                         pass
                 except:
                     exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
-                exm_submit.save()
+                    exm_submit.save()
             message = "Exam Details Updated!"
         except:
             new_instance = Section_Exam.objects.create(section = course_section,
@@ -732,6 +756,12 @@ class Delete:
         '''This function will delete the exam of a section'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        questions = Question.objects.filter(questions_of = section_exam)
+        for question in questions:
+            path = settings.MEDIA_ROOT+str(question.question_image)
+            if os.path.isfile(path):
+                os.remove(path)
+            question.delete()
         section_exam.delete()
 
         return True
