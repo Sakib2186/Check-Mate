@@ -67,7 +67,7 @@
                                     <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
                                     <li class="breadcrumb-item active">{{exam_type}}</li>
                                 </ol>
-                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or ta_allowed %}
+                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or logged_in_ta %}
                                 <form method="POST">
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
@@ -179,7 +179,7 @@
                                             </a>
                                         </div>
                                         {% endif %}
-                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user or ta_allowed %}
+                                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user or logged_in_ta %}
                                         <div class="sidebar-heading">Submited By</div>
                                         {% for student in students_exam_material_during_exam %}
                                         <ul class="list-group list-group-fit">

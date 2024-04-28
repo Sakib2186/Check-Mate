@@ -633,8 +633,13 @@ def course(request,course_id):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
         section_exams = Load_Courses.get_section_exams(course_id)
+        exam =Load_Courses.get_specific_course_section(course_id)
         
-
+        submitted_by = exam.teaching_assistant.all()
+        ta = submitted_by[0].teaching_id
+        logged_in_ta = False 
+        if ta == logged_in_user:
+            logged_in_ta = True
         
 
         if logged_in_user == None:
@@ -653,6 +658,7 @@ def course(request,course_id):
 
                 'course_id':course_id,
                 'section_exams':section_exams,
+                'logged_in_ta':logged_in_ta,
             }
         
         return render(request,"exam_homepage.html",context)
@@ -1141,14 +1147,15 @@ def exam(request,course_id,exam_type,exam_id):
                 ta_allowed = section_exam.ta_available
                 is_uploaded = False
 
-        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or is_uploaded or ta_allowed:
+        submitted_by = section_exam.section.teaching_assistant.all()
+        ta = submitted_by[0].teaching_id
             
-            submitted_by = section_exam.section.teaching_assistant.all()
-            ta = submitted_by[0].teaching_id
-            
-            if ta == logged_in_user:
-                logged_in_ta = True
+        if ta == logged_in_user:
+            logged_in_ta = True
 
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or is_uploaded or logged_in_ta:
+            
+    
             if request.method == "POST":
 
                 if request.POST.get('shuffle_papers'):
@@ -1228,6 +1235,7 @@ def exam(request,course_id,exam_type,exam_id):
                         'exam_id':exam_id,
                         'user_submitted':user_submitted,
                         'ta_allowed':ta_allowed,
+                        'logged_in_ta':logged_in_ta,
             }
             return render(request,"exam.html",context)
         else:
@@ -1255,14 +1263,21 @@ def review_paper_all(request,course_id,exam_id):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
         all_students_papers = Load_Courses.get_all_students_submission(exam_id)
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
         
+        logged_in_ta = False
+        submitted_by = section_exam.section.teaching_assistant.all()
+        ta = submitted_by[0].teaching_id
+            
+        if ta == logged_in_user:
+            logged_in_ta = True
 
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
 
-        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user:
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or logged_in_ta:
             context = {
                             'page_title':'Check Mate',
                             'user_type':type_of_logged_in_user,
@@ -1274,6 +1289,7 @@ def review_paper_all(request,course_id,exam_id):
                             'all_students_papers':all_students_papers,
                             'course_id':course_id,
                             'exam_id':exam_id,
+                            'logged_in_ta':logged_in_ta,
             }
 
             return render(request,"review_paper.html",context)
@@ -1303,7 +1319,16 @@ def student_paper(request,course_id,exam_id,student_id):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
         question_answer = Load_Courses.get_question_and_answer_of_student(exam_id,student_id)
-
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        
+        logged_in_ta = False
+        submitted_by = section_exam.section.teaching_assistant.all()
+        ta = submitted_by[0].teaching_id
+            
+        if ta == logged_in_user:
+            logged_in_ta = True
+        
+        
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -1316,7 +1341,7 @@ def student_paper(request,course_id,exam_id,student_id):
         else:
             allowed_user = False
         
-        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or allowed_user:
+        if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or allowed_user or logged_in_ta:
         
             context = {
                                 'page_title':'Check Mate',
@@ -1335,6 +1360,7 @@ def student_paper(request,course_id,exam_id,student_id):
                                 'obtained_marks':question_answer[3],
                                 'set_number':question_answer[4],
                                 'first_question':question_answer[5],
+                                'logged_in_ta':logged_in_ta,
                 }
         
             return render(request,"student_exam_submit_page.html",context)
