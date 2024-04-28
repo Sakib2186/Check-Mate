@@ -255,6 +255,7 @@
         </script>
 
         {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
+        {% if  answer.answer_image %}
         <script>
             window.onload = function() {
                 var canvas = document.getElementById('imageCanvas');
@@ -371,6 +372,7 @@
                 }
             }
         </script>
+        {% endif %}
         {% endif %}
         
 
