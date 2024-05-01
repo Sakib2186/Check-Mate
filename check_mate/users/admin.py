@@ -67,12 +67,12 @@ class Section_Exam_Admin_Panel(admin.ModelAdmin):
 @admin.register(Question)
 class Question_Admin_panel(admin.ModelAdmin):
     list_display = [
-        'questions_of','question','answer_field_length','answer_field_length_number','marks','question_set','question_image'
+        'pk','questions_of','question_number','question','answer_field_length','answer_field_length_number','marks','question_set','question_image'
     ]
 @admin.register(Answer)
 class Answer_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained','comment'
+        'pk','answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained','comment'
     ]
 @admin.register(Shuffled_Papers)
 class Suffple_Papers_Admin_Panel(admin.ModelAdmin):

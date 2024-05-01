@@ -146,7 +146,7 @@
                                      data-perfect-scrollbar>
                                     <div class="sidebar-p-y">
                                         {% if 3 in user_type or 1 in user_type or logged_in_ta %}
-                                        <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
+                                        <form method="POST" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                             <div class="card card-body">
                                                 {% if question_next.pk or question_back.pk %}
@@ -172,11 +172,11 @@
                                                                        data-max="1000000"
                                                                        data-step="50"
                                                                        type="number"
-                                                                       value="200"
-                                                                       name="demo2"
+                                                                       value="{{answer.marks_obtained}}"
+                                                                       name="marks"
                                                                        class="form-control"
                                                                        style="width:50%;" />
-                                                                <div class="ml-2" style="font-size:80%;">/200</div>
+                                                                <div class="ml-2" style="font-size:80%;">{{answer.marks_obtained}}/{{question.marks}}</div>
                                                             </div>
                                                     </div>
                                                 </div>
@@ -185,14 +185,14 @@
                                                         <div class="form-group">
                                                         <textarea class="form-control"
                                                                   rows="2"
-                                                                  placeholder="Write comment (if any)"></textarea>
+                                                                  placeholder="Write comment (if any)"
+                                                                  name="comment">{{answer.comment|default:""}}</textarea>
                                                         </div>
                                                             
                                                     </div>
                                                     
                                                 </div>
-                                                <button id="submitBtn" class="btn btn-success" type="submit" style="width:50%;">Submit</button>
-                                                <input type="hidden" id="submitCourseFlag" name="submitCourseFlag" value="">
+                                                <input class="btn btn-success" type="submit" name="submit_marks_comment" style="width:50%;" value="Submit">
                                                 
                                                     
                                                     

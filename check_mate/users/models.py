@@ -219,6 +219,7 @@ class Exam_Submitted(models.Model):
 class Question(models.Model):
 
     questions_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    question_number = models.IntegerField(null=True,blank=True,default=1)
     question = models.TextField(null=True,blank=True)
     answer_field_length = models.CharField(max_length=100,null=True,blank=True)#short,medium,long
     answer_field_length_number = models.IntegerField(default = 0)
@@ -228,7 +229,7 @@ class Question(models.Model):
 
     def __str__(self) -> str:
         return str(self.questions_of)
-    
+      
     class Meta:
 
         verbose_name = "Questions"

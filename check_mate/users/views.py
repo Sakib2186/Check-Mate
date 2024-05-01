@@ -1421,11 +1421,26 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
             logged_in_ta = True
 
         if request.method == 'POST':
-            annotated_image = request.POST.get('annotated_image')
-            # Process the annotated image data here
-            # Example: Save the image to a file or database
-            print(annotated_image)
-            return JsonResponse({'message': 'Image saved successfully'})
+
+            # annotated_image = request.POST.get('annotated_image')
+            # # Process the annotated image data here
+            # # Example: Save the image to a file or database
+            # print(annotated_image)
+            # return JsonResponse({'message': 'Image saved successfully'})
+
+            if request.POST.get('submit_marks_comment'):
+                marks = request.POST.get('marks')
+                comment = request.POST.get('comment')
+
+                if Save.save_marks_comment(question_pk,marks,comment,student_id):
+                    messages.success(request,"Saved!")
+                    #TODO:Redirect to page where uploaded file i viewed
+                    return redirect("users:paper_view",course_id,exam_id,student_id,question_pk)
+                else:
+                    messages.error(request,"Error Occured while saving!")
+                    return redirect("users:exam",course_id,exam_id,student_id,question_pk)
+
+
 
 
         context = {

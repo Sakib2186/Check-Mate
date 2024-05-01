@@ -301,7 +301,7 @@ class Load_Courses:
         for i in range(section_exam.exam_set):
             ascii_value = ord('A') + i
             letter = chr(ascii_value)
-            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-pk')
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-question_number')
             dic={}
             dic[letter]=questions
             sets.append((letter,dic))
@@ -641,7 +641,6 @@ class Save:
             quest.save()
             message = "Question Updated!"
         except:
-  
             question_exam = Question.objects.create(questions_of = section_exm,
                                                     question = question,
                                                     answer_field_length = answer_size,
@@ -714,6 +713,20 @@ class Save:
         exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
         exm_submit.is_uploaded = True
         exm_submit.save()
+
+        return True
+    
+    def save_marks_comment(question_pk,marks,comment,student_id):
+
+        '''Thus function will save the marks and comments for a answer'''
+
+        question = Question.objects.get(pk = question_pk)
+        answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
+
+        answer.marks_obtained = marks
+        answer.comment = comment
+        
+        answer.save()
 
         return True
 
