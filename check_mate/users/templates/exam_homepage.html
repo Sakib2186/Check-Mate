@@ -69,6 +69,10 @@
                             </div>
                             {% if 1 in user_type or 3 in user_type %}
                             <div class="media-right d-flex align-items-center">
+                                <a href="{% url 'users:generate_spreadsheet' course_id %}"
+                                   class="btn btn-success mr-2">Generate Spreadsheet</a>
+                            </div>
+                            <div class="media-right d-flex align-items-center">
                                 <a href="{% url 'users:take_exam' course_id %}"
                                    class="btn btn-success mr-2">Take Exam</a>
                             </div>
@@ -76,6 +80,7 @@
                         </div>
                         <div class="card-columns">
                             {% for exam,number in section_exams.items %}
+                            {% if exam.exam_mode.mode_id == 3 %}
                             {% if exam.is_started or 1 in user_type or 3 in user_type or exam.is_completed or logged_in_ta %}
                             <div class="card card-sm">
                                 <div class="card-body media">
@@ -126,7 +131,39 @@
                                 </div>
                                 <div class="card-footer text-center">
                                     {% if 1 in user_type or 3 in user_type or logged_in_ta %}
-                                    <a href=""
+                                    <a href="{% url 'users:review_paper_all' course_id exam.pk %}"
+                                       class="btn btn-white btn-sm float-left">Review <span class="badge badge-dark ml-2">{{number}}{% if number == 1 %} paper{% else %} papers{% endif %}</span></a>
+                                    {% endif %}
+                                       <p
+                                       class="btn btn-white btn-sm float-left">Exam: <span class="badge badge-dark ml-2">{{exam.exam_type.exam_type}}</span></p>
+                                       {% if 1 in user_type or 3 in user_type %}
+                                       <a href="{% url 'users:edit_exam' course_id exam.pk %}"
+                                       class="btn btn-default btn-sm float-right"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
+                                        {% endif %}
+                                       <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <div class="card card-sm">
+                                <div class="card-body media">
+                                    <div class="media-left">
+                                            <a href="{% if logged_in_user %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}"
+
+                                            class="avatar avatar-lg avatar-4by3">
+                                             <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
+                                                  alt="Exam Image"
+                                                  class="avatar-img">
+                                            </a>
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="card-title mb-0"><a href="{% if logged_in_user %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}">{{exam.exam_title}}</a></h4>
+                                        <small class="text-muted">{{exam.exam_description}}</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    {% if 1 in user_type or 3 in user_type or logged_in_ta %}
+                                    <a href="{% url 'users:review_paper_all' course_id exam.pk %}"
                                        class="btn btn-white btn-sm float-left">Review <span class="badge badge-dark ml-2">{{number}}{% if number == 1 %} paper{% else %} papers{% endif %}</span></a>
                                     {% endif %}
                                        <p

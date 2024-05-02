@@ -60,6 +60,7 @@
                     <div data-push
                          data-responsive-width="992px"
                          class="mdk-drawer-layout js-mdk-drawer-layout">
+                         {% if section_exam.exam_mode.mode_id == 3 %}
                         <div class="mdk-drawer-layout__content page ">
                             <div class="container page__container">
                             <div class="container-fluid page__container">
@@ -202,6 +203,135 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if section_exam.exam_mode.mode_id == 1 %}
+                        {% if 1 in type_of_logged_in_user or  3 in type_of_logged_in_user or logged_in_ta %}
+                        <div class="mdk-drawer-layout__content page ">
+                            <div class="container page__container">
+                            <div class="container-fluid page__container">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item active">{{exam_type}}</li>
+                                </ol>
+                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or logged_in_ta %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                <div class="media align-items-center mb-headings">
+                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                </div>
+                                </form>
+                                {% endif %}
+                                <div class="card-group">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            {% if student_id == 0 %}
+                                            Upload Students Paper
+                                            {% else %}
+                                            Upload Paper For - {{student_id}}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+    
+                        </div>
+                        <div class="mdk-drawer js-mdk-drawer"
+                             data-align="end">
+                            <div class="mdk-drawer__content ">
+                                <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
+                                     data-perfect-scrollbar>
+                                    <div class="sidebar-p-y"> 
+                                        
+                                        <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
+                                            {% csrf_token %}
+                                        <div class="sidebar-heading">Submit (PDF)</div>
+                                        <ul class="list-group list-group-fit">
+                                            <li class="list-group-item">
+                                                <div class="form-group m-0">
+                                                    <div class="custom-file">
+                                                        <input type="file"
+                                                               id="file"
+                                                               class="custom-file-input"
+                                                               name = "pdf_file">
+                                                        <label for="file"
+                                                               class="custom-file-label">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-center"> <!-- Added d-flex and justify-content-center classes -->
+                                                <button id="submitBtn" class="btn btn-success" type="submit" style="width:50%;">Submit</button>
+                                                <input type="hidden" id="submitCourseFlag" name="submitCourseFlag" value="">
+                                                
+                                            </li>
+                                        </ul>
+                                        </form>
+                                        
+                                        <div class="sidebar-heading">Uploaded -
+                                            {% for student in not_pending %}
+                                            <a href="">
+                                                <span class="media align-items-center">
+                                                    <span class="media-left">
+                                                        <span class="btn btn-white btn-circle"><i class="fa-solid fa-check"></i></span>
+                                                    </span>
+                                                    <span class="media-body">
+                                                        {{student.user_id}} - {{student.user_first_name}} {{student.user_last_name}}
+                                                    </span>
+                                                </span>
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <div class="sidebar-heading">Pending Upload</div>
+                                        {% for student in all_students%}
+                                        <ul class="list-group list-group-fit">
+                                            <li class="list-group-item">
+                                                <a href="{% url 'users:exam' course_id exam_type exam_id student.user_id %}">
+                                                    <span class="media align-items-center">
+                                                        <span class="media-left">
+                                                            <span class="btn btn-white btn-circle">#{{forloop.counter}}</span>
+                                                        </span>
+                                                        <span class="media-body">
+                                                            {{student.user_id}} - {{student.user_first_name}} {{student.user_last_name}}
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        {% if 2 in type_of_logged_in_user %}
+                        <div class="mdk-drawer-layout__content page ">
+                            <div class="container page__container">
+                            <div class="container-fluid page__container">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item active">{{exam_type}}</li>
+                                </ol>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                <div class="media align-items-center mb-headings">
+                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                </div>
+                                </form>
+
+                                <div class="card-group">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            You paper is still being Checked. Have Patience!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+    
+                        </div>
+                        {% endif %}
     
                     </div>
     

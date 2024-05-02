@@ -61,6 +61,10 @@
                                 <div class="col-lg container-fluid page__container">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                        {% if 1 in user_type or 3 in user_type or logged_in_ta %}
+                                        <li class="breadcrumb-item"><a href="{% url 'users:course' course_id %}">Exams</a></li>
+                                        <li class="breadcrumb-item"><a href="{% url 'users:review_paper_all' course_id exam_id %}">Review Papers</a></li>
+                                        {% endif %}
                                         <li class="breadcrumb-item active">{{user.user_id}} - {{user.user_first_name}} {{user.user_last_name}}</li>
                                     </ol>
     

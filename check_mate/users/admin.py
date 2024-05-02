@@ -84,3 +84,8 @@ class Exam_Submitted_Admin_Panel(admin.ModelAdmin):
     list_display=[
         'exam_of','student','is_uploaded'
     ]
+@admin.register(Students_Score)
+class Students_Score_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'exam_of','student','quiz_score','mid_score','final_score'
+    ]

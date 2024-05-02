@@ -411,6 +411,7 @@ class Load_Courses:
             set_number = question.question_set
             total_marks += question.marks
             score += answer.marks_obtained 
+            #here giving algo to store marks of students
 
         return (question_answer,student,total_marks,score,set_number,first_question)
 
@@ -701,18 +702,23 @@ class Save:
         section_exam.save()
         return True
     
-    def uploaded_answer_file(user,file,exam_id):
+    def uploaded_answer_file(user,file,exam_id,student_id = None):
 
         '''This method will save the file uploaded by the user'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        if section_exam.exam_mode.mode_id == 3:
+            if user == None:
+                return False
 
-        if user == None:
-            return False
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
+            exm_submit.is_uploaded = True
+            exm_submit.save()
+        elif section_exam.exam_mode.mode_id == 1:
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
+            exm_submit.is_uploaded = True
+            exm_submit.save()
 
-        exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
-        exm_submit.is_uploaded = True
-        exm_submit.save()
 
         return True
     

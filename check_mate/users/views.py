@@ -1117,7 +1117,7 @@ def edit_exam(request,course_id,exam_id):
         return HttpResponse("Bad Request") 
     
 @login_required
-def exam(request,course_id,exam_type,exam_id):
+def exam(request,course_id,exam_type,exam_id,student_id = None):
 
     try:
         #loading the data to pass them in dictionary, context
@@ -1149,7 +1149,18 @@ def exam(request,course_id,exam_type,exam_id):
 
         submitted_by = section_exam.section.teaching_assistant.all()
         ta = submitted_by[0].teaching_id
-            
+
+        students = section_exam.section.students.all()
+        pending_students = []
+        not_pending_students = []
+        for student in students:
+            stud = student.student_id
+            user_submitted = Exam_Submitted.objects.get(student = stud,exam_of = section_exam)
+            if not user_submitted.is_uploaded:
+                pending_students.append(stud)
+            else:
+                not_pending_students.append(stud)
+
         if ta == logged_in_user:
             logged_in_ta = True
 
@@ -1202,6 +1213,7 @@ def exam(request,course_id,exam_type,exam_id):
                         #logic of ML to separate papers
                         uploaded_file = request.FILES.get('pdf_file')
 
+                    if section_exam.exam_mode.mode_id == 3:
                         if logged_in_ta or 1 in type_of_logged_in_user:
                             messages.error(request,"As an Intructor or TA you can't upload!")
                             return redirect("users:exam",course_id,exam_type,exam_id)
@@ -1213,6 +1225,14 @@ def exam(request,course_id,exam_type,exam_id):
                             else:
                                 messages.error(request,"Error Occured while uploaded!")
                                 return redirect("users:exam",course_id,exam_type,exam_id)
+                    elif section_exam.exam_mode.mode_id == 1:
+                        if Save.uploaded_answer_file(logged_in_user,uploaded_file,exam_id,student_id):
+                            messages.success(request,"File Uploaded!")
+                            #TODO:Redirect to page where uploaded file i viewed
+                            return redirect("users:exam",course_id,exam_type,exam_id,student_id)
+                        else:
+                            messages.error(request,"Error Occured while uploaded!")
+                            return redirect("users:exam",course_id,exam_type,exam_id,student_id)
 
 
 
@@ -1236,6 +1256,9 @@ def exam(request,course_id,exam_type,exam_id):
                         'user_submitted':user_submitted,
                         'ta_allowed':ta_allowed,
                         'logged_in_ta':logged_in_ta,
+                        'all_students':pending_students,
+                        'not_pending':not_pending_students,
+                        'student_id':student_id,
             }
             return render(request,"exam.html",context)
         else:
@@ -1466,6 +1489,37 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
         }
 
         return render(request,"paper_view.html",context)
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def generate_spreadsheet(request,course_id):
+    try:
+
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+    
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+        }
+
+        return render(request,"excel_creation_page.html",context)
+
     except Exception as e:
         #saving error information in database if error occured
         logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
