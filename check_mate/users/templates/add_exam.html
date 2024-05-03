@@ -237,10 +237,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="#fourth" data-toggle="tab">Time</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#fifth" data-toggle="tab">Annouce Answer Template</a>
+                                </li>
                                 {% endif %}
                                 
                             </ul>
-                            
                             <div class="card-body tab-content">
                                 <div class="tab-pane" id="fourth">
                                     <form method="POST">
@@ -291,6 +293,43 @@
                                         </div>
                                         <div class="nestable" id="nestable">
                                             
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
+                                <div class="tab-pane" id="fifth">
+                                    <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Give Announcement</h4>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+
+                                            <div class="col">
+                                                <label for="cmn-toggle"
+                                               class="col-sm-3 col-form-label form-label">Announcement <small>Make all sets answer length equal</small>:</label>
+                                                <div class="form-inline">
+                                                    <div class="form-group mr-2" style="border:1px solid black;">
+                                                        <input type="text"
+                                                               class="form-control text-center"
+                                                               value=""
+                                                               name="announcement"
+                                                               style="width:500px;">
+                                                    </div>
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="View Answer Template" name="answer_template">
+                                                        </div>
+                                                    </div>
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="Save" name="save_announcement">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
                                         </div>
                                     </div>
                                 </form>
