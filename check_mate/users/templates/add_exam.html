@@ -258,15 +258,15 @@
                                                     <div class="form-group mr-2">
                                                         <input type="number"
                                                                class="form-control text-center"
-                                                               value="1"
+                                                               value="{% if time %}{{time.0}}{% else %}1{% endif %}"
                                                                name="time_number"
                                                                style="width:100px;">
                                                     </div>
                                                     <div class="form-group">
                                                         <select class="custom-select" name="time_second_number">
                                                             <option value="hour"
-                                                                    selected>Hours</option>
-                                                            <option value="minutes">Minutes</option>
+                                                                    {% if time.1 == "hour" %}selected{% endif%}>Hours</option>
+                                                            <option value="minutes" {% if time.1 == "minutes" %}selected{% endif %}>Minutes</option>
                                                         </select>
                                                     </div>
                                                     <div class="media-right text-right">
@@ -302,7 +302,8 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>&nbsp
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -317,6 +318,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
+                                                                <a href="#" style="text-decoration:none;color:black;">{{questions.marks}}</a>&nbsp
                                                                 <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}','{{questions.answer_field_length_number}}','{{questions.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
@@ -336,7 +338,8 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>&nbsp
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -352,6 +355,7 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
+                                                                <a href="#" style="text-decoration:none;color:black;">{{question.marks}}</a>&nbsp
                                                                 <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}','{{question.answer_field_length_number}}','{{question.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>

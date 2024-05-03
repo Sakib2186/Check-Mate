@@ -573,8 +573,11 @@ class Save:
   
             new_instance.exam_description = exam_description
 
+            print(new_instance.exam_set)
+            print(int(exam_set))
+            if new_instance.exam_set != int(exam_set):
 
-            if new_instance.exam_set != exam_set:
+                print("here")
  
                 questions = Question.objects.filter(questions_of = new_instance)
  

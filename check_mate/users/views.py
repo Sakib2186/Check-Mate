@@ -761,6 +761,11 @@ def edit_exam(request,course_id,exam_id):
         exam_modes = Exam_Mode.objects.all()
         exam_type = Exam_Type.objects.all()
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        try:
+            time = section_exam.exam_time.split(" ")
+        except:
+            time = None
+
 
         if logged_in_user == None:
             user = request.user.username
@@ -1097,6 +1102,7 @@ def edit_exam(request,course_id,exam_id):
                     'section_exam':section_exam,
                     'question_set':sets,
                     'none_set_questions':none_set_questions,
+                    'time':time,
                 }
 
             return render(request,"add_exam.html",context)
@@ -1129,7 +1135,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
         questions = Load_Courses.get_question_and_marks(exam_id,sets)
         students_exam_material_during_exam = Load_Courses.get_exam_uploaded_students(exam_id)
 
-        
+        print(questions)
         
         user_submitted = None
         logged_in_ta = False

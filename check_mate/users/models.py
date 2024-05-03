@@ -207,9 +207,9 @@ class Students_Score(models.Model):
 
     exam_of = models.ForeignKey(Section_Exam,on_delete = models.CASCADE)
     student = models.ForeignKey(School_Users,on_delete = models.CASCADE)
-    quiz_score = models.JSONField()
-    mid_score = models.JSONField()
-    final_score = models.IntegerField(null=True,blank=True,default = 0)
+    score = models.IntegerField(default = 0)
+    exam_type= models.ForeignKey(Exam_Type,on_delete = models.CASCADE)
+
 
     def __str__(self) -> str:
         return str(self.exam_of)
