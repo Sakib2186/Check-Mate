@@ -58,63 +58,131 @@
 
                 <div class="page ">
 
-                    <div class="page ">
 
                         <div class="container page__container">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                                <li class="breadcrumb-item">Components</li>
-                                <li class="breadcrumb-item active">Forms</li>
+                                <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'users:course' course_id %}">Exams</a></li>
+                                <li class="breadcrumb-item" active>Generate Spreadsheet</li>
                             </ol>
-    
-                            <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <h4 class="card-title">Select Number of Quizzes</h4>
-                                    </div>
-                                    <div class="col-lg-8">
-                                        <form action="#">
-                                            
-                                            <div class="form-group">
-                                                <label class="form-label"
-                                                       for="custom-select">Quizzes (Best Score Would be Considered)</label>
-                                                <select id="custom-select"
-                                                        class="form-control custom-select" multiple>
-                                                    <option selected>Open this select menu</option>
-                                                    <option value="1">One</option>
-                                                    <option value="2">Two</option>
-                                                    <option value="3">Three</option>
-                                                </select>
-                                            </div>
-                                           
-                                            <div class="form-group">
-                                                <label for="touch-spin-2"
-                                                        class="form-label">Weight (in %)</label>
-                                                <input id="touch-spin-2"
-                                                        data-toggle="touch-spin"
-                                                        data-min="-1000000"
-                                                        data-max="1000000"
-                                                        data-step="50"
-                                                        type="text"
-                                                        value="200"
-                                                        name="demo2"
-                                                        class="form-control" />
-                                            </div>
-                                             
 
-                                        </form>
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                            <div class="card card-body">
+                                
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Select Number of Quizzes</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label class="form-label"
+                                                            for="custom-select">Quizzes (Best Scores Average)</label>
+                                                    <select id="custom-select"
+                                                            class="form-control custom-select" name="best_score">
+                                                        <option value="All" selected>All</option>
+                                                        {% for i in quiz_number %}
+                                                        <option value="{{forloop.counter}}">Best - {{forloop.counter}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="15"
+                                                            name="quiz_weight"
+                                                            class="form-control" />
+                                                </div>
+                                                    
+                                        </div>
                                     </div>
-                                </div>
+
+                                    {% for i in midterm_number %}
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Midterm{% if midterm_number|length > 1 %} - {{forloop.counter}}{% endif %}</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="{{ midterm }}"
+                                                            name="midterm_weight_{{forloop.counter}}"
+                                                            class="form-control" />
+                                                </div>
+                                                    
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    
+                                    {% if final|length > 0 %}
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Final</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="40"
+                                                            name="final_weight"
+                                                            class="form-control" />
+                                                </div>
+                                                    
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% comment %} <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Curve Grade: </h4>
+                                        </div>
+                                        <div class="col-lg-8 d-flex align-items-center">
+                                            <div class="flex"><br>
+                                                <div class="custom-control custom-checkbox-toggle custom-control-inline mr-1">
+                                                    <input checked=""
+                                                            type="checkbox"
+                                                            id="subscribe"
+                                                            class="custom-control-input">
+                                                    <label class="custom-control-label"
+                                                            for="subscribe">Yes</label>
+                                                </div>
+                                                <label class="form-label mb-0"
+                                                        for="subscribe">Yes</label>
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
+                                    <input type="submit" class="btn btn-success mr-2" value="Generate Spreadsheet" name="generate_excel" style="width:200px;">
+                                
                             </div>
-    
+                        </form>
+
+                                
+                            
                         </div>
-    
-                        <div class="container page__container">
-                            <div class="footer">
-                                Copyright &copy; 2016 - <a href="http://themeforest.net/item/learnplus-learning-management-application/15287372?ref=mosaicpro">Purchase LearnPlus</a>
-                            </div>
-                        </div>
-                    </div>
 
                     {% block footer %}
                         {% include 'footer.html' %}

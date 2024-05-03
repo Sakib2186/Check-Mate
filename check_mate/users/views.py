@@ -1553,11 +1553,44 @@ def generate_spreadsheet(request,course_id):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
-    
+
+        midterm = 0
+        numbers = Load_Courses.number_of_quizzes_and_midterm(course_id)
+       
         if logged_in_user == None:
             user = request.user.username
         else:
             user = logged_in_user.user_id
+
+        
+
+        if request.method == "POST":
+
+            if request.POST.get('generate_excel'):
+                
+                midterm_weights = []
+                best_score_number = request.POST.get('best_score')
+                quiz_weight = request.POST.get('quiz_weight')
+
+                for i in range(len(numbers[1])):
+                    weight = request.POST.get(f"midterm_weight_{i+1}")
+                    midterm_weights.append(weight)
+                
+                final_weight = request.POST.get('final_weight')
+
+                print(best_score_number)
+                print(quiz_weight)
+
+                print(midterm_weights)
+                print(final_weight)
+
+                
+
+
+            try:
+                midterm = 35/len(numbers[1])
+            except:
+                midterm = 0
 
         context = {
                     'page_title':'Check Mate',
@@ -1566,6 +1599,12 @@ def generate_spreadsheet(request,course_id):
                     'logged_in_user':logged_in_user,
                     'year':datetime.now().year,
                     'current_semester':current_semester,
+
+                    'course_id':course_id,
+                    'quiz_number':numbers[0],
+                    'midterm_number':numbers[1],
+                    'final':numbers[2],
+                    'midterm':midterm,
         }
 
         return render(request,"excel_creation_page.html",context)

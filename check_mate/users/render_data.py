@@ -414,6 +414,28 @@ class Load_Courses:
             #here giving algo to store marks of students
 
         return (question_answer,student,total_marks,score,set_number,first_question)
+    
+    def number_of_quizzes_and_midterm(course_id):
+
+        '''This function returns the number of quizzes held in the section'''
+
+        course_section = Load_Courses.get_specific_course_section(course_id)
+        section_exam = Section_Exam.objects.filter(section = course_section)
+
+        quiz_number = []
+        midterm_number = []
+        final = []
+
+        for exams in section_exam:
+            if exams.exam_type.type_id == 1:
+                quiz_number.append(exams)
+            elif exams.exam_type.type_id == 2:
+                midterm_number.append(exams)
+            elif exams.exam_type.type_id == 3:
+                final.append(exams)
+
+        return (quiz_number,midterm_number,final)
+
 
 
 
@@ -600,12 +622,16 @@ class Save:
             for student in all_students:
                 try:
                     old = Exam_Submitted.objects.get(exam_of = new_instance,student = student.student_id)
- 
+                    old_score = Students_Score.objects.get(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
                     if old:
+                        pass
+                    if old_score:
                         pass
                 except:
                     exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
                     exm_submit.save()
+                    exm_score = Students_Score.objects.create(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
+                    exm_score.save()
             message = "Exam Details Updated!"
         except:
             new_instance = Section_Exam.objects.create(section = course_section,
@@ -621,6 +647,8 @@ class Save:
             for student in all_students:
                 exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
                 exm_submit.save()
+                exm_score = Students_Score.objects.create(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
+                exm_score.save()
             message = "Exam Created Successfully!"
         
         return (True,message,new_instance)
