@@ -142,7 +142,7 @@
                                              data-value="8"
                                              data-unit="hour"></div>
                                         {% endif %}     
-                                        {% if 3 in type_of_logged_in_user or not user_submitted.is_uploaded %}
+                                        {% if 3 in type_of_logged_in_user or user_submitted.is_uploaded == false %}
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
@@ -304,7 +304,7 @@
                             </div>
                         </div>
                         {% endif %}
-                        {% endif %}
+                        
                         {% if 2 in type_of_logged_in_user %}
                         <div class="mdk-drawer-layout__content page ">
                             <div class="container page__container">
@@ -316,14 +316,14 @@
                                 <form method="POST">
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
-                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                    <a href="{% url 'users:student_paper' course_id exam_id student_id %}" class="btn btn-info mr-2">Review Papers</a>
                                 </div>
                                 </form>
 
                                 <div class="card-group">
                                     <div class="card">
                                         <div class="card-body text-center">
-                                            You paper is still being Checked. Have Patience!
+                                            {% if is_uploaded %}Your paper is still not uploaded yet!{% else %}Click Review to view paper{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -331,6 +331,7 @@
                             </div>
     
                         </div>
+                        {% endif %}
                         {% endif %}
     
                     </div>

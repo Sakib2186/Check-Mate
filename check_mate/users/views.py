@@ -1205,8 +1205,8 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
         not_pending_students = []
         for student in students:
             stud = student.student_id
-            user_submitted = Exam_Submitted.objects.get(student = stud,exam_of = section_exam)
-            if not user_submitted.is_uploaded:
+            user_submitteds = Exam_Submitted.objects.get(student = stud,exam_of = section_exam)
+            if not user_submitteds.is_uploaded:
                 pending_students.append(stud)
             else:
                 not_pending_students.append(stud)
@@ -1214,7 +1214,8 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
         if ta == logged_in_user:
             logged_in_ta = True
 
-        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or is_uploaded or logged_in_ta:
+
+        if section_exam.is_started or 1 in type_of_logged_in_user or 3 in type_of_logged_in_user or is_uploaded or logged_in_ta or section_exam.exam_mode.mode_id == 1:
             
     
             if request.method == "POST":
@@ -1286,7 +1287,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
 
 
 
-                    
+               
             context = {
                         'page_title':'Check Mate',
                         'user_type':type_of_logged_in_user,
@@ -1309,6 +1310,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
                         'all_students':pending_students,
                         'not_pending':not_pending_students,
                         'student_id':student_id,
+                        'is_uploaded':is_uploaded,
             }
             return render(request,"exam.html",context)
         else:

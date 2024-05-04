@@ -145,7 +145,7 @@
                                 <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
                                      data-perfect-scrollbar>
                                     <div class="sidebar-p-y">
-                                        {% if 3 in user_type or 1 in user_type or logged_in_ta %}
+                                        
                                         <form method="POST" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                             <div class="card card-body">
@@ -161,6 +161,7 @@
                                                 <br><br><br>
                                                 <hr>
                                                 {% endif %}
+                                                {% if 3 in user_type or 1 in user_type or logged_in_ta %}
                                                 <div class="row">
                                                     <div class="col-lg-8 d-flex align-items-center">
                                                             <div class="form-group">
@@ -180,6 +181,7 @@
                                                             </div>
                                                     </div>
                                                 </div>
+                                                
                                                 <div class="row">
                                                     <div class="col-lg-8 d-flex align-items-center">
                                                         <div class="form-group">
@@ -193,14 +195,13 @@
                                                     
                                                 </div>
                                                 <input class="btn btn-success" type="submit" name="submit_marks_comment" style="width:50%;" value="Submit">
-                                                
+                                                {% endif %}
                                                     
                                                     
                                                 
                                             </div>
                                             
                                         </form>
-                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
