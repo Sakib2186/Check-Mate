@@ -317,7 +317,7 @@ class Load_Courses:
         answer_length = []
         question_images = []
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
+        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('pk')
         for q in questions:
             question_list.append(str(q.question))
             marks_list.append(str(q.marks))

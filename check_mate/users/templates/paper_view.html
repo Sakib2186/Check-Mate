@@ -161,7 +161,7 @@
                                                 <br><br><br>
                                                 <hr>
                                                 {% endif %}
-                                                {% if 3 in user_type or 1 in user_type or logged_in_ta %}
+                                                
                                                 <div class="row">
                                                     <div class="col-lg-8 d-flex align-items-center">
                                                             <div class="form-group">
@@ -176,7 +176,8 @@
                                                                        value="{{answer.marks_obtained}}"
                                                                        name="marks"
                                                                        class="form-control"
-                                                                       style="width:50%;" />
+                                                                       style="width:50%;" 
+                                                                       {% if not 3 in user_type or not 1 in user_type or not logged_in_ta %}disabled{% endif %}/>
                                                                 <div class="ml-2" style="font-size:80%;">{{answer.marks_obtained}}/{{question.marks}}</div>
                                                             </div>
                                                     </div>
@@ -188,12 +189,14 @@
                                                         <textarea class="form-control"
                                                                   rows="2"
                                                                   placeholder="Write comment (if any)"
-                                                                  name="comment">{{answer.comment|default:""}}</textarea>
+                                                                  name="comment"
+                                                                  {% if not 3 in user_type or not 1 in user_type or not logged_in_ta %}disabled{% endif %}>{{answer.comment|default:""}}</textarea>
                                                         </div>
                                                             
                                                     </div>
                                                     
                                                 </div>
+                                                {% if 3 in user_type or 1 in user_type or logged_in_ta %}
                                                 <input class="btn btn-success" type="submit" name="submit_marks_comment" style="width:50%;" value="Submit">
                                                 {% endif %}
                                                     

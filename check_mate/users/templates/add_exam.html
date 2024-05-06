@@ -217,6 +217,9 @@
                         </div>
                         {% if edit_exam %}                    
                         <div class="card">
+                            {% if section_exam.exam_mode.mode_id == 3 %}
+                            <p style="text-align:center;color:red;">Make sure all sets answer length is same</p>
+                            {% endif %}
                             <ul class="nav nav-tabs nav-tabs-card">
                                 {% if question_set|length == 0 %}
                                 <li class="nav-item">

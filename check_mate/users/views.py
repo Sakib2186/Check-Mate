@@ -934,6 +934,7 @@ def edit_exam(request,course_id,exam_id):
                     if section_exam.exam_mode.mode_id == 1:
                         set_number = request.POST.get('question_set')
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
+                        print(questions[0])
                         for section in doc.sections:
                             section.top_margin = Inches(1)  # Adjust margin as needed
                             section.bottom_margin = Inches(1)
@@ -1070,18 +1071,21 @@ def edit_exam(request,course_id,exam_id):
                             #             borders2.append(border)
                             
                             doc.add_paragraph()
-                            # Save the document to a BytesIO object
-                            doc_stream = BytesIO()
-                            doc.save(doc_stream)
-                            doc_stream.seek(0)
+                            doc.add_paragraph()
+                        # Save the document to a BytesIO object
+                        doc_stream = BytesIO()
+                        doc.save(doc_stream)
+                        doc_stream.seek(0)
 
-                            # Return the Word document as an attachment
-                            response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-                            response['Content-Disposition'] = f'attachment; filename=Set:{set_number}_{section_exam.section.course_id.course_name}.{section_exam.section.section_number}.docx'
-                            return response
+                        # Return the Word document as an attachment
+                        response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                        response['Content-Disposition'] = f'attachment; filename=Set:{set_number}_{section_exam.section.course_id.course_name}.{section_exam.section.section_number}.docx'
+                        return response
+                        
                     elif section_exam.exam_mode.mode_id == 3:
 
                         set_number = "A"
+                        print("herer")
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
                         
                         for section in doc.sections:
@@ -1115,16 +1119,17 @@ def edit_exam(request,course_id,exam_id):
                                 borders.append(border_elm)
                             
                             doc.add_paragraph()
+                            doc.add_paragraph()
 
-                            # Save the document to a BytesIO object
-                            doc_stream = BytesIO()
-                            doc.save(doc_stream)
-                            doc_stream.seek(0)
+                        # Save the document to a BytesIO object
+                        doc_stream = BytesIO()
+                        doc.save(doc_stream)
+                        doc_stream.seek(0)
 
-                            # Return the Word document as an attachment
-                            response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-                            response['Content-Disposition'] = f'attachment; filename={section_exam.section.course_id.course_name}.{section_exam.section.section_number}.docx'
-                            return response
+                        # Return the Word document as an attachment
+                        response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                        response['Content-Disposition'] = f'attachment; filename={section_exam.section.course_id.course_name}.{section_exam.section.section_number}.docx'
+                        return response
                     
                 
 
