@@ -177,7 +177,7 @@
                                                                        name="marks"
                                                                        class="form-control"
                                                                        style="width:50%;" 
-                                                                       {% if not 3 in user_type or not 1 in user_type or not logged_in_ta %}disabled{% endif %}/>
+                                                                       {% if  3 in user_type or  1 in user_type or  logged_in_ta %}{% else %}disabled{% endif %}/>
                                                                 <div class="ml-2" style="font-size:80%;">{{answer.marks_obtained}}/{{question.marks}}</div>
                                                             </div>
                                                     </div>
@@ -190,14 +190,15 @@
                                                                   rows="2"
                                                                   placeholder="Write comment (if any)"
                                                                   name="comment"
-                                                                  {% if not 3 in user_type or not 1 in user_type or not logged_in_ta %}disabled{% endif %}>{{answer.comment|default:""}}</textarea>
+                                                                  {% if 3 in user_type or  1 in user_type or  logged_in_ta %}{% else %}disabled{% endif %}>{{answer.comment|default:""}}</textarea>
                                                         </div>
                                                             
                                                     </div>
                                                     
                                                 </div>
-                                                {% if 3 in user_type or 1 in user_type or logged_in_ta %}
+                                                {% if  3 in user_type or 1 in user_type or logged_in_ta %}
                                                 <input class="btn btn-success" type="submit" name="submit_marks_comment" style="width:50%;" value="Submit">
+                                                {% else %}
                                                 {% endif %}
                                                     
                                                     

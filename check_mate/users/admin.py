@@ -87,5 +87,5 @@ class Exam_Submitted_Admin_Panel(admin.ModelAdmin):
 @admin.register(Students_Score)
 class Students_Score_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'exam_of','student','score','exam_type'
+        'exam_of','student','score','total_marks','exam_type'
     ]

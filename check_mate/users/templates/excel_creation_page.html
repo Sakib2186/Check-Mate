@@ -69,7 +69,8 @@
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                             <div class="card card-body">
-                                
+
+                                {% if quiz_number|length > 0%}
                                     <div class="row">
                                         <div class="col-lg-4">
                                             <h4 class="card-title">Select Number of Quizzes</h4>
@@ -81,7 +82,9 @@
                                                             for="custom-select">Quizzes (Best Scores Average)</label>
                                                     <select id="custom-select"
                                                             class="form-control custom-select" name="best_score">
+                                                        {% if quiz_number|length > 1%}
                                                         <option value="All" selected>All</option>
+                                                        {% endif %}
                                                         {% for i in quiz_number %}
                                                         <option value="{{forloop.counter}}">Best - {{forloop.counter}}</option>
                                                         {% endfor %}
@@ -104,6 +107,7 @@
                                                     
                                         </div>
                                     </div>
+                                    {% endif %}
 
                                     {% for i in midterm_number %}
                                     <div class="row">

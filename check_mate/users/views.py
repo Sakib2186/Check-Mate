@@ -19,6 +19,7 @@ from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
 from django.http import JsonResponse
+import xlwt
 
 
 logger=logging.getLogger(__name__)
@@ -1560,6 +1561,7 @@ def generate_spreadsheet(request,course_id):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
+        course_section = Load_Courses.get_specific_course_section(course_id)
 
         midterm = 0
         numbers = Load_Courses.number_of_quizzes_and_midterm(course_id)
@@ -1576,20 +1578,94 @@ def generate_spreadsheet(request,course_id):
             if request.POST.get('generate_excel'):
                 
                 midterm_weights = []
+                mid_number = 0
                 best_score_number = request.POST.get('best_score')
-                quiz_weight = request.POST.get('quiz_weight')
+                quiz_weight = int(request.POST.get('quiz_weight'))
+
+                if best_score_number == "All":
+                    best_score_number = numbers[0]
+                else:
+                    best_score_number = int(best_score_number)
 
                 for i in range(len(numbers[1])):
-                    weight = request.POST.get(f"midterm_weight_{i+1}")
+                    weight = int(request.POST.get(f"midterm_weight_{i+1}"))
                     midterm_weights.append(weight)
+                    mid_number += 1 
                 
-                final_weight = request.POST.get('final_weight')
+                try:
+                    final_weight = int(request.POST.get('final_weight'))
+                except:
+                    final_weight = 0
 
-                print(best_score_number)
-                print(quiz_weight)
 
-                print(midterm_weights)
-                print(final_weight)
+                semester = Session.objects.get(current=True)
+                date=datetime.now()
+                response = HttpResponse(
+                    content_type='application/ms-excel')  # eclaring content type for the excel files
+                response['Content-Disposition'] = f'attachment; filename={course_section.course_id.course_name}.{course_section.section_number} - {semester}: Semester Grade Sheet.xls'  # making files downloadable with name of session and timestamp
+                # adding encoding to the workbook
+                workBook = xlwt.Workbook(encoding='utf-8')
+                # opening an worksheet to work with the columns
+                workSheet = workBook.add_sheet(f'Semester Grade Sheet of {semester}')
+
+                # generating the first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+
+                quiz_columns = [f'Quiz-{i}' for i in range(1, best_score_number + 1)]
+                mid_columns = [f'MidTerm-{i}' for i in range(1,len(midterm_weights)+1)]
+
+                # Defining columns that will stay in the first row
+                columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final']
+
+                # Defining first column
+                column_widths = [5000,5000]
+                column_widths+=[5000]*best_score_number
+                column_widths+=[5000]
+                column_widths+=[5000]*mid_number
+                column_widths+=[5000,5000]
+
+                for col, width in enumerate(column_widths):
+                    workSheet.col(col).width = width
+
+
+                for column in range(len(columns)):
+                    workSheet.write(row_num, column, columns[column], font_style)
+
+                # reverting font style to default
+                font_style = xlwt.XFStyle()
+
+                # Center alignment style
+                center_alignment = xlwt.easyxf('align: horiz center')
+                # Word wrap style
+                word_wrap_style = xlwt.easyxf('alignment: wrap True')
+
+                # events= Branch.load_all_inter_branch_collaborations_with_events_yearly(year,1)
+                # sl_num = 0
+                # for event,collaborations in events.items():
+                #     row_num += 1
+                #     sl_num += 1
+                #     workSheet.write(row_num,0 , sl_num,  center_alignment)
+                #     workSheet.write(row_num,1 , event.event_name,  center_alignment)
+                #     workSheet.write(row_num,2 , event.event_date.strftime('%Y-%m-%d'),  center_alignment)
+                #     workSheet.write(row_num,3 , event.event_organiser.group_name,  center_alignment)
+                #     collaborations_text = ""
+                #     for collabs in collaborations:
+                #         collaborations_text += collabs + '\n'
+                #     workSheet.write(row_num, 4, collaborations_text, word_wrap_style) 
+                #     categories = ""   
+                #     for event_type in event.event_type.all():
+                #         categories+=event_type.event_category + '\n'  
+                #     workSheet.write(row_num, 5, categories, word_wrap_style)
+                #     venue_list = Branch.get_selected_venues(event.pk)
+                #     venues=""
+                #     for venue in venue_list:
+                #         venues += venue + '\n'
+                #     workSheet.write(row_num, 6, venues, word_wrap_style)
+                        
+                workBook.save(response)
+                return (response)
 
                 
 

@@ -412,6 +412,12 @@ class Load_Courses:
             total_marks += question.marks
             score += answer.marks_obtained 
             #here giving algo to store marks of students
+        
+        student_score = Students_Score.objects.get(exam_of = section_exam,student = student)
+        student_score.total_marks = total_marks
+        student_score.score = score
+        student_score.save()
+
 
         return (question_answer,student,total_marks,score,set_number,first_question)
     
@@ -761,7 +767,7 @@ class Save:
         answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
 
         answer.marks_obtained = marks
-        answer.comment = comment
+        answer.comment = comment        
         
         answer.save()
 
