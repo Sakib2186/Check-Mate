@@ -86,7 +86,7 @@
                                                         <option value="All" selected>All</option>
                                                         {% endif %}
                                                         {% for i in quiz_number %}
-                                                        <option value="{{forloop.counter}}">Best - {{forloop.counter}}</option>
+                                                        <option value="{{forloop.counter}}">{{forloop.counter}}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -102,7 +102,8 @@
                                                             type="text"
                                                             value="15"
                                                             name="quiz_weight"
-                                                            class="form-control" />
+                                                            class="form-control" 
+                                                            disabled/>
                                                 </div>
                                                     
                                         </div>
@@ -127,7 +128,8 @@
                                                             type="text"
                                                             value="{{ midterm }}"
                                                             name="midterm_weight_{{forloop.counter}}"
-                                                            class="form-control" />
+                                                            class="form-control"
+                                                            disabled />
                                                 </div>
                                                     
 

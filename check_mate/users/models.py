@@ -216,7 +216,6 @@ class Students_Score(models.Model):
         return str(self.exam_of)
     
     class Meta:
-
         verbose_name = "Student Score"
 class Exam_Submitted(models.Model):
 

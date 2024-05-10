@@ -441,6 +441,70 @@ class Load_Courses:
                 final.append(exams)
 
         return (quiz_number,midterm_number,final)
+    
+    def load_spreadsheet_info(course_id,quizzes_number):
+
+        '''This function will return the average of all quizzes if All is choosen
+            else the best quizzes average would be returned'''
+        
+        course_section = Load_Courses.get_specific_course_section(course_id)
+        section_exams = Section_Exam.objects.filter(section=course_section)
+        students = course_section.students.all()
+        
+        student_scores = {}
+
+        # Initialize dictionaries to store scores for each type
+        quiz_scores = {student: [] for student in students}
+        mid_scores = {student: [] for student in students}
+        final_scores = {student: [] for student in students}
+
+
+        for exam in section_exams:
+            for student in students:
+                stud = School_Users.objects.get(user_id = student)
+                student_score = Students_Score.objects.get(exam_of=exam, student=stud)
+
+                if exam.exam_type.type_id == 1:
+                    quiz_scores[student].append(student_score.score)
+                elif exam.exam_type.type_id == 2:
+                    mid_scores[student].append(student_score.score)
+                elif exam.exam_type.type_id == 3:
+                    final_scores[student].append(student_score.score)
+
+        # Calculate average scores based on the choice
+        for student in students:
+            if quizzes_number == 'All':
+                quiz_avg = sum(quiz_scores[student]) / len(quiz_scores[student]) if quiz_scores[student] else 0
+            else:
+                quizzes_number = int(quizzes_number)
+                if quizzes_number >= 1:  # Ensure at least one quiz is selected
+                    quiz_avg = sum(sorted(quiz_scores[student], reverse=True)[:quizzes_number]) / quizzes_number if quiz_scores[student] else 0
+                else:
+                    quiz_avg = 0
+
+            mid_avg = sum(mid_scores[student]) / len(mid_scores[student]) if mid_scores[student] else 0
+            final_avg = sum(final_scores[student]) / len(final_scores[student]) if final_scores[student] else 0
+
+            stud = School_Users.objects.get(user_id = student)
+            result = quiz_avg * (15/100) + mid_avg * (35/100) + final_avg * (40/100) 
+            student_scores[stud] = {
+            'Quizzes': quiz_scores[student],
+            'Quiz Average': quiz_avg,
+            'Mids': mid_scores[student],
+            'Midterm Average': mid_avg,
+            'Final Average': final_avg,
+            'result':result,
+            }
+
+        return student_scores
+
+
+
+
+
+
+
+
 
 
 

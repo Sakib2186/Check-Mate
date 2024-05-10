@@ -1564,7 +1564,13 @@ def generate_spreadsheet(request,course_id):
         course_section = Load_Courses.get_specific_course_section(course_id)
 
         midterm = 0
+        
         numbers = Load_Courses.number_of_quizzes_and_midterm(course_id)
+        try:
+            midterm = 35/len(numbers[1])
+        except:
+            midterm = 0
+
        
         if logged_in_user == None:
             user = request.user.username
@@ -1580,23 +1586,27 @@ def generate_spreadsheet(request,course_id):
                 midterm_weights = []
                 mid_number = 0
                 best_score_number = request.POST.get('best_score')
-                quiz_weight = int(request.POST.get('quiz_weight'))
+                # quiz_weight = int(request.POST.get('quiz_weight'))
+                # if quiz_weight == None:
+                #     quiz_weight = 15
+                quizzes_number = best_score_number
 
                 if best_score_number == "All":
-                    best_score_number = numbers[0]
+                    best_score_number = len(numbers[0])
                 else:
                     best_score_number = int(best_score_number)
 
-                for i in range(len(numbers[1])):
-                    weight = int(request.POST.get(f"midterm_weight_{i+1}"))
-                    midterm_weights.append(weight)
-                    mid_number += 1 
+                # for i in range(len(numbers[1])):
+                #     weight = int(request.POST.get(f"midterm_weight_{i+1}"))
+                #     midterm_weights.append(weight)
+                #     mid_number += 1 
                 
-                try:
-                    final_weight = int(request.POST.get('final_weight'))
-                except:
-                    final_weight = 0
+                # try:
+                #     final_weight = int(request.POST.get('final_weight'))
+                # except:
+                #     final_weight = 0
 
+                result = Load_Courses.load_spreadsheet_info(course_id,quizzes_number)
 
                 semester = Session.objects.get(current=True)
                 date=datetime.now()
@@ -1614,7 +1624,7 @@ def generate_spreadsheet(request,course_id):
                 font_style.font.bold = True
 
                 quiz_columns = [f'Quiz-{i}' for i in range(1, best_score_number + 1)]
-                mid_columns = [f'MidTerm-{i}' for i in range(1,len(midterm_weights)+1)]
+                mid_columns = [f'MidTerm-{i}' for i in range(1,len(numbers[1])+1)]
 
                 # Defining columns that will stay in the first row
                 columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final']
@@ -1631,7 +1641,7 @@ def generate_spreadsheet(request,course_id):
 
 
                 for column in range(len(columns)):
-                    workSheet.write(row_num, column, columns[column], font_style)
+                    workSheet.write(row_num, column, columns[column], xlwt.easyxf('align: horiz center; alignment: wrap True'))
 
                 # reverting font style to default
                 font_style = xlwt.XFStyle()
@@ -1640,9 +1650,33 @@ def generate_spreadsheet(request,course_id):
                 center_alignment = xlwt.easyxf('align: horiz center')
                 # Word wrap style
                 word_wrap_style = xlwt.easyxf('alignment: wrap True')
-
+                row_num += 1
                 # events= Branch.load_all_inter_branch_collaborations_with_events_yearly(year,1)
                 # sl_num = 0
+                for student, scores in result.items():
+                    # Write student ID and name
+                    workSheet.write(row_num, 0, student.user_id)
+                    workSheet.write(row_num, 1, student.user_first_name)
+
+                    # Write quiz scores
+                    for idx, quiz_score in enumerate(scores['Quizzes']):
+                        workSheet.write(row_num, 2 + idx, quiz_score)
+
+                    # Write quiz average
+                    workSheet.write(row_num, 2 + len(quiz_columns), scores['Quiz Average'])
+
+                    # Write midterm scores
+                    for idx, mid_score in enumerate(scores['Mids']):
+                        workSheet.write(row_num, 3 + len(quiz_columns) + idx, mid_score)
+
+                    # Write midterm average
+                    workSheet.write(row_num, 3 + len(quiz_columns) + len(mid_columns), scores['Midterm Average'])
+
+                    # Write final score
+                    workSheet.write(row_num, 4 + len(quiz_columns) + len(mid_columns), scores['Final Average'])
+                    workSheet.write(row_num, 5 + len(quiz_columns) + len(mid_columns), scores['result'])
+                    # Move to the next row
+                    row_num += 1
                 # for event,collaborations in events.items():
                 #     row_num += 1
                 #     sl_num += 1
@@ -1670,10 +1704,6 @@ def generate_spreadsheet(request,course_id):
                 
 
 
-            try:
-                midterm = 35/len(numbers[1])
-            except:
-                midterm = 0
 
         context = {
                     'page_title':'Check Mate',
