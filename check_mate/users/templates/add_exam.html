@@ -316,18 +316,18 @@
                                                     <div class="form-group mr-2" style="border:1px solid black;">
                                                         <input type="text"
                                                                class="form-control text-center"
-                                                               value=""
+                                                               value="{{announce.announcement}}"
                                                                name="announcement"
                                                                style="width:500px;">
                                                     </div>
                                                     <div class="media-right text-right">
                                                         <div style="width:100px">
-                                                            <input type="submit" class="btn btn-primary btn-sm" value="View Answer Template" name="answer_template">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="{% if announce %}Update{% else %}Save{% endif %}" name="save_announcement">
                                                         </div>
                                                     </div>
                                                     <div class="media-right text-right">
                                                         <div style="width:100px">
-                                                            <input type="submit" class="btn btn-primary btn-sm" value="Save" name="save_announcement">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="View Answer Template" name="answer_template">
                                                         </div>
                                                     </div>
                                                 </div>

@@ -277,3 +277,15 @@ class Shuffled_Papers(models.Model):
     class Meta:
 
         verbose_name = "Shuffled Papers Student Info"
+
+class Announcements(models.Model):
+
+    section_exam = models.ForeignKey(Section_Exam,on_delete = models.CASCADE)
+    announcement = models.TextField(null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.section_exam)
+    
+    class Meta:
+
+        verbose_name = "Announcement"

@@ -836,6 +836,19 @@ class Save:
         answer.save()
 
         return True
+    
+    def save_announcement(section_exam,announcement):
+
+        '''This function will save the announcement'''
+
+        try:
+            annouce = Announcements.objects.get(section_exam = section_exam)
+        except:
+            annouce = Announcements.objects.create(section_exam = section_exam)
+        annouce.announcement = announcement
+        annouce.save()
+
+        return True
 
 
 class Delete:

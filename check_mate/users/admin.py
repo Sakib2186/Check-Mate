@@ -89,3 +89,8 @@ class Students_Score_Admin_Panel(admin.ModelAdmin):
     list_display = [
         'exam_of','student','score','total_marks','exam_type'
     ]
+@admin.register(Announcements)
+class Annoucements_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'section_exam','announcement'
+    ]

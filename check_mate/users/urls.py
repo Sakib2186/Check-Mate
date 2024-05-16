@@ -32,4 +32,7 @@ urlpatterns = [
     path('all_courses/course_edit/<int:course_id>',views.course_edit,name="course_edit"),
 
 
+    path('announcements/',views.announcements,name="announcements"),
+
+
 ]

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Dashboard</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="page__header">
+                    <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
+                        <div class="container">
+
+                            {% block navbar %}
+                                {% include 'navbar.html' %}
+                            {% endblock navbar %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page ">
+
+                    <div class="container page__container">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                            <li class="breadcrumb-item active">Announcements</li>
+                        </ol>
+                        <h1 class="h2">All Announcements</h1>
+                        <div class="card-deck">
+                            <div class="row">
+
+                                <div class="col-md-8">
+                                    <div class="card card-body">
+                                        <div class="d-flex">
+                                            <a href="#"
+                                               class="avatar avatar-online mr-3">
+                                                <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
+                                                     alt="people"
+                                                     class="avatar-img rounded-circle">
+                                            </a>
+                                            <div class="flex">
+                                                <p class="d-flex align-items-center mb-2">
+                                                    <a href="fixed-instructor-profile.html"
+                                                       class="text-body mr-2"><strong>Jenell D. Matney</strong></a>
+                                                </p>
+                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores beatae quisquam iste maiores libero, corrupti totam saepe itaque quidem perspiciatis?</p>
+                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos culpa commodi consequuntur! Optio labore corporis quo a quia, incidunt unde soluta velit ad, eius exercitationem sequi ab laborum! Nostrum voluptate earum sit aperiam quaerat unde, vel excepturi quisquam nihil reprehenderit in minus laudantium eligendi odio iusto nemo, aspernatur, optio soluta!</p>
+                                                <div style="width:100px">
+                                                    <input type="submit" class="btn btn-primary btn-sm" value="Download Paper" name="download_paper">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br><br><hr>
+                                <div class="col-md-8">
+                                    <div class="card card-body">
+                                        <div class="d-flex">
+                                            <a href="#"
+                                               class="avatar avatar-online mr-3">
+                                                <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
+                                                     alt="people"
+                                                     class="avatar-img rounded-circle">
+                                            </a>
+                                            <div class="flex">
+                                                <p class="d-flex align-items-center mb-2">
+                                                    <a href="fixed-instructor-profile.html"
+                                                       class="text-body mr-2"><strong>Jenell D. Matney</strong></a>
+                                                </p>
+                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores beatae quisquam iste maiores libero, corrupti totam saepe itaque quidem perspiciatis?</p>
+                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos culpa commodi consequuntur! Optio labore corporis quo a quia, incidunt unde soluta velit ad, eius exercitationem sequi ab laborum! Nostrum voluptate earum sit aperiam quaerat unde, vel excepturi quisquam nihil reprehenderit in minus laudantium eligendi odio iusto nemo, aspernatur, optio soluta!</p>
+                                                <div style="width:100px">
+                                                    <input type="submit" class="btn btn-primary btn-sm" value="Download Paper" name="download_paper>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
+                </div>
+            </div>
+
+        </div>
+
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+
+
+    </body>
+
+</html>

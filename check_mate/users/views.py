@@ -635,12 +635,15 @@ def course(request,course_id):
         current_semester = Session.objects.get(current=True)
         section_exams = Load_Courses.get_section_exams(course_id)
         exam =Load_Courses.get_specific_course_section(course_id)
+        logged_in_ta = False
         
-        submitted_by = exam.teaching_assistant.all()
-        ta = submitted_by[0].teaching_id
-        logged_in_ta = False 
-        if ta == logged_in_user:
-            logged_in_ta = True
+        try:
+            submitted_by = exam.teaching_assistant.all()
+            ta = submitted_by[0].teaching_id
+            if ta == logged_in_user:
+                logged_in_ta = True
+        except:
+            pass
         
 
         if logged_in_user == None:
@@ -762,6 +765,11 @@ def edit_exam(request,course_id,exam_id):
         exam_modes = Exam_Mode.objects.all()
         exam_type = Exam_Type.objects.all()
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        try:
+            announce = Announcements.objects.get(section_exam=section_exam)
+            print(announce)
+        except:
+            announce = None
         try:
             time = section_exam.exam_time.split(" ")
         except:
@@ -920,6 +928,17 @@ def edit_exam(request,course_id,exam_id):
 
                     if Save.shuffled_papers(course_id):
                         messages.success(request,"Papers Shuffled!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    else:
+                        messages.error(request,"Error Occured")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    
+                if request.POST.get('save_announcement'):
+
+                    annoucement = request.POST.get('announcement')
+
+                    if Save.save_announcement(section_exam,annoucement):
+                        messages.success(request,"Announcement Posted Successfully!")
                         return redirect('users:edit_exam',course_id,section_exam.pk)
                     else:
                         messages.error(request,"Error Occured")
@@ -1153,6 +1172,7 @@ def edit_exam(request,course_id,exam_id):
                     'question_set':sets,
                     'none_set_questions':none_set_questions,
                     'time':time,
+                    'announce':announce,
                 }
 
             return render(request,"add_exam.html",context)
@@ -1721,6 +1741,32 @@ def generate_spreadsheet(request,course_id):
         }
 
         return render(request,"excel_creation_page.html",context)
+
+    except Exception as e:
+        #saving error information in database if error occured
+        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+        return HttpResponse("Bad Request")
+
+@login_required
+def announcements(request):
+
+    try:
+        #loading the data to pass them in dictionary, context
+        type_of_logged_in_user = Login.user_type_logged_in(request)
+        logged_in_user = Login.logged_in_user(request)
+        current_semester = Session.objects.get(current=True)
+
+
+        context = {
+                    'page_title':'Check Mate',
+                    'user_type':type_of_logged_in_user,
+                    'media_url':settings.MEDIA_URL,
+                    'logged_in_user':logged_in_user,
+                    'year':datetime.now().year,
+                    'current_semester':current_semester,
+        }
+        return render(request,"announcements.html",context)
 
     except Exception as e:
         #saving error information in database if error occured
