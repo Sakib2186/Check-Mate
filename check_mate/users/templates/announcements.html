@@ -64,58 +64,40 @@
                             <li class="breadcrumb-item active">Announcements</li>
                         </ol>
                         <h1 class="h2">All Announcements</h1>
-                        <div class="card-deck">
-                            <div class="row">
 
+                            <div class="row">
+                                <form method="POST">
+                                {% csrf_token %}
+                                {% for x in announcements %}
                                 <div class="col-md-8">
                                     <div class="card card-body">
                                         <div class="d-flex">
                                             <a href="#"
                                                class="avatar avatar-online mr-3">
-                                                <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
+                                                <img src=""
                                                      alt="people"
-                                                     class="avatar-img rounded-circle">
+                                                     class="avatar-img rounded-circle"
+                                                     onerror="this.onerror=null;this.src='{% static 'default_profile_picture/default_profile_picture.png'%}';">
                                             </a>
                                             <div class="flex">
                                                 <p class="d-flex align-items-center mb-2">
                                                     <a href="fixed-instructor-profile.html"
-                                                       class="text-body mr-2"><strong>Jenell D. Matney</strong></a>
+                                                       class="text-body mr-2"><strong>{{x.given_by}}</strong></a>
                                                 </p>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores beatae quisquam iste maiores libero, corrupti totam saepe itaque quidem perspiciatis?</p>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos culpa commodi consequuntur! Optio labore corporis quo a quia, incidunt unde soluta velit ad, eius exercitationem sequi ab laborum! Nostrum voluptate earum sit aperiam quaerat unde, vel excepturi quisquam nihil reprehenderit in minus laudantium eligendi odio iusto nemo, aspernatur, optio soluta!</p>
+                                                <p>{{x.announcement}}</p>
                                                 <div style="width:100px">
-                                                    <input type="submit" class="btn btn-primary btn-sm" value="Download Paper" name="download_paper">
+                                                    <input type="submit" class="btn btn-primary btn-sm" value="Download Answer Template" name="download_paper">
+                                                    <input type="hidden" value="{{x.section_exam.pk}}" name="get_value">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <br><br><hr>
-                                <div class="col-md-8">
-                                    <div class="card card-body">
-                                        <div class="d-flex">
-                                            <a href="#"
-                                               class="avatar avatar-online mr-3">
-                                                <img src="assets/images/256_rsz_nicolas-horn-689011-unsplash.jpg"
-                                                     alt="people"
-                                                     class="avatar-img rounded-circle">
-                                            </a>
-                                            <div class="flex">
-                                                <p class="d-flex align-items-center mb-2">
-                                                    <a href="fixed-instructor-profile.html"
-                                                       class="text-body mr-2"><strong>Jenell D. Matney</strong></a>
-                                                </p>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores beatae quisquam iste maiores libero, corrupti totam saepe itaque quidem perspiciatis?</p>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos culpa commodi consequuntur! Optio labore corporis quo a quia, incidunt unde soluta velit ad, eius exercitationem sequi ab laborum! Nostrum voluptate earum sit aperiam quaerat unde, vel excepturi quisquam nihil reprehenderit in minus laudantium eligendi odio iusto nemo, aspernatur, optio soluta!</p>
-                                                <div style="width:100px">
-                                                    <input type="submit" class="btn btn-primary btn-sm" value="Download Paper" name="download_paper>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% endfor %}
+                                </form>
                             </div>
-                        </div>
+
                     </div>
 
                     {% block footer %}

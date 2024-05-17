@@ -937,8 +937,21 @@ def edit_exam(request,course_id,exam_id):
 
                     annoucement = request.POST.get('announcement')
 
-                    if Save.save_announcement(section_exam,annoucement):
+                    if Save.save_announcement(logged_in_user,section_exam,annoucement):
                         messages.success(request,"Announcement Posted Successfully!")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    else:
+                        messages.error(request,"Error Occured")
+                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                
+                if request.POST.get('delete_announcement'):
+
+                    annoucement = request.POST.get('announcement')
+                    delete = Announcements.objects.get(section_exam = section_exam,announcement = annoucement)
+                    delete.delete()
+
+                    if Save.save_announcement(section_exam,annoucement):
+                        messages.success(request,"Announcement Deleted Successfully!")
                         return redirect('users:edit_exam',course_id,section_exam.pk)
                     else:
                         messages.error(request,"Error Occured")
@@ -1757,6 +1770,67 @@ def announcements(request):
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
 
+        if logged_in_user == None:
+            user = request.user.username
+        else:
+            user = logged_in_user.user_id
+
+        announcements = Load_Courses.load_announcements(logged_in_user,type_of_logged_in_user)
+        print(announcements)
+
+        if request.method == "POST":
+
+            if request.POST.get('download_paper'):
+                
+                doc = Document()
+                section_exam = request.POST.get('get_value')
+                set_number = "A"
+                print("herer")
+                questions = Load_Courses.get_questions_and_marks_list(section_exam,set_number)
+                
+                for section in doc.sections:
+                    section.top_margin = Inches(1)  # Adjust margin as needed
+                    section.bottom_margin = Inches(1)
+                    section.left_margin = Inches(1)
+                    section.right_margin = Inches(1)
+
+
+
+                # Iterate through questions and answers
+                for q, m, l, img in zip(questions[0], questions[1],questions[2],questions[3]):
+                                        
+                    table = doc.add_table(rows=1, cols=1)
+                    table.autofit = False
+                    table.columns[0].width = Pt(50)
+                    table.rows[0].height = Pt(l) 
+                    
+                    cell = table.cell(0, 0)
+                    tc_pr = cell._element.get_or_add_tcPr()
+                    borders = OxmlElement('w:tcBorders')
+                    tc_pr.append(borders)
+                    
+                    for border_type in ['top', 'left', 'bottom', 'right']:
+                        border_elm = OxmlElement(f'w:{border_type}')
+                        border_elm.set(qn('w:val'), 'dotted')
+                        border_elm.set(qn('w:sz'), '15')
+                        border_elm.set(qn('w:space'), '0')
+                        border_elm.set(qn('w:color'), '000000')
+                        border_elm.set(qn('w:rounded'), 'true') 
+                        borders.append(border_elm)
+                    
+                    doc.add_paragraph()
+                    doc.add_paragraph()
+
+                # Save the document to a BytesIO object
+                doc_stream = BytesIO()
+                doc.save(doc_stream)
+                doc_stream.seek(0)
+
+                # Return the Word document as an attachment
+                response = HttpResponse(doc_stream, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename=Answer Template.docx'
+                return response
+
 
         context = {
                     'page_title':'Check Mate',
@@ -1765,6 +1839,7 @@ def announcements(request):
                     'logged_in_user':logged_in_user,
                     'year':datetime.now().year,
                     'current_semester':current_semester,
+                    'announcements':announcements,
         }
         return render(request,"announcements.html",context)
 

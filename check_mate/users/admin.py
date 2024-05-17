@@ -92,5 +92,5 @@ class Students_Score_Admin_Panel(admin.ModelAdmin):
 @admin.register(Announcements)
 class Annoucements_Admin_Panel(admin.ModelAdmin):
     list_display=[
-        'section_exam','announcement'
+        'section_exam','announcement','given_by'
     ]

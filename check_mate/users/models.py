@@ -282,6 +282,7 @@ class Announcements(models.Model):
 
     section_exam = models.ForeignKey(Section_Exam,on_delete = models.CASCADE)
     announcement = models.TextField(null=True,blank=True)
+    given_by = models.CharField(max_length=20,default = "",null=True,blank=True)
 
     def __str__(self) -> str:
         return str(self.section_exam)

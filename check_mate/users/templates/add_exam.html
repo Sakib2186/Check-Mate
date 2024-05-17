@@ -325,6 +325,13 @@
                                                             <input type="submit" class="btn btn-primary btn-sm" value="{% if announce %}Update{% else %}Save{% endif %}" name="save_announcement">
                                                         </div>
                                                     </div>
+                                                    {% if announce %}
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-danger btn-sm" value="Delete" name="delete_announcement">
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
                                                     <div class="media-right text-right">
                                                         <div style="width:100px">
                                                             <input type="submit" class="btn btn-primary btn-sm" value="View Answer Template" name="answer_template">

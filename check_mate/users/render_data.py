@@ -497,8 +497,33 @@ class Load_Courses:
             }
 
         return student_scores
+    
+    def load_announcements(logged_in_user,type_of_logged_in_user):
 
+        '''This function will load all the announcements'''
 
+        if logged_in_user == None:
+            return Announcements.objects.all().order_by('-pk')
+        session = Session.objects.get(current = True)
+
+        ann = []
+        if 1 in type_of_logged_in_user:
+            intstructor = Instructor.objects.filter(instructor_id=logged_in_user,semester = session,year = session.year)
+            
+            for course in intstructor:
+                course_section = Course_Section.objects.get(course_id = course.courses)
+                section_exam = Section_Exam.objects.filter(section = course_section)
+                for exam in section_exam:
+                    ann = ann + list(Announcements.objects.filter(section_exam = exam).order_by('-pk'))
+                    return ann
+        if 2 in type_of_logged_in_user:
+            students = Student.objects.filter(student_id=logged_in_user,semester = session,year = session.year)
+            for course in students:
+                course_section = Course_Section.objects.get(course_id = course.courses)
+                section_exam = Section_Exam.objects.filter(section = course_section)
+                for exam in section_exam:
+                    ann =ann + list(Announcements.objects.filter(section_exam = exam.pk).order_by('-pk'))
+                    return ann
 
 
 
@@ -837,7 +862,7 @@ class Save:
 
         return True
     
-    def save_announcement(section_exam,announcement):
+    def save_announcement(logged_in_user,section_exam,announcement):
 
         '''This function will save the announcement'''
 
@@ -846,6 +871,10 @@ class Save:
         except:
             annouce = Announcements.objects.create(section_exam = section_exam)
         annouce.announcement = announcement
+        if logged_in_user == None:
+            annouce.given_by = "Admin"
+        else:
+            annouce.given_by = logged_in_user
         annouce.save()
 
         return True
