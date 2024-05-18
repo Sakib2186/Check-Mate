@@ -69,31 +69,38 @@
                                 <form method="POST">
                                 {% csrf_token %}
                                 {% for x in announcements %}
+                                {% if not x.section_exam.is_completed %}
                                 <div class="col-md-8">
-                                    <div class="card card-body">
+
                                         <div class="d-flex">
                                             <a href="#"
                                                class="avatar avatar-online mr-3">
                                                 <img src=""
                                                      alt="people"
-                                                     class="avatar-img rounded-circle"
+                                                     class="avatar"
                                                      onerror="this.onerror=null;this.src='{% static 'default_profile_picture/default_profile_picture.png'%}';">
                                             </a>
                                             <div class="flex">
                                                 <p class="d-flex align-items-center mb-2">
-                                                    <a href="fixed-instructor-profile.html"
-                                                       class="text-body mr-2"><strong>{{x.given_by}}</strong></a>
+                                                    <a href=""
+                                                       class="text-body mr-2" style="text-decoration:none;"><strong>{{x.given_by}}</strong></a>
                                                 </p>
+                                                <p class="d-flex align-items-center mb-2">
+                                                    <a href=""
+                                                        class="text-body mr-2" style="text-decoration:none;"><strong>{{x.section_exam.section.course_id.course_code}}.{{x.section_exam.section.section_number}}</strong></a>
+                                                </p>
+                                                
                                                 <p>{{x.announcement}}</p>
-                                                <div style="width:100px">
+
                                                     <input type="submit" class="btn btn-primary btn-sm" value="Download Answer Template" name="download_paper">
                                                     <input type="hidden" value="{{x.section_exam.pk}}" name="get_value">
-                                                </div>
+
                                             </div>
                                         </div>
-                                    </div>
+
                                 </div>
                                 <br><br><hr>
+                                {% endif %}
                                 {% endfor %}
                                 </form>
                             </div>

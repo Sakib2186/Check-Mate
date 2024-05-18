@@ -22,6 +22,7 @@ from django.http import JsonResponse
 import xlwt
 
 
+
 logger=logging.getLogger(__name__)
 
 # Create your views here.
@@ -963,7 +964,7 @@ def edit_exam(request,course_id,exam_id):
                     if section_exam.exam_mode.mode_id == 1:
                         set_number = request.POST.get('question_set')
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
-                        print(questions[0])
+                        
                         for section in doc.sections:
                             section.top_margin = Inches(1)  # Adjust margin as needed
                             section.bottom_margin = Inches(1)

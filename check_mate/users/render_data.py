@@ -8,6 +8,15 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import os
 import random
+import fitz
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from io import BytesIO
+from ultralytics import YOLO
+from PIL import Image
+import threading
+
+
 class Login:
 
     '''This class will hold all the functionalities to log in and regsitration of new user'''
@@ -301,7 +310,7 @@ class Load_Courses:
         for i in range(section_exam.exam_set):
             ascii_value = ord('A') + i
             letter = chr(ascii_value)
-            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-question_number')
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-pk')
             dic={}
             dic[letter]=questions
             sets.append((letter,dic))
@@ -317,7 +326,7 @@ class Load_Courses:
         answer_length = []
         question_images = []
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('pk')
+        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
         for q in questions:
             question_list.append(str(q.question))
             marks_list.append(str(q.marks))
@@ -515,7 +524,7 @@ class Load_Courses:
                 section_exam = Section_Exam.objects.filter(section = course_section)
                 for exam in section_exam:
                     ann = ann + list(Announcements.objects.filter(section_exam = exam).order_by('-pk'))
-                    return ann
+            return ann
         if 2 in type_of_logged_in_user:
             students = Student.objects.filter(student_id=logged_in_user,semester = session,year = session.year)
             for course in students:
@@ -523,7 +532,8 @@ class Load_Courses:
                 section_exam = Section_Exam.objects.filter(section = course_section)
                 for exam in section_exam:
                     ann =ann + list(Announcements.objects.filter(section_exam = exam.pk).order_by('-pk'))
-                    return ann
+            return ann
+                
 
 
 
@@ -831,23 +841,69 @@ class Save:
     def uploaded_answer_file(user,file,exam_id,student_id = None):
 
         '''This method will save the file uploaded by the user'''
-
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        if section_exam.exam_mode.mode_id == 3:
-            if user == None:
-                return False
+        ####here apply question
+        pdf = file
+        pdf_bytes = pdf.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
 
-            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
-            exm_submit.is_uploaded = True
-            exm_submit.save()
-        elif section_exam.exam_mode.mode_id == 1:
-            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
-            exm_submit.is_uploaded = True
-            exm_submit.save()
+        img_dir = os.path.join(settings.MEDIA_ROOT, 'predicted_images')
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+
+        saved_image_paths = []
+        result = []
+        for i, page in enumerate(doc):
+            pix = page.get_pixmap()
+            image_bytes = pix.tobytes() 
+            img = Image.open(BytesIO(image_bytes))
+            saved_image_paths.append(Save.save_image(img, exam_id, i))
+        
+        for img_path in saved_image_paths:
+            img = Image.open(img_path)
+            result += Save.apply_yolo_detection(img)
+            # Process YOLO detection results as needed
+            # Delete the temporary image file after processing
+            os.remove(img_path)
+        
+        for r in range(len(result)):
+            result[r].save()
+            
+
+
+
+            
+        
+        # if section_exam.exam_mode.mode_id == 3:
+        #     if user == None:
+        #         return False
+
+        #     exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
+        #     exm_submit.is_uploaded = True
+        #     exm_submit.save()
+        # elif section_exam.exam_mode.mode_id == 1:
+        #     exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
+        #     exm_submit.is_uploaded = True
+        #     exm_submit.save()
 
 
         return True
-    
+
+    def save_image(img, exam_id, page_num):
+        # Save the image to a temporary location
+        img_dir = os.path.join(settings.MEDIA_ROOT, 'temporary_images')
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+        img_path = os.path.join(img_dir, f"temp_page_{page_num}_exam_{exam_id}.jpg")
+        img.save(img_path)
+        return img_path
+
+    def apply_yolo_detection(img):
+        # Apply YOLO object detection on the image
+        model = YOLO('yolov8predict.pt') 
+        result = model.predict(img,imgsz=320, conf=0.5)
+        return result
+
     def save_marks_comment(question_pk,marks,comment,student_id):
 
         '''Thus function will save the marks and comments for a answer'''
