@@ -7,6 +7,7 @@ from datetime import datetime,timedelta
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import os
+import random
 class Login:
 
     '''This class will hold all the functionalities to log in and regsitration of new user'''
@@ -156,12 +157,13 @@ class Load_Courses:
         elif 2 in roles:
             try:
                 #getting students courses
-                student_courses = Student.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
+                student_courses = Student.objects.filter(student_id = logged_in_user,semester = semester,year = semester.year)
 
-                for course in student_courses.courses.all():
-                    
-                    course_obj = Course.objects.get(id = course.pk)
-                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year)
+                for course in student_courses:
+
+                    course_obj = Course.objects.get(id = course.courses.pk)
+                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year,section_number = course.section)
+
                     #checking which course section belongs to this student
                     for i in specific_course:
                         try:
@@ -169,22 +171,22 @@ class Load_Courses:
                             stud = i.students.get(student_id = logged_in_user)
                             if stud:
                                 all_courses.append(i)
-                                break
+                                
                         except:
                             pass
-                    print(all_courses)
+   
                 try:
                     #if the student is also a TA then loading those courses as well
-                    ta_courses = Teaching_Assistant.objects.get(student_id = logged_in_user,semester = semester,year = semester.year)
-                    for course in ta_courses.courses.all():
-                        specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                    ta_courses = Teaching_Assistant.objects.filter(teaching_id = logged_in_user,semester = semester,year = semester.year)
+                    for course in ta_courses:
+                        specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
                         for i in specific_course:
                             try:
                                 ta = None
                                 ta = i.teaching_assistant.get(teaching_id = logged_in_user)
-                                if ta and i not in all_courses:
-                                    all_courses.append(i)
-                                    break
+                                if ta:
+                                    if i not in all_courses:
+                                        all_courses.append(i)
                             except:
                                 pass
                 except:
@@ -195,9 +197,9 @@ class Load_Courses:
         elif 1 in roles:
             try:
                 #loading instructors courses
-                instructor_courses = Instructor.objects.get(instructor_id = logged_in_user,semester = semester,year = semester.year)
-                for course in instructor_courses.courses.all():
-                    specific_course = Course_Section.objects.filter(course_id = course,semester = semester,year = semester.year)
+                instructor_courses = Instructor.objects.filter(instructor_id = logged_in_user,semester = semester,year = semester.year)
+                for course in instructor_courses:
+                    specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
                     for i in specific_course:
                         all_courses.append(i)
             except:
@@ -259,12 +261,17 @@ class Load_Courses:
     
     def get_section_exams(course_id):
 
-        '''This function will return all the exams of a section'''
+        '''This function will return all the exams of a section along with the number of students
+            in each section'''
 
         course_section = Course_Section.objects.get(pk = course_id)
         sec_exam = Section_Exam.objects.filter(section = course_section)
+        dic={}
+        for sec in sec_exam:
+            total_student_enrollment = sec.section.students.all().count()
+            dic[sec] = total_student_enrollment
 
-        return sec_exam
+        return dic
     
     def get_saved_section_exams(exam_id):
 
@@ -279,7 +286,7 @@ class Load_Courses:
         dic={}
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         if section_exam.exam_set == 0:
-            questions = Question.objects.filter(questions_of = section_exam,question_set='A')
+            questions = Question.objects.filter(questions_of = section_exam,question_set='A').order_by('-pk')
             dic['A'] = questions
 
         return dic
@@ -294,12 +301,242 @@ class Load_Courses:
         for i in range(section_exam.exam_set):
             ascii_value = ord('A') + i
             letter = chr(ascii_value)
-            questions = Question.objects.filter(questions_of = section_exam,question_set=letter)
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-question_number')
             dic={}
             dic[letter]=questions
             sets.append((letter,dic))
 
         return sets
+    
+    def get_questions_and_marks_list(exam_id,question_set):
+
+        '''This function will return the a list containing two lists of questions and marks'''
+
+        question_list = []
+        marks_list = []
+        answer_length = []
+        question_images = []
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('pk')
+        for q in questions:
+            question_list.append(str(q.question))
+            marks_list.append(str(q.marks))
+            answer_length.append(q.answer_field_length_number)
+            if q.question_image:
+                question_images.append(q.question_image)
+            else:
+                question_images.append(None)
+
+        return (question_list,marks_list,answer_length,question_images)
+    
+    def get_question_and_marks(exam_id,set_number):
+
+        '''This function will return a questions of that set'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        total_marks = 0
+        if set_number == "all":
+            question =  Question.objects.filter(questions_of = section_exam).order_by('-pk')
+            for mark in question:
+                total_marks += mark.marks
+        else:
+            question =  Question.objects.filter(questions_of = section_exam,question_set=set_number).order_by('-pk')
+            for mark in question:
+                total_marks += mark.marks
+
+        return (question,total_marks)
+    
+    def load_set_of_student(user,course_id):
+        
+        '''This function will return the students set for the exam
+        if admin or instructor then can view all'''
+        
+        course_section = Course_Section.objects.get(pk = course_id)
+        try:
+            student = Student.objects.get(student_id = user)
+            set_student = Shuffled_Papers.objects.get(student = student,course_id = course_section)
+            return set_student.set_name
+        except:
+            return "all"
+    
+    def load_updated_time(exam_id):
+
+        '''This function will return the updated time each time the page is loaded'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+
+        current_date = datetime.now()
+        time = section_exam.exam_time
+        time = time.split(' ')
+        number = time[0]
+        minute_or_hour = time[1]
+
+    def get_exam_uploaded_students(exam_id):
+
+        '''This function will return the students who have uploaded their work'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        submitted_exam = Exam_Submitted.objects.filter(exam_of = section_exam,is_uploaded = True)
+
+        return submitted_exam
+    
+    def get_all_students_submission(exam_id):
+
+        '''This function will return all the submission details of student'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        papers = Exam_Submitted.objects.filter(exam_of = section_exam)
+
+        return papers
+
+    def get_question_and_answer_of_student(exam_id,student_id):
+
+        '''This function will return the questions and answer of that question of a student'''
+        
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        student = School_Users.objects.get(user_id = student_id)
+        ins = Student.objects.get(student_id =student,courses = section_exam.section.course_id,section = section_exam.section.section_number)
+        student_set = Shuffled_Papers.objects.get(student = ins, course_id = section_exam.section)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
+        question_answer = {}
+        set_number = ""
+        first_question = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).first()
+
+        total_marks = 0
+        score = 0
+        for question in questions:
+
+            answer = Answer.objects.get(answer_of = question,uploaded_by = student)
+            question_answer[question] = answer
+            set_number = question.question_set
+            total_marks += question.marks
+            score += answer.marks_obtained 
+            #here giving algo to store marks of students
+        
+        student_score = Students_Score.objects.get(exam_of = section_exam,student = student)
+        student_score.total_marks = total_marks
+        student_score.score = score
+        student_score.save()
+
+
+        return (question_answer,student,total_marks,score,set_number,first_question)
+    
+    def number_of_quizzes_and_midterm(course_id):
+
+        '''This function returns the number of quizzes held in the section'''
+
+        course_section = Load_Courses.get_specific_course_section(course_id)
+        section_exam = Section_Exam.objects.filter(section = course_section)
+
+        quiz_number = []
+        midterm_number = []
+        final = []
+
+        for exams in section_exam:
+            if exams.exam_type.type_id == 1:
+                quiz_number.append(exams)
+            elif exams.exam_type.type_id == 2:
+                midterm_number.append(exams)
+            elif exams.exam_type.type_id == 3:
+                final.append(exams)
+
+        return (quiz_number,midterm_number,final)
+    
+    def load_spreadsheet_info(course_id,quizzes_number):
+
+        '''This function will return the average of all quizzes if All is choosen
+            else the best quizzes average would be returned'''
+        
+        course_section = Load_Courses.get_specific_course_section(course_id)
+        section_exams = Section_Exam.objects.filter(section=course_section)
+        students = course_section.students.all()
+        
+        student_scores = {}
+
+        # Initialize dictionaries to store scores for each type
+        quiz_scores = {student: [] for student in students}
+        mid_scores = {student: [] for student in students}
+        final_scores = {student: [] for student in students}
+
+
+        for exam in section_exams:
+            for student in students:
+                stud = School_Users.objects.get(user_id = student)
+                student_score = Students_Score.objects.get(exam_of=exam, student=stud)
+
+                if exam.exam_type.type_id == 1:
+                    quiz_scores[student].append(student_score.score)
+                elif exam.exam_type.type_id == 2:
+                    mid_scores[student].append(student_score.score)
+                elif exam.exam_type.type_id == 3:
+                    final_scores[student].append(student_score.score)
+
+        # Calculate average scores based on the choice
+        for student in students:
+            if quizzes_number == 'All':
+                quiz_avg = sum(quiz_scores[student]) / len(quiz_scores[student]) if quiz_scores[student] else 0
+            else:
+                quizzes_number = int(quizzes_number)
+                if quizzes_number >= 1:  # Ensure at least one quiz is selected
+                    quiz_avg = sum(sorted(quiz_scores[student], reverse=True)[:quizzes_number]) / quizzes_number if quiz_scores[student] else 0
+                else:
+                    quiz_avg = 0
+
+            mid_avg = sum(mid_scores[student]) / len(mid_scores[student]) if mid_scores[student] else 0
+            final_avg = sum(final_scores[student]) / len(final_scores[student]) if final_scores[student] else 0
+
+            stud = School_Users.objects.get(user_id = student)
+            result = quiz_avg * (15/100) + mid_avg * (35/100) + final_avg * (40/100) 
+            student_scores[stud] = {
+            'Quizzes': quiz_scores[student],
+            'Quiz Average': quiz_avg,
+            'Mids': mid_scores[student],
+            'Midterm Average': mid_avg,
+            'Final Average': final_avg,
+            'result':result,
+            }
+
+        return student_scores
+    
+    def load_announcements(logged_in_user,type_of_logged_in_user):
+
+        '''This function will load all the announcements'''
+
+        if logged_in_user == None:
+            return Announcements.objects.all().order_by('-pk')
+        session = Session.objects.get(current = True)
+
+        ann = []
+        if 1 in type_of_logged_in_user:
+            intstructor = Instructor.objects.filter(instructor_id=logged_in_user,semester = session,year = session.year)
+            
+            for course in intstructor:
+                course_section = Course_Section.objects.get(course_id = course.courses)
+                section_exam = Section_Exam.objects.filter(section = course_section)
+                for exam in section_exam:
+                    ann = ann + list(Announcements.objects.filter(section_exam = exam).order_by('-pk'))
+                    return ann
+        if 2 in type_of_logged_in_user:
+            students = Student.objects.filter(student_id=logged_in_user,semester = session,year = session.year)
+            for course in students:
+                course_section = Course_Section.objects.get(course_id = course.courses)
+                section_exam = Section_Exam.objects.filter(section = course_section)
+                for exam in section_exam:
+                    ann =ann + list(Announcements.objects.filter(section_exam = exam.pk).order_by('-pk'))
+                    return ann
+
+
+
+
+
+
+
+
+
+
+        
+
+    
 class Save:
 
     '''This class will hold all the functions for saving new data and updating existing one'''
@@ -394,14 +631,14 @@ class Save:
                 i.delete()
 
         ta = Teaching_Assistant.objects.create(teaching_id = ta,semester = session,year = session.year)
-        ta.courses.add(courses)
+        ta.courses = courses
         ta.semester = session
         ta.year = session.year
         ta.section = section
         ta.save()
 
         instructor = Instructor.objects.create(instructor_id = instructor,semester = session,year = session.year)
-        instructor.courses.add(courses)
+        instructor.courses = courses
         instructor.semester = session
         instructor.year = session.year
         instructor.section = section
@@ -411,7 +648,7 @@ class Save:
         for i in students:
             inst = School_Users.objects.get(user_id = i)
             stud = Student.objects.create(student_id = inst,semester = session,year = session.year)
-            stud.courses.add(courses)
+            stud.courses = courses
             stud.semester = session
             stud.year = session.year
             stud.section = section
@@ -430,7 +667,7 @@ class Save:
         return (True,"Successfully Saved!")
 
 
-    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id):
+    def save_exams_for_section(course_id,exam_title,exam_type,exam_mode,exam_date,exam_description,exam_set,exam_id,ta_available):
 
         '''This function will save/update the exam for a section'''
 
@@ -439,16 +676,57 @@ class Save:
         exm_mode = Exam_Mode.objects.get(mode_id = exam_mode)
 
         try:
-
+     
             new_instance = Section_Exam.objects.get(pk = exam_id)
+      
             #Updating an existing instance
             new_instance.exam_title = exam_title
+    
             new_instance.exam_type = exm_type
+   
             new_instance.exam_mode = exm_mode
+    
             new_instance.exam_date = exam_date
+  
             new_instance.exam_description = exam_description
+
+            print(new_instance.exam_set)
+            print(int(exam_set))
+            if new_instance.exam_set != int(exam_set):
+
+                print("here")
+ 
+                questions = Question.objects.filter(questions_of = new_instance)
+ 
+                for question in questions:
+                    path = settings.MEDIA_ROOT+str(question.question_image)
+
+                    if os.path.isfile(path):
+
+                        os.remove(path)
+
+                    question.delete()
+
             new_instance.exam_set = exam_set
+
+            new_instance.ta_available = ta_available
+
             new_instance.save()
+            all_students = new_instance.section.students.all()
+
+            for student in all_students:
+                try:
+                    old = Exam_Submitted.objects.get(exam_of = new_instance,student = student.student_id)
+                    old_score = Students_Score.objects.get(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
+                    if old:
+                        pass
+                    if old_score:
+                        pass
+                except:
+                    exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
+                    exm_submit.save()
+                    exm_score = Students_Score.objects.create(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
+                    exm_score.save()
             message = "Exam Details Updated!"
         except:
             new_instance = Section_Exam.objects.create(section = course_section,
@@ -457,13 +735,20 @@ class Save:
                                                     exam_type = exm_type,
                                                     exam_mode = exm_mode,
                                                     exam_date = exam_date,
-                                                    exam_set = exam_set)
+                                                    exam_set = exam_set,
+                                                    ta_available = ta_available)
             new_instance.save()
+            all_students = new_instance.section.students.all()
+            for student in all_students:
+                exm_submit = Exam_Submitted.objects.create(exam_of = new_instance,student = student.student_id)
+                exm_submit.save()
+                exm_score = Students_Score.objects.create(exam_of = new_instance,student = student.student_id,exam_type = exm_type)
+                exm_score.save()
             message = "Exam Created Successfully!"
         
         return (True,message,new_instance)
 
-    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,question_id):
+    def save_question_for_exam(exam_id,question_set,question,answer_size,marks,box_height,question_image,question_id):
 
         '''This function will save the questions for a particular exam'''
 
@@ -474,18 +759,125 @@ class Save:
             quest.answer_field_length = answer_size
             quest.marks = marks
             quest.question_set = question_set
+            quest.answer_field_length_number = box_height
+            if question_image != None:
+                path = settings.MEDIA_ROOT+str(quest.question_image)
+                if os.path.isfile(path):
+                    os.remove(path)
+            quest.question_image = question_image
             quest.save()
             message = "Question Updated!"
         except:
-            
             question_exam = Question.objects.create(questions_of = section_exm,
                                                     question = question,
                                                     answer_field_length = answer_size,
                                                     marks = marks,
-                                                    question_set = question_set)
+                                                    answer_field_length_number = box_height,
+                                                    question_set = question_set,
+                                                    question_image = question_image)
             question_exam.save()
+            all_students = section_exm.section.students.all()
+            for student in all_students:
+                answer = Answer.objects.create(answer_of = question_exam,uploaded_by =student.student_id)
+                answer.save()
             message = "Question Saved!"
         return (True,message)
+
+    def shuffled_papers(course_id):
+
+        '''This function will shuffle the papers everytime the instructor clicks start'''
+        
+        course_section = Load_Courses.get_specific_course_section(course_id)
+
+        try:
+            shuffled_papers_of_this_section = Shuffled_Papers.objects.filter(course_id = course_section)
+            shuffled_papers_of_this_section.delete()
+        except:
+            pass
+
+        
+        all_students = course_section.students.all()
+
+        all_sets = Question.objects.values_list('question_set',flat=True).distinct()
+        all_sets = list(all_sets)
+        all_sets_length = len(all_sets)
+
+
+        if all_sets_length==1:
+            for student in all_students:
+                shuffled_paper = Shuffled_Papers.objects.create(student = student,course_id = course_section,set_name = all_sets[0])
+                shuffled_paper.save()
+        else:
+            student_list = list(all_students)
+            random.shuffle(student_list)
+            shuffled_students = Student.objects.filter(pk__in=[obj.pk for obj in student_list])
+            for student in shuffled_students:
+                random_set = random.randint(0, all_sets_length-1)
+
+                shuffled_paper = Shuffled_Papers.objects.create(student = student,course_id = course_section,set_name = all_sets[random_set])
+                shuffled_paper.save()
+
+        return True
+
+    def start_exam(exam_id):
+
+        '''This function will start the exam'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        section_exam.is_started=True
+        section_exam.save()
+        return True
+    
+    def uploaded_answer_file(user,file,exam_id,student_id = None):
+
+        '''This method will save the file uploaded by the user'''
+
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        if section_exam.exam_mode.mode_id == 3:
+            if user == None:
+                return False
+
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
+            exm_submit.is_uploaded = True
+            exm_submit.save()
+        elif section_exam.exam_mode.mode_id == 1:
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
+            exm_submit.is_uploaded = True
+            exm_submit.save()
+
+
+        return True
+    
+    def save_marks_comment(question_pk,marks,comment,student_id):
+
+        '''Thus function will save the marks and comments for a answer'''
+
+        question = Question.objects.get(pk = question_pk)
+        answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
+
+        answer.marks_obtained = marks
+        answer.comment = comment        
+        
+        answer.save()
+
+        return True
+    
+    def save_announcement(logged_in_user,section_exam,announcement):
+
+        '''This function will save the announcement'''
+
+        try:
+            annouce = Announcements.objects.get(section_exam = section_exam)
+        except:
+            annouce = Announcements.objects.create(section_exam = section_exam)
+        annouce.announcement = announcement
+        if logged_in_user == None:
+            annouce.given_by = "Admin"
+        else:
+            annouce.given_by = logged_in_user
+        annouce.save()
+
+        return True
 
 
 class Delete:
@@ -511,6 +903,12 @@ class Delete:
         '''Thus function will delete the question for the specific set'''
 
         question = Question.objects.get(pk=pk)
+        answer = Answer.objects.filter(answer_of = question)
+        for ans in answer:
+            path = settings.MEDIA_ROOT+str(ans.answer_image)
+            if os.path.isfile(path):
+                os.remove(path)
+            ans.delete()
         question.delete()
 
         return True
@@ -520,6 +918,12 @@ class Delete:
         '''This function will delete the exam of a section'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        questions = Question.objects.filter(questions_of = section_exam)
+        for question in questions:
+            path = settings.MEDIA_ROOT+str(question.question_image)
+            if os.path.isfile(path):
+                os.remove(path)
+            question.delete()
         section_exam.delete()
 
         return True

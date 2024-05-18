@@ -14,7 +14,7 @@ class Roles_Admin_Panel(admin.ModelAdmin):
 @admin.register(School_Users)
 class School_Users_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'user_id','user_first_name','user_middle_name','user_last_name','user_email',
+        'pk','user_id','user_first_name','user_middle_name','user_last_name','user_email',
         'user_phone_number','user_profile_picture','user_otp_verified'
     ]
 @admin.register(Course)
@@ -26,17 +26,17 @@ class Course_Admin_Panel(admin.ModelAdmin):
 @admin.register(Student)
 class Student_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'student_id','semester','year','section'
+        'student_id','courses','semester','year','section'
     ]
 @admin.register(Instructor)
 class Instructor_Admin_Panel(admin.ModelAdmin):
     list_display=[
-        'instructor_id','semester','year','section'
+        'instructor_id','courses','semester','year','section'
     ]
 @admin.register(Teaching_Assistant)
 class Teaching_Asistant_Admin_Panel(admin.ModelAdmin):
     list_display=[
-        'teaching_id','semester','year','section'
+        'teaching_id','courses','semester','year','section'
     ]
 @admin.register(Course_Section)
 class Course_Section_Admin_Panel(admin.ModelAdmin):
@@ -61,10 +61,36 @@ class Exam_Mode_Admin_Panel(admin.ModelAdmin):
 @admin.register(Section_Exam)
 class Section_Exam_Admin_Panel(admin.ModelAdmin):
     list_display = [
-        'section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set'
+        'pk','section','exam_title','exam_description','exam_type','exam_mode','exam_date','exam_time','exam_set','ta_available',
+        'is_started','is_stopped','is_completed','is_checked'
     ]
 @admin.register(Question)
 class Question_Admin_panel(admin.ModelAdmin):
     list_display = [
-        'questions_of','question','answer_field_length','marks','question_set'
+        'pk','questions_of','question_number','question','answer_field_length','answer_field_length_number','marks','question_set','question_image'
+    ]
+@admin.register(Answer)
+class Answer_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'pk','answer_of','uploaded_by','answer_textfield','answer_image','marks_obtained','comment'
+    ]
+@admin.register(Shuffled_Papers)
+class Suffple_Papers_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'student','course_id','set_name'
+    ]
+@admin.register(Exam_Submitted)
+class Exam_Submitted_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'exam_of','student','is_uploaded'
+    ]
+@admin.register(Students_Score)
+class Students_Score_Admin_Panel(admin.ModelAdmin):
+    list_display = [
+        'exam_of','student','score','total_marks','exam_type'
+    ]
+@admin.register(Announcements)
+class Annoucements_Admin_Panel(admin.ModelAdmin):
+    list_display=[
+        'section_exam','announcement','given_by'
     ]

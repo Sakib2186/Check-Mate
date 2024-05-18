@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Dashboard</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="page__header">
+                    <div class="navbar bg-dark navbar-dark navbar-expand-sm d-none2 d-md-flex2">
+                        <div class="container">
+
+                            {% block navbar %}
+                                {% include 'navbar.html' %}
+                            {% endblock navbar %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page ">
+
+
+                        <div class="container page__container">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'users:course' course_id %}">Exams</a></li>
+                                <li class="breadcrumb-item" active>Generate Spreadsheet</li>
+                            </ol>
+
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                            <div class="card card-body">
+
+                                {% if quiz_number|length > 0%}
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Select Number of Quizzes</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label class="form-label"
+                                                            for="custom-select">Quizzes (Best Scores Average)</label>
+                                                    <select id="custom-select"
+                                                            class="form-control custom-select" name="best_score">
+                                                        {% if quiz_number|length > 1%}
+                                                        <option value="All" selected>All</option>
+                                                        {% endif %}
+                                                        {% for i in quiz_number %}
+                                                        <option value="{{forloop.counter}}">{{forloop.counter}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="15"
+                                                            name="quiz_weight"
+                                                            class="form-control" 
+                                                            disabled/>
+                                                </div>
+                                                    
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    {% for i in midterm_number %}
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Midterm{% if midterm_number|length > 1 %} - {{forloop.counter}}{% endif %}</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="{{ midterm }}"
+                                                            name="midterm_weight_{{forloop.counter}}"
+                                                            class="form-control"
+                                                            disabled />
+                                                </div>
+                                                    
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    
+                                    {% if final|length > 0 %}
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Final</h4>
+                                        </div>
+                                        <div class="col-lg-8">
+                                                
+                                                <div class="form-group">
+                                                    <label for="touch-spin-2"
+                                                            class="form-label">Weight (in %)</label>
+                                                    <input id="touch-spin-2"
+                                                            data-toggle="touch-spin"
+                                                            data-min="-1000000"
+                                                            data-max="1000000"
+                                                            data-step="50"
+                                                            type="text"
+                                                            value="40"
+                                                            name="final_weight"
+                                                            class="form-control" />
+                                                </div>
+                                                    
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% comment %} <div class="row">
+                                        <div class="col-lg-4">
+                                            <h4 class="card-title">Curve Grade: </h4>
+                                        </div>
+                                        <div class="col-lg-8 d-flex align-items-center">
+                                            <div class="flex"><br>
+                                                <div class="custom-control custom-checkbox-toggle custom-control-inline mr-1">
+                                                    <input checked=""
+                                                            type="checkbox"
+                                                            id="subscribe"
+                                                            class="custom-control-input">
+                                                    <label class="custom-control-label"
+                                                            for="subscribe">Yes</label>
+                                                </div>
+                                                <label class="form-label mb-0"
+                                                        for="subscribe">Yes</label>
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
+                                    <input type="submit" class="btn btn-success mr-2" value="Generate Spreadsheet" name="generate_excel" style="width:200px;">
+                                
+                            </div>
+                        </form>
+
+                                
+                            
+                        </div>
+
+                    {% block footer %}
+                        {% include 'footer.html' %}
+                    {% endblock footer %}
+                </div>
+            </div>
+
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+
+
+    </body>
+
+</html>

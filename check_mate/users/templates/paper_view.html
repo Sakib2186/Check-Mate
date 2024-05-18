@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en"
+      dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible"
+            content="IE=edge">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{{page_title}} - Dashboard</title>
+        <script src="https://kit.fontawesome.com/c7045d037b.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,700%7CRoboto:400,500%7CRoboto:400,500&amp;display=swap"
+            rel="stylesheet">
+                    
+        <link type="text/css"
+            href="{% static 'css/check_mate.css' %}"
+            rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/perfect-scrollbar.css' %}"
+              rel="stylesheet">
+
+        <link type="text/css"
+              href="{% static 'css/spinkit.css' %}"
+              rel="stylesheet">
+        <style>
+            .question-image.fullscreen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                background-color: rgba(0, 0, 0, 0.9);
+                object-fit: contain;
+            }
+            #imageCanvas {
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+                margin: auto;
+            }
+        
+            .card {
+                max-width: 100%; /* Adjust this value if needed */
+                overflow: hidden; /* Hide overflow content */
+            }
+            #eraseBtn,
+            #saveBtn {
+                display: none;
+            }
+            
+        </style>
+    </head>
+
+    <body class=" fixed-layout">
+
+        {% block loader %}
+            {% include 'loader.html' %}
+        {% endblock %}
+
+        <div class="mdk-header-layout js-mdk-header-layout">
+
+            {% block header%}
+                {% include 'header.html' %}
+            {% endblock header %}
+
+            <!-- Header Layout Content -->
+            <div class="mdk-header-layout__content d-flex flex-column">
+
+                <div class="mdk-header-layout__content">
+
+                    <div data-push
+                         data-responsive-width="992px"
+                         class="mdk-drawer-layout js-mdk-drawer-layout">
+                        <div class="mdk-drawer-layout__content page ">
+                            <div class="container page__container">
+                            <div class="container-fluid page__container">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'users:dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'users:student_paper' course_id exam_id student_id %}">{{section_exam.exam_type.exam_type}}</a></li>
+                                    <li class="breadcrumb-item" active >Set: {{question.question_set}}</li>
+                                </ol>
+                                {% if 1 in type_of_logged_in_user or 3 in type_of_logged_in_user %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                <div class="media align-items-center mb-headings">
+                                    {% if section_exam.is_completed %}
+                                    <a href="{% url 'users:review_paper_all' course_id exam_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                    {% endif %}
+                                    {% if not section_exam.is_completed and not section_exam.is_started and not section_exam.is_stopped %}
+                                    <input type="submit" name="shuffle_papers" class="btn btn-warning mr-2" value="Shuffle Questions">
+                                    {% endif %}
+                                    {% if not section_exam.is_started and not section_exam.is_stopped %}
+                                    <input type="submit" name="start_exam" class="btn btn-success mr-2" value="Start Exam">
+                                    {% endif %}
+                                    {% if section_exam.is_started %}
+                                    <input type="submit" name="stop_exam" class="btn btn-danger mr-2" value="Stop Exam">
+                                    {% endif %}
+                                    {% if section_exam.is_stopped and not section_exam.is_completed %}
+                                    <input type="submit" name="complete_exam" class="btn btn-success mr-2" value="Complete Exam">
+                                    {% endif %}
+                                </div>
+                                </form>
+                                {% endif %}
+                                <div class="card-group">
+                                    <div class="card">
+                                        <div class="card-body text-center" id="totalMarksSection">
+                                            <h4 class="mb-0"><strong>{{total_marks}}</strong></h4>
+                                            Question: {{question.question}}
+                                        </div>
+                                        {% if question.question_image %}
+                                        <p class="text-center">
+                                            <img class="rounded question-image" src="{{media_url}}{{question.question_image}}" alt="" width="150">
+                                        </p>
+                                        {% endif %}
+                                        
+                                    </div>
+                                </div>
+                                {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
+                                <div class="card">
+                                    <button id="eraseBtn" class="btn btn-danger">Erase Annotations</button>
+                                    <button id="saveBtn">Save Image</button>
+                                    <div class="card-header">
+                                        <div class="media align-items-center">
+                                            <canvas id="imageCanvas"></canvas>
+                                        </div>
+                                    </div>    
+                                </div>
+                                {% else %}
+                                <p>Written text fied</p>
+                                {% endif %}
+                                    
+                            </div>
+                            </div>
+    
+                        </div>
+    
+                        <div class="mdk-drawer js-mdk-drawer"
+                             data-align="end">
+                            <div class="mdk-drawer__content ">
+                                <div class="sidebar sidebar-right sidebar-light bg-white o-hidden"
+                                     data-perfect-scrollbar>
+                                    <div class="sidebar-p-y">
+                                        
+                                        <form method="POST" enctype="multipart/form-data"> 
+                                            {% csrf_token %}
+                                            <div class="card card-body">
+                                                {% if question_next.pk or question_back.pk %}
+                                                <div class="btn-group" role="group" aria-label="Next and Previous Buttons">
+                                                    {% if question_back.pk %}
+                                                    <a href="{% url 'users:paper_view' course_id exam_id student_id question_back.pk %}" class="btn btn-info" style="width: 48%;">Previous</a>
+                                                    {% endif %}
+                                                    {% if question_next.pk %}
+                                                    <a href="{% url 'users:paper_view' course_id exam_id student_id question_next.pk %}" class="btn btn-info" style="width: 48%;">Next</a>
+                                                    {% endif %}
+                                                </div>
+                                                <br><br><br>
+                                                <hr>
+                                                {% endif %}
+                                                
+                                                <div class="row">
+                                                    <div class="col-lg-8 d-flex align-items-center">
+                                                            <div class="form-group">
+                                                                <label for="touch-spin-2"
+                                                                       class="form-label">Score</label>
+                                                                <input id="touch-spin-2"
+                                                                       data-toggle="touch-spin"
+                                                                       data-min="-1000000"
+                                                                       data-max="1000000"
+                                                                       data-step="50"
+                                                                       type="number"
+                                                                       value="{{answer.marks_obtained}}"
+                                                                       name="marks"
+                                                                       class="form-control"
+                                                                       style="width:50%;" 
+                                                                       {% if  3 in user_type or  1 in user_type or  logged_in_ta %}{% else %}disabled{% endif %}/>
+                                                                <div class="ml-2" style="font-size:80%;">{{answer.marks_obtained}}/{{question.marks}}</div>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row">
+                                                    <div class="col-lg-8 d-flex align-items-center">
+                                                        <div class="form-group">
+                                                        <textarea class="form-control"
+                                                                  rows="2"
+                                                                  placeholder="Write comment (if any)"
+                                                                  name="comment"
+                                                                  {% if 3 in user_type or  1 in user_type or  logged_in_ta %}{% else %}disabled{% endif %}>{{answer.comment|default:""}}</textarea>
+                                                        </div>
+                                                            
+                                                    </div>
+                                                    
+                                                </div>
+                                                {% if  3 in user_type or 1 in user_type or logged_in_ta %}
+                                                <input class="btn btn-success" type="submit" name="submit_marks_comment" style="width:50%;" value="Submit">
+                                                {% else %}
+                                                {% endif %}
+                                                    
+                                                    
+                                                
+                                            </div>
+                                            
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                    </div>
+    
+
+    
+                </div>
+            </div>
+
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/perfect-scrollbar.min.js' %}"></script>
+        <script src="{% static 'js/dom-factory.js' %}"></script>
+        <script src="{% static 'js/material-design-kit.js' %}"></script>
+        <script src="{% static 'js/check_mate.js' %}"></script>
+        <script src="{% static 'js/list.min.js' %}"></script>
+        <script src="{% static 'js/list.js' %}"></script>
+        <script src="{% static 'js/toggle-check-all.js' %}"></script>
+        <script src="{% static 'js/check-selected-row.js' %}"></script>
+        <script src="{% static 'js/quill.min.js' %}"></script>
+        <script src="{% static 'js/quill.js' %}"></script>
+        <script src="{% static 'js/countdown.js' %}"></script>
+        <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+        <script src="{% static 'js/moment.min.js' %}"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const images = document.querySelectorAll('.question-image');
+                
+                images.forEach(image => {
+                    image.addEventListener('click', function() {
+                        this.classList.toggle('fullscreen');
+                    });
+                });
+            });
+        </script>
+
+        {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
+        {% if  answer.answer_image %}
+        <script>
+            window.onload = function() {
+                var canvas = document.getElementById('imageCanvas');
+                var ctx = canvas.getContext('2d');
+                var img = new Image();
+                var mousePressed = false;
+                var isAnnotating = false;
+                var lastX, lastY;
+                
+
+                img.onload = function () {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = {{ answer.answer_image }}
+        
+                canvas.addEventListener('mousedown', function (e) {
+                    mousePressed = true;
+                    var rect = canvas.getBoundingClientRect();
+                    lastX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                    lastY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                    draw(lastX, lastY, false);
+                });
+        
+                canvas.addEventListener('mousemove', function (e) {
+                    if (mousePressed) {
+                        var rect = canvas.getBoundingClientRect();
+                        var mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                        var mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                        draw(mouseX, mouseY, true);
+                        lastX = mouseX;
+                        lastY = mouseY;
+                    }
+                });
+        
+                canvas.addEventListener('mouseup', function() {
+                    mousePressed = false;
+                    isAnnotating = true;
+                    toggleButtonsVisibility();
+                });
+        
+                canvas.addEventListener('mouseleave', function() {
+                    mousePressed = false;
+                });
+        
+                document.getElementById('eraseBtn').addEventListener('click', function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    isAnnotating = false;
+                    toggleButtonsVisibility();
+                });
+        
+                function draw(x, y, isDown) {
+                    if (isDown) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 3;
+                        ctx.lineJoin = 'round';
+                        ctx.moveTo(lastX, lastY);
+                        ctx.lineTo(x, y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                    lastX = x; lastY = y;
+                }
+        
+                function toggleButtonsVisibility() {
+                    var eraseBtn = document.getElementById('eraseBtn');
+                    var saveBtn = document.getElementById('saveBtn');
+                    if (isAnnotating) {
+                        eraseBtn.style.display = 'block';
+                        saveBtn.style.display = 'block';
+                    } else {
+                        eraseBtn.style.display = 'none';
+                        saveBtn.style.display = 'none';
+                    }
+                }
+        
+                document.getElementById('saveBtn').addEventListener('click', function() {
+                    var dataURL = canvas.toDataURL('image/png');
+                    var formData = new FormData();
+                    formData.append('annotated_image', dataURL);
+                    var csrftoken = getCookie('csrftoken');
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '{% url "users:paper_view" 20 28 2121422 1 %}');
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            console.log('Image saved successfully');
+                        } else {
+                            console.error('Error saving image:', xhr.statusText);
+                        }
+                    };
+                    xhr.onerror = function() {
+                        console.error('Error saving image:', xhr.statusText);
+                    };
+                    xhr.send(formData);
+                });
+        
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+            }
+        </script>
+        {% endif %}
+        {% endif %}
+        
+
+
+    </body>
+
+</html>

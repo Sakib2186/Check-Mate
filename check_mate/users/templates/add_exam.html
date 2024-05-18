@@ -157,6 +157,27 @@
                                                                 value="{% if section_exam.exam_set == 0 %}None{% else %}{{section_exam.exam_set}}{% endif %}">
                                                         </div>
                                                     </div>
+                                                    {% if edit_exam %}
+                                                    <div class="form-group row">
+                                                        <label for="cmn-toggle"
+                                                               class="col-sm-3 col-form-label form-label">Available to TA:</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="form-group">
+                                                                <div class="custom-control custom-checkbox-toggle">
+                                                                    <input id="cmn-toggle"
+                                                                           type="checkbox"
+                                                                           aria-checked="false"
+                                                                           class="custom-control-input"
+                                                                           role="switch"
+                                                                           name="ta_available"
+                                                                           {% if section_exam.ta_available %}checked{% endif %}>
+                                                                    <label class="custom-control-label"
+                                                                           for="cmn-toggle"><span class="sr-only">Available to Teaching Assistant</span></label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
                                                     <div class="form-group row">
                                                         <label for="cmn-toggle"
                                                             class="col-sm-3 col-form-label form-label">Date (Tentative):</label>
@@ -196,6 +217,9 @@
                         </div>
                         {% if edit_exam %}                    
                         <div class="card">
+                            {% if section_exam.exam_mode.mode_id == 3 %}
+                            <p style="text-align:center;color:red;">Make sure all sets answer length is same</p>
+                            {% endif %}
                             <ul class="nav nav-tabs nav-tabs-card">
                                 {% if question_set|length == 0 %}
                                 <li class="nav-item">
@@ -208,12 +232,118 @@
                                 </li>
                                 {% endfor %}
                                 {% endif %}
+                                {% if section_exam.exam_mode.mode_id == 1 %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="#third" data-toggle="tab">Get Question</a>
                                 </li>
+                                {% else%}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#fourth" data-toggle="tab">Time</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#fifth" data-toggle="tab">Annouce Answer Template</a>
+                                </li>
+                                {% endif %}
+                                
                             </ul>
-                            
                             <div class="card-body tab-content">
+                                <div class="tab-pane" id="fourth">
+                                    <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Set Timer</h4>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+
+                                            <div class="col">
+                                                <label for="cmn-toggle"
+                                               class="col-sm-3 col-form-label form-label">Timeframe</label>
+                                                <div class="form-inline">
+                                                    <div class="form-group mr-2">
+                                                        <input type="number"
+                                                               class="form-control text-center"
+                                                               value="{% if time %}{{time.0}}{% else %}1{% endif %}"
+                                                               name="time_number"
+                                                               style="width:100px;">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <select class="custom-select" name="time_second_number">
+                                                            <option value="hour"
+                                                                    {% if time.1 == "hour" %}selected{% endif%}>Hours</option>
+                                                            <option value="minutes" {% if time.1 == "minutes" %}selected{% endif %}>Minutes</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="Save" name="save_time">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="col">
+                                                <label for="cmn-toggle"
+                                               class="col-sm-3 col-form-label form-label">Shuffle Papers</label>
+                                                <div class="form-inline">
+                                                    <div class="media-right text-right">
+                                                        <div class="form-group">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="Shuffle" name="shuffle_papers">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+                                            
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
+                                <div class="tab-pane" id="fifth">
+                                    <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title">Give Announcement</h4>
+                                        </div>
+                                        <div class="nestable" id="nestable">
+
+                                            <div class="col">
+                                                <label for="cmn-toggle"
+                                               class="col-sm-3 col-form-label form-label">Announcement <small>Make all sets answer length equal</small>:</label>
+                                                <div class="form-inline">
+                                                    <div class="form-group mr-2" style="border:1px solid black;">
+                                                        <input type="text"
+                                                               class="form-control text-center"
+                                                               value="{{announce.announcement}}"
+                                                               name="announcement"
+                                                               style="width:500px;">
+                                                    </div>
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="{% if announce %}Update{% else %}Save{% endif %}" name="save_announcement">
+                                                        </div>
+                                                    </div>
+                                                    {% if announce %}
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-danger btn-sm" value="Delete" name="delete_announcement">
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                    <div class="media-right text-right">
+                                                        <div style="width:100px">
+                                                            <input type="submit" class="btn btn-primary btn-sm" value="View Answer Template" name="answer_template">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
                                 {% if question_set|length == 0 %}
                                 <div class="tab-pane active" id="second">
                                     <div class="card">
@@ -221,7 +351,8 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('A')">Add Question <i class="fa-solid fa-plus"></i></a>&nbsp
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -236,7 +367,8 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" style="text-decoration:none;color:black;">{{questions.marks}}</a>&nbsp
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{questions.pk}}','{{questions.question_set}}','{{questions.question}}','{{questions.answer_field_length}}','{{questions.marks}}','{{questions.answer_field_length_number}}','{{questions.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -255,7 +387,8 @@
                                             <h4 class="card-title">Questions</h4>
                                         </div>
                                         <div class="card-header">
-                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>
+                                            
+                                            <a href="#" data-toggle="modal" data-target="#add_question" class="btn btn-outline-secondary" onclick="openModal('{{i.0}}')">Add Question <i class="fa-solid fa-plus"></i></a>&nbsp
                                         </div>
                                         <div class="nestable" id="nestable">
                                             <ul class="list-group list-group-fit nestable-list-plain mb-0">
@@ -271,7 +404,8 @@
                                                         </div>
                                                         <div class="media-right text-right">
                                                             <div style="width:100px">
-                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}')"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                                <a href="#" style="text-decoration:none;color:black;">{{question.marks}}</a>&nbsp
+                                                                <a href="#" data-toggle="modal" data-target="#edit_quiz" class="btn btn-primary btn-sm" onclick="openModal2('{{question.pk}}','{{question.question_set}}','{{question.question}}','{{question.answer_field_length}}','{{question.marks}}','{{question.answer_field_length_number}}','{{question.question_image}}')"><i class="fa-solid fa-pen-to-square"></i></a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -291,52 +425,54 @@
                                             <h4 class="card-title">Get Paper</h4>
                                         </div>
                                         <div class="card-body">
-                                            <!-- Form for creating a new quiz -->
-                                            {% comment %} <form id="quiz_form">
-                                                <div class="form-group row">
-                                                    <label for="quiz_title" class="col-sm-3 col-form-label form-label">Quiz Title:</label>
-                                                    <div class="col-sm-9">
-                                                        <input id="quiz_title" type="text" class="form-control" placeholder="Title" value="Vue.js Introduction">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="quiz_image" class="col-sm-3 col-form-label form-label">Quiz Image:</label>
-                                                    <div class="col-sm-9 col-md-4">
-                                                        <p><img src="assets/images/vuejs.png" alt="" width="150" class="rounded"></p>
-                                                        <div class="custom-file">
-                                                            <input type="file" id="quiz_image" class="custom-file-input">
-                                                            <label for="quiz_image" class="custom-file-label">Choose file</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="cmn-toggle" class="col-sm-3 col-form-label form-label">Timeframe</label>
-                                                    <div class="col-sm-9">
-                                                        <div class="form-group">
-                                                            <div class="custom-control custom-checkbox-toggle">
-                                                                <input id="cmn-toggle" type="checkbox" aria-checked="false" class="custom-control-input" role="switch">
-                                                                <label class="custom-control-label" for="cmn-toggle"><span class="sr-only">Timeframe</span></label>
+                                            <div class="nestable" id="nestable">
+                                                <ul class="list-group list-group-fit nestable-list-plain mb-0">
+                                                    {% if question_set|length == 0 %}
+                                                    <li class="list-group-item nestable-item">
+                                                        <form method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="media align-items-center">
+                                                            <div class="media-left">
+                                                                <span>Question Paper</span>
+                                                            </div>
+                                                            <div class="media-body">
+                                                               
+                                                            </div>
+                                                            <div class="media-right text-right">
+                                                                <div style="width:100px">
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download Docx">
+                                                                    <input type="hidden" name="question_set" value="A">
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-inline">
-                                                            <div class="form-group mr-2">
-                                                                <input type="number" class="form-control text-center" value="4" style="width:50px;">
+                                                        <br>
+                                                        </form>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% for x in question_set %}
+                                                    <li class="list-group-item nestable-item">
+                                                        <form method="POST">
+                                                        {% csrf_token %}
+                                                        <div class="media align-items-center">
+                                                            <div class="media-left">
+                                                                <span>Set {{x.0}}</span>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <select class="custom-select">
-                                                                    <option value="hour" selected>Hours</option>
-                                                                    <option value="minutes">Minutes</option>
-                                                                </select>
+                                                            <div class="media-body">
+                                                               
+                                                            </div>
+                                                            <div class="media-right text-right">
+                                                                <div style="width:100px">
+                                                                    <input type="submit" class="btn btn-primary btn-sm" name="download_question" value="Download Docx">
+                                                                    <input type="hidden" name="question_set" value="{{x.0}}">
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row mb-0">
-                                                    <div class="col-sm-9 offset-sm-3">
-                                                        <input type="submit" class="btn btn-primary next-tab" value="Save">
-                                                    </div>
-                                                </div>
-                                            </form> {% endcomment %}
+                                                        <br>
+                                                        </form>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -358,7 +494,7 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="POST">
+                                    <form method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="form-group row">
                                             <label for="qtitle"
@@ -378,13 +514,36 @@
                                             <label for="type"
                                                 class="col-form-label form-label col-md-3">Answering field:</label>
                                             <div class="col-md-4">
-                                                <select id="type"
+                                                <select id="answer_size"
                                                         class="custom-control custom-select form-control" name="answer_size" required>
                                                     <option value="0">----------</option>
                                                     <option value="Short">Short</option>
                                                     <option value="Medium">Medium</option>
                                                     <option value="Large">Large</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt"
+                                                class="col-form-label form-label col-md-3">Box Height:</label>
+                                            <div class="col-md-4">
+                                                <input id="bx-hgt"
+                                                    data-toggle="touch-spin"
+                                                    type="number"
+                                                    value=""
+                                                    name="box_height"
+                                                    required
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt-2"
+                                                class="col-form-label form-label col-md-3">Image (if any):</label>
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <input type="file" id="question_image_add" class="custom-file-input" name="question_image_add" accept="image/*">
+                                                    <label for="question_image_add" class="custom-file-label">Select</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -452,13 +611,38 @@
                                             <label for="type"
                                                 class="col-form-label form-label col-md-3">Answering field:</label>
                                             <div class="col-md-4">
-                                                <select id="answer_size"
-                                                        class="custom-control custom-select form-control" name="answer_size" required>
+                                                <select id="answer_size2"
+                                                        class="custom-control custom-select form-control" name="answer_size2" required>
                                                     <option value="0">----------</option>
                                                     <option value="Short">Short</option>
                                                     <option value="Medium">Medium</option>
                                                     <option value="Large">Large</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt2"
+                                                class="col-form-label form-label col-md-3">Box Height:</label>
+                                            <div class="col-md-4">
+                                                <input id="bx-hgt2"
+                                                    data-toggle="touch-spin"
+                                                    type="number"
+                                                    name="box_height2"
+                                                    required
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="bx-hgt"
+                                                class="col-form-label form-label col-md-3">Image (if any):</label>
+                                                <div class="col-md-4">
+                                                <p><img id = "question_image_modal" src="" alt="" width="150" class="rounded"></p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <input type="file" id="question_image_2" class="custom-file-input" name="question_image_edit" accept="image/*">
+                                                    <label for="quiz_image" class="custom-file-label">Select</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -518,7 +702,7 @@
             
               }
 
-            function openModal2(id,question_set,question,answering_field,marks) {
+            function openModal2(id,question_set,question,answering_field,marks,hgt,question_image) {
                 // Set data in the modal
                 var pk = document.getElementById('pk');
                 pk.value = id;
@@ -526,10 +710,15 @@
                 quest.value = question;
                 var quest_set = document.getElementById('question_set');
                 quest_set.value = question_set;
-                var answ = document.getElementById('answer_size');
+                var answ = document.getElementById('answer_size2');
                 answ.value = answering_field;
+                var bx_hgt = document.getElementById('bx-hgt2');
+                console.log(bx_hgt.value)
+                bx_hgt.value = hgt;
                 var mrk = document.getElementById('marks');
                 mrk.value = marks;
+                var img = document.getElementById('question_image_modal');
+                img.src = "{{ media_url }}" + question_image;
                 
               }
 
@@ -575,6 +764,38 @@
                 });
             });
 
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var selectField = document.getElementById('answer_size');
+                var inputField = document.getElementById('bx-hgt');
+        
+                selectField.addEventListener('change', function() {
+                    var selectedValue = selectField.value;
+                    if (selectedValue === 'Short') {
+                        inputField.value = 100;
+                    } else if (selectedValue === 'Medium') {
+                        inputField.value = 200;
+                    } else if (selectedValue === 'Large') {
+                        inputField.value = 400;
+                    } 
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                var selectField = document.getElementById('answer_size2');
+                var inputField = document.getElementById('bx-hgt2');
+        
+                selectField.addEventListener('change', function() {
+                    var selectedValue = selectField.value;
+                    if (selectedValue === 'Short') {
+                        inputField.value = 100;
+                    } else if (selectedValue === 'Medium') {
+                        inputField.value = 200;
+                    } else if (selectedValue === 'Large') {
+                        inputField.value = 400;
+                    }
+                });
+            });
         </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>

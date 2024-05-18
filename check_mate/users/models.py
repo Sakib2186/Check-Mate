@@ -1,12 +1,23 @@
 from django.db import models
 from django_resized import ResizedImageField
+import json
 import os
 
 #funtion for saving image path in os
 def course_picture_upload_path(instance, filename):
     # Generate file path dynamically
-    return os.path.join('Courses', str(instance.course_code), 'course_cover_picture', filename)
+    return os.path.join('Courses', f'{str(instance.course_code)}','cover_picture', filename)
+def question_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.questions_of.section.course_id.course_code)}',f'{str(instance.questions_of.section.section_number)}',f'{str(instance.questions_of.exam_type)}_{str(instance.questions_of.exam_title)}','questions', filename)
 
+def answer_picture_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',{str(instance.uploaded_by)}, filename)
+
+def file_upload_path(instance, filename):
+    # Generate file path dynamically
+    return os.path.join('Courses', f'{str(instance.exam_of.section.course_id.course_code)}',f'{str(instance.exam_of.section.section_number)}',f'{str(instance.exam_of.exam_type.exam_type)}_{str(instance.exam_of.exam_title)}','answers',{str(instance.student)}, filename)
 # Create your models here.
 
 class Session(models.Model):
@@ -86,7 +97,7 @@ class Course(models.Model):
 class Student(models.Model):
     
     student_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
@@ -101,7 +112,7 @@ class Student(models.Model):
 class Instructor(models.Model):
 
     instructor_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
@@ -116,7 +127,7 @@ class Instructor(models.Model):
 class Teaching_Assistant(models.Model):
 
     teaching_id = models.ForeignKey(School_Users,on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    courses = models.ForeignKey(Course,on_delete=models.CASCADE,blank=True,null=True)
     semester = models.ForeignKey(Session,on_delete = models.CASCADE)
     year = models.IntegerField(default = 0)
     section = models.IntegerField(default = 1)
@@ -180,6 +191,11 @@ class Section_Exam(models.Model):
     exam_date = models.DateField(null=True,blank=True)
     exam_time = models.CharField(max_length = 50,null=True,blank=True)
     exam_set = models.IntegerField(default = 0)
+    ta_available = models.BooleanField(default=False)
+    is_started = models.BooleanField(default= False)
+    is_stopped = models.BooleanField(default = False)
+    is_completed = models.BooleanField(default = False)
+    is_checked = models.BooleanField(default  = False)
 
     def __str__(self) -> str:
         return str(self.section)
@@ -187,20 +203,90 @@ class Section_Exam(models.Model):
     class Meta:
 
         verbose_name = "Section Exam"
+class Students_Score(models.Model):
+
+    exam_of = models.ForeignKey(Section_Exam,on_delete = models.CASCADE)
+    student = models.ForeignKey(School_Users,on_delete = models.CASCADE)
+    score = models.IntegerField(default = 0)
+    total_marks = models.IntegerField(default = 0)
+    exam_type= models.ForeignKey(Exam_Type,on_delete = models.CASCADE)
+
+
+    def __str__(self) -> str:
+        return str(self.exam_of)
     
+    class Meta:
+        verbose_name = "Student Score"
+class Exam_Submitted(models.Model):
+
+    exam_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    student = models.ForeignKey(School_Users,on_delete=models.CASCADE)
+    is_uploaded  = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.exam_of)
+    
+    class Meta:
+
+        verbose_name = "Exam Submitted"
 
 class Question(models.Model):
 
     questions_of = models.ForeignKey(Section_Exam,on_delete=models.CASCADE)
+    question_number = models.IntegerField(null=True,blank=True,default=1)
     question = models.TextField(null=True,blank=True)
     answer_field_length = models.CharField(max_length=100,null=True,blank=True)#short,medium,long
+    answer_field_length_number = models.IntegerField(default = 0)
     marks = models.IntegerField(default = 0)
     question_set = models.CharField(max_length=10,null=True,blank=True)
+    question_image =  ResizedImageField(size=[500, 300], upload_to=question_picture_upload_path, blank=True, null=True)
 
     def __str__(self) -> str:
         return str(self.questions_of)
-    
+      
     class Meta:
 
         verbose_name = "Questions"
 
+class Answer(models.Model):
+
+    answer_of = models.ForeignKey(Question,on_delete=models.CASCADE)
+    uploaded_by = models.ForeignKey(School_Users,on_delete=models.CASCADE,null=True)
+    answer_textfield = models.TextField(blank=True,null=True)
+    answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
+    marks_obtained = models.IntegerField(default = 0)
+    comment = models.TextField(null=True,blank=True)
+
+
+    def __str__(self) -> str:
+        return str(self.answer_of)
+    
+    class Meta:
+
+        verbose_name = "Answers"
+
+class Shuffled_Papers(models.Model):
+
+    student = models.ForeignKey(Student,on_delete = models.CASCADE)
+    course_id = models.ForeignKey(Course_Section,on_delete=models.CASCADE,null=True)
+    set_name = models.CharField(max_length=10,null=True,blank=True,default="A")
+
+    def __str__(self) -> str:
+        return str(self.student)
+    
+    class Meta:
+
+        verbose_name = "Shuffled Papers Student Info"
+
+class Announcements(models.Model):
+
+    section_exam = models.ForeignKey(Section_Exam,on_delete = models.CASCADE)
+    announcement = models.TextField(null=True,blank=True)
+    given_by = models.CharField(max_length=20,default = "",null=True,blank=True)
+
+    def __str__(self) -> str:
+        return str(self.section_exam)
+    
+    class Meta:
+
+        verbose_name = "Announcement"
