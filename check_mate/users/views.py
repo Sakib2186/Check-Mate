@@ -950,12 +950,8 @@ def edit_exam(request,course_id,exam_id):
                     delete = Announcements.objects.get(section_exam = section_exam,announcement = annoucement)
                     delete.delete()
 
-                    if Save.save_announcement(section_exam,annoucement):
-                        messages.success(request,"Announcement Deleted Successfully!")
-                        return redirect('users:edit_exam',course_id,section_exam.pk)
-                    else:
-                        messages.error(request,"Error Occured")
-                        return redirect('users:edit_exam',course_id,section_exam.pk)
+                    messages.success(request,"Announcement Deleted Successfully!")
+                    return redirect('users:edit_exam',course_id,section_exam.pk)
                     
 
                 if request.POST.get('download_question') or request.POST.get('answer_template'):
@@ -1783,11 +1779,9 @@ def announcements(request):
             if request.POST.get('download_paper'):
                 
                 doc = Document()
-                section_exam = request.POST.get('get_value')
+                section_exam = int(request.POST.get('get_value'))
                 set_number = "A"
-                print("herer")
                 questions = Load_Courses.get_questions_and_marks_list(section_exam,set_number)
-                
                 for section in doc.sections:
                     section.top_margin = Inches(1)  # Adjust margin as needed
                     section.bottom_margin = Inches(1)
