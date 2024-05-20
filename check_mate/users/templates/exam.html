@@ -245,6 +245,7 @@
                                         
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
+                                        {% if student_id != 0 %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
@@ -265,6 +266,7 @@
                                                 
                                             </li>
                                         </ul>
+                                        {% endif %}
                                         </form>
                                         
                                         <div class="sidebar-heading">Uploaded -

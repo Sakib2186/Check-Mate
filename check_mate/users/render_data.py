@@ -15,7 +15,12 @@ from io import BytesIO
 from ultralytics import YOLO
 from PIL import Image
 import threading
+from ultralytics.engine.results import Results
+from ultralytics.utils.plotting import save_one_box
+import logging
+from pathlib import Path
 
+LOGGER = logging.getLogger(__name__)
 
 class Login:
 
@@ -867,7 +872,8 @@ class Save:
             os.remove(img_path)
         
         for r in range(len(result)):
-            result[r].save()
+            Results.save_crop = Save.custom_save_crop
+            result[r].save_crop(save_dir=img_dir, file_name="crop_image.jpg")
             
 
 
@@ -934,6 +940,28 @@ class Save:
         annouce.save()
 
         return True
+    
+    def custom_save_crop(self, save_dir, file_name=Path("im.jpg")):
+        """
+        Save cropped predictions to `save_dir/file_name.jpg`.
+
+        Args:
+            save_dir (str | pathlib.Path): Save path.
+            file_name (str | pathlib.Path): File name.
+        """
+        if self.probs is not None:
+            LOGGER.warning("WARNING ⚠️ Classify task do not support `save_crop`.")
+            return
+        if self.obb is not None:
+            LOGGER.warning("WARNING ⚠️ OBB task do not support `save_crop`.")
+            return
+        for d in self.boxes:
+            save_one_box(
+                d.xyxy,
+                self.orig_img.copy(),
+                file=Path(save_dir) / f"{Path(file_name).stem}.jpg",
+                BGR=True,
+            )
 
 
 class Delete:
