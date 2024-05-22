@@ -261,6 +261,7 @@
         </script>
 
         {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
+        
         {% if  answer.answer_image %}
         <script>
             window.onload = function() {
@@ -281,7 +282,7 @@
                     ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
                 };
                 img.src = "{{media_url}}{{ answer.answer_image }}";
-        
+                {% if 1 in user_type or 3 in user_type %}
                 canvas.addEventListener('mousedown', function (e) {
                     mousePressed = true;
                     var rect = canvas.getBoundingClientRect();
@@ -393,6 +394,7 @@
                     }
                     return cookieValue;
                 }
+                {% endif %}
             }
         </script>
         {% endif %}

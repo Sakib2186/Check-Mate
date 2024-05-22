@@ -546,9 +546,10 @@ class Load_Courses:
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
         question_answer_list = {}
+        session = Session.objects.get(current = True)
         if section_exam.exam_mode.mode_id == 1 and student_id != None and student_id != 0:
 
-            shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+            shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(courses=section_exam.section.course_id,semester=session,student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
             questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
             
             for q in questions:
@@ -810,6 +811,11 @@ class Save:
             for student in all_students:
                 answer = Answer.objects.create(answer_of = question_exam,uploaded_by =student.student_id)
                 answer.save()
+                try:
+                    shuff = Shuffled_Papers.objects.get(student = student,course_id = section_exm.section)
+                except:
+                    shuff = Shuffled_Papers.objects.create(student = student,course_id = section_exm.section,set_name = "A")
+                shuff.save()
             message = "Question Saved!"
         return (True,message)
 
@@ -861,9 +867,12 @@ class Save:
     def uploaded_answer_file(user,file,exam_id,student_id = None):
 
         '''This method will save the file uploaded by the user'''
-        section_exam = Load_Courses.get_saved_section_exams(exam_id)
 
-        shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        session = Session.objects.get(current = True)
+        if section_exam.exam_mode.mode_id == 3:
+            student_id = user.user_id
+        shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(courses=section_exam.section.course_id,semester=session,student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
         questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
         
         count = 0
@@ -894,7 +903,7 @@ class Save:
         for r in range(len(result)):
             Results.save_crop = Save.custom_save_crop
             result[r].save_crop(save_dir=img_dir, file_name="crop_image.jpg")
-        print("About to")
+
         idx= 0
         for img_file in sorted(os.listdir(img_dir)):
 
@@ -905,8 +914,6 @@ class Save:
                     img_number = int(img_file[len("crop_image"):-len(".jpg")])
                 except:
                     img_number = 1
-                print("printing image number herer hrere her")
-                print(img_number)
                 # Load the cropped image
                 cropped_img = Image.open(img_path)
 

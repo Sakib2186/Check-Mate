@@ -224,7 +224,7 @@ class Exam_Submitted(models.Model):
     is_uploaded  = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return str(self.exam_of)
+        return str(self.exam_of.exam_title)
     
     class Meta:
 

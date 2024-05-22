@@ -1229,6 +1229,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
             try:
                 user_submitted = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
                 is_uploaded = user_submitted.is_uploaded
+                print(is_uploaded)
             except:
                 #ta trying to get in
                 ta_allowed = section_exam.ta_available
