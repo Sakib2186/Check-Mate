@@ -20,8 +20,9 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
 from django.http import JsonResponse
 import xlwt
-
-
+import base64
+import os,time
+from django.core.files.base import ContentFile
 
 logger=logging.getLogger(__name__)
 
@@ -1214,7 +1215,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
         sets = Load_Courses.load_set_of_student(logged_in_user,course_id)
         questions = Load_Courses.get_question_and_marks(exam_id,sets)
         students_exam_material_during_exam = Load_Courses.get_exam_uploaded_students(exam_id)
-
+        answers = Load_Courses.load_students_answer(exam_id,student_id)
         print(questions)
         
         user_submitted = None
@@ -1347,6 +1348,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
                         'not_pending':not_pending_students,
                         'student_id':student_id,
                         'is_uploaded':is_uploaded,
+                        'quest_ans_dic':answers,
             }
             return render(request,"exam.html",context)
         else:
@@ -1503,6 +1505,7 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
         logged_in_ta = False
 
         question = Question.objects.get(pk = question_pk,questions_of = section_exam)
+        print(question.pk)
         answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
 
 
@@ -1533,11 +1536,32 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
 
         if request.method == 'POST':
 
-            # annotated_image = request.POST.get('annotated_image')
-            # # Process the annotated image data here
-            # # Example: Save the image to a file or database
-            # print(annotated_image)
-            # return JsonResponse({'message': 'Image saved successfully'})
+            annotated_image = request.POST.get('annotated_image')
+            # Process the annotated image data here
+            # Example: Save the image to a file or database
+
+
+            if annotated_image:
+                path = settings.MEDIA_ROOT+str(answer.answer_image)
+                if os.path.isfile(path):
+                    print("Here")
+                    os.remove(path)
+
+                format, imgstr = annotated_image.split(';base64,')
+        
+                # Decode the base64 string to binary data
+                img_data = base64.b64decode(imgstr)
+                
+                # Generate a file name
+                file_name = f'annotated_{int(time.time())}.png'
+                
+                # Create a Django file
+                django_file = ContentFile(img_data, name=file_name)
+                
+                # Assign this file to the answer_image field
+                answer.answer_image.save(file_name, django_file, save=False)
+                answer.save()
+            
 
             if request.POST.get('submit_marks_comment'):
                 marks = request.POST.get('marks')
@@ -1573,6 +1597,7 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
                                 'student_id':student_id,
                                 'question_back':question_back,
                                 'answer_back':answer_back,
+                                'question_pk':question_pk,
 
         }
 

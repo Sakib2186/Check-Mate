@@ -37,6 +37,25 @@
                 background-color: rgba(0, 0, 0, 0.9);
                 object-fit: contain;
             }
+            .submitted-images-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px; /* Adjust the gap as needed */
+                margin-top: 20px;
+            }
+            
+            .submitted-image-wrapper {
+                width: calc(100% - 40px); /* Adjust width */
+                max-width: 1500px; /* Adjust max-width as needed */
+            }
+            
+            .submitted-image {
+                width: 100%;
+                height: auto;
+                display: block;
+                max-width: 100%;
+            }
         </style>
     </head>
 
@@ -225,12 +244,26 @@
                                     <div class="card">
                                         <div class="card-body text-center">
                                             {% if student_id == 0 %}
-                                            Upload Students Paper
+                                            Upload Students Paper<br>
+                                            <small>Select student from the right</small>
                                             {% else %}
                                             Upload Paper For - {{student_id}}
                                             {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                                <div class="submitted-images-container">
+                                    {% for q,a in quest_ans_dic.items %}
+                                    <div class="media-body">
+                                        <h4 class="card-title">
+                                            Q-{{forloop.counter}}. {{q.question}}
+                                        </h4>
+                                    </div>
+                                    <div class="submitted-image-wrapper">
+                                        <img class="submitted-image" src="{{media_url}}{{a.answer_image}}" alt="Submitted Image">
+                                    </div>
+                                    <br><hr>
+                                    {% endfor %}
                                 </div>
                             </div>
                             </div>
@@ -271,7 +304,7 @@
                                         
                                         <div class="sidebar-heading">Uploaded -
                                             {% for student in not_pending %}
-                                            <a href="">
+                                            <a href="{% url 'users:exam' course_id exam_type exam_id student.user_id %}">
                                                 <span class="media align-items-center">
                                                     <span class="media-left">
                                                         <span class="btn btn-white btn-circle"><i class="fa-solid fa-check"></i></span>

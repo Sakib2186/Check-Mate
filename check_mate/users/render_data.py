@@ -413,7 +413,7 @@ class Load_Courses:
         student = School_Users.objects.get(user_id = student_id)
         ins = Student.objects.get(student_id =student,courses = section_exam.section.course_id,section = section_exam.section.section_number)
         student_set = Shuffled_Papers.objects.get(student = ins, course_id = section_exam.section)
-        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).order_by('-pk')
         question_answer = {}
         set_number = ""
         first_question = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).first()
@@ -542,7 +542,20 @@ class Load_Courses:
             return ann
                 
 
+    def load_students_answer(exam_id,student_id):
 
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        question_answer_list = {}
+        if section_exam.exam_mode.mode_id == 1 and student_id != None and student_id != 0:
+
+            shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+            questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
+            
+            for q in questions:
+                answer = Answer.objects.get(answer_of = q,uploaded_by = School_Users.objects.get(user_id = student_id))
+                question_answer_list[q] = answer
+
+        return question_answer_list
 
 
 
@@ -907,29 +920,27 @@ class Save:
                 answer = Answer.objects.get(
                     answer_of = questions[idx],
                     uploaded_by=School_Users.objects.get(user_id = student_id))
+                path = settings.MEDIA_ROOT+str(answer.answer_image)
+                if os.path.isfile(path):
+                    os.remove(path)
                 answer.answer_image.save(img_file, django_file)
                 answer.save()
                 idx += 1
                 # # Clean up the cropped image file
                 os.remove(img_path)
 
-                
-
-
-
-            
         
-        # if section_exam.exam_mode.mode_id == 3:
-        #     if user == None:
-        #         return False
+        if section_exam.exam_mode.mode_id == 3:
+            if user == None:
+                return False
 
-        #     exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
-        #     exm_submit.is_uploaded = True
-        #     exm_submit.save()
-        # elif section_exam.exam_mode.mode_id == 1:
-        #     exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
-        #     exm_submit.is_uploaded = True
-        #     exm_submit.save()
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = user)
+            exm_submit.is_uploaded = True
+            exm_submit.save()
+        elif section_exam.exam_mode.mode_id == 1:
+            exm_submit = Exam_Submitted.objects.get(exam_of = section_exam,student = School_Users.objects.get(user_id = student_id))
+            exm_submit.is_uploaded = True
+            exm_submit.save()
 
 
         return True
