@@ -18,6 +18,8 @@ import threading
 from ultralytics.engine.results import Results
 from ultralytics.utils.plotting import save_one_box
 import logging
+from io import BytesIO
+from django.core.files import File
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
@@ -847,11 +849,16 @@ class Save:
 
         '''This method will save the file uploaded by the user'''
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+
+        shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
+        
+        count = 0
         ####here apply question
         pdf = file
         pdf_bytes = pdf.read()
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-
+        
         img_dir = os.path.join(settings.MEDIA_ROOT, 'predicted_images')
         if not os.path.exists(img_dir):
             os.makedirs(img_dir)
@@ -870,11 +877,43 @@ class Save:
             # Process YOLO detection results as needed
             # Delete the temporary image file after processing
             os.remove(img_path)
-        
+        len(result)
         for r in range(len(result)):
             Results.save_crop = Save.custom_save_crop
             result[r].save_crop(save_dir=img_dir, file_name="crop_image.jpg")
-            
+        print("About to")
+        idx= 0
+        for img_file in sorted(os.listdir(img_dir)):
+
+            if img_file.startswith("crop_image") and img_file.endswith(".jpg"):
+                print("inside")
+                img_path = os.path.join(img_dir, img_file)
+                try:
+                    img_number = int(img_file[len("crop_image"):-len(".jpg")])
+                except:
+                    img_number = 1
+                print("printing image number herer hrere her")
+                print(img_number)
+                # Load the cropped image
+                cropped_img = Image.open(img_path)
+
+                # Save the cropped image to a BytesIO object
+                img_byte_arr = BytesIO()
+                cropped_img.save(img_byte_arr, format='JPEG')
+                img_byte_arr.seek(0)
+                
+                django_file = File(img_byte_arr, name=img_file)
+                # # Save the cropped image to the Answer model
+                answer = Answer.objects.get(
+                    answer_of = questions[idx],
+                    uploaded_by=School_Users.objects.get(user_id = student_id))
+                answer.answer_image.save(img_file, django_file)
+                answer.save()
+                idx += 1
+                # # Clean up the cropped image file
+                os.remove(img_path)
+
+                
 
 
 

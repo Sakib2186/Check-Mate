@@ -13,7 +13,7 @@ def question_picture_upload_path(instance, filename):
 
 def answer_picture_upload_path(instance, filename):
     # Generate file path dynamically
-    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',{str(instance.uploaded_by)}, filename)
+    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',str(instance.uploaded_by), filename)
 
 def file_upload_path(instance, filename):
     # Generate file path dynamically
@@ -259,7 +259,7 @@ class Answer(models.Model):
 
 
     def __str__(self) -> str:
-        return str(self.answer_of)
+        return str(self.answer_of.question)
     
     class Meta:
 
