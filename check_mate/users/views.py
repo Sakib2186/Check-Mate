@@ -32,7 +32,7 @@ def check_mate(request):
     if request.user.is_authenticated:
         return redirect('users:dashboard')
     else:
-        return HttpResponse("Landing Page")
+        return redirect('users:login')
 
     
 def login(request):
