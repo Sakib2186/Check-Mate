@@ -8,6 +8,22 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import os
 import random
+import fitz
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from io import BytesIO
+from ultralytics import YOLO
+from PIL import Image
+import threading
+from ultralytics.engine.results import Results
+from ultralytics.utils.plotting import save_one_box
+import logging
+from io import BytesIO
+from django.core.files import File
+from pathlib import Path
+
+LOGGER = logging.getLogger(__name__)
+
 class Login:
 
     '''This class will hold all the functionalities to log in and regsitration of new user'''
@@ -135,6 +151,111 @@ class Login:
         return type
 
 class Load_Courses:
+
+    def get_bar_chart_stats(logged_in_user):
+
+        semester = Session.objects.get(current=True)
+        #role of user
+        roles = []
+        if logged_in_user == None:
+            roles.append(3)
+        else:
+            user_role = logged_in_user.user_role.all()
+            for i in user_role:
+                roles.append(i.role_id)
+        courses_list = []
+        count_list = []
+        all_courses = []
+        highest_achiever = []
+        highest_marks = []
+        #getting all courses of this user
+        if 3 in roles:
+            #as admin so getting all courses
+            all_courses = Course_Section.objects.filter(semester = semester,year = semester.year)
+            for course in all_courses:
+                sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                courses_list.append(name_sec)
+                count_list.append(sec_exam_count)
+
+                sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                print(sec_exam)
+                highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                
+                if highest_mark == None:
+                    continue
+                print(highest_mark.student.user_id)
+                new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                highest_achiever.append(new)
+                highest_marks.append(highest_mark.score)
+        elif 2 in roles:
+            try:
+                #getting students courses
+                student_courses = Student.objects.filter(student_id = logged_in_user,semester = semester,year = semester.year)
+
+                for course in student_courses:
+
+                    course_obj = Course.objects.get(id = course.courses.pk)
+                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year,section_number = course.section)
+
+                    #checking which course section belongs to this student
+                    for i in specific_course:
+                        try:
+                            stud = None
+                            stud = i.students.get(student_id = logged_in_user)
+                            if stud:
+                                all_courses.append(i)
+                                
+                        except:
+                            pass
+                    for course in all_courses:
+                        sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                        name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                        courses_list.append(name_sec)
+                        count_list.append(sec_exam_count)
+
+                        sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                        print(sec_exam)
+                        highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                        
+                        if highest_mark == None:
+                            continue
+                        print(highest_mark.student.user_id)
+                        new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                        highest_achiever.append(new)
+                        highest_marks.append(highest_mark.score)
+            except:
+                pass
+
+        elif 1 in roles:
+            try:
+                #loading instructors courses
+                instructor_courses = Instructor.objects.filter(instructor_id = logged_in_user,semester = semester,year = semester.year)
+                for course in instructor_courses:
+                    specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
+                    for i in specific_course:
+                        all_courses.append(i)
+            except:
+                pass
+            for course in all_courses:
+                sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                courses_list.append(name_sec)
+                count_list.append(sec_exam_count)
+
+                sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                print(sec_exam)
+                highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                
+                if highest_mark == None:
+                    continue
+                print(highest_mark.student.user_id)
+                new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                highest_achiever.append(new)
+                highest_marks.append(highest_mark.score)
+
+        return (courses_list[:6],count_list[:6],highest_achiever[:6],highest_marks[:6])
+
 
     def get_user_courses(logged_in_user):
 
@@ -301,7 +422,7 @@ class Load_Courses:
         for i in range(section_exam.exam_set):
             ascii_value = ord('A') + i
             letter = chr(ascii_value)
-            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-question_number')
+            questions = Question.objects.filter(questions_of = section_exam,question_set=letter).order_by('-pk')
             dic={}
             dic[letter]=questions
             sets.append((letter,dic))
@@ -317,7 +438,7 @@ class Load_Courses:
         answer_length = []
         question_images = []
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
-        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('pk')
+        questions = Question.objects.filter(questions_of = section_exam,question_set=question_set).order_by('-pk')
         for q in questions:
             question_list.append(str(q.question))
             marks_list.append(str(q.marks))
@@ -397,7 +518,7 @@ class Load_Courses:
         student = School_Users.objects.get(user_id = student_id)
         ins = Student.objects.get(student_id =student,courses = section_exam.section.course_id,section = section_exam.section.section_number)
         student_set = Shuffled_Papers.objects.get(student = ins, course_id = section_exam.section)
-        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).order_by('-pk')
         question_answer = {}
         set_number = ""
         first_question = Question.objects.filter(questions_of = section_exam,question_set = student_set.set_name).first()
@@ -515,7 +636,7 @@ class Load_Courses:
                 section_exam = Section_Exam.objects.filter(section = course_section)
                 for exam in section_exam:
                     ann = ann + list(Announcements.objects.filter(section_exam = exam).order_by('-pk'))
-                    return ann
+            return ann
         if 2 in type_of_logged_in_user:
             students = Student.objects.filter(student_id=logged_in_user,semester = session,year = session.year)
             for course in students:
@@ -523,9 +644,24 @@ class Load_Courses:
                 section_exam = Section_Exam.objects.filter(section = course_section)
                 for exam in section_exam:
                     ann =ann + list(Announcements.objects.filter(section_exam = exam.pk).order_by('-pk'))
-                    return ann
+            return ann
+                
 
+    def load_students_answer(exam_id,student_id):
 
+        section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        question_answer_list = {}
+        session = Session.objects.get(current = True)
+        if section_exam.exam_mode.mode_id == 1 and student_id != None and student_id != 0:
+
+            shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(courses=section_exam.section.course_id,semester=session,student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+            questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
+            
+            for q in questions:
+                answer = Answer.objects.get(answer_of = q,uploaded_by = School_Users.objects.get(user_id = student_id))
+                question_answer_list[q] = answer
+
+        return question_answer_list
 
 
 
@@ -780,6 +916,11 @@ class Save:
             for student in all_students:
                 answer = Answer.objects.create(answer_of = question_exam,uploaded_by =student.student_id)
                 answer.save()
+                try:
+                    shuff = Shuffled_Papers.objects.get(student = student,course_id = section_exm.section)
+                except:
+                    shuff = Shuffled_Papers.objects.create(student = student,course_id = section_exm.section,set_name = "A")
+                shuff.save()
             message = "Question Saved!"
         return (True,message)
 
@@ -833,6 +974,74 @@ class Save:
         '''This method will save the file uploaded by the user'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        session = Session.objects.get(current = True)
+        if section_exam.exam_mode.mode_id == 3:
+            student_id = user.user_id
+        shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(courses=section_exam.section.course_id,semester=session,student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
+        questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
+        
+        count = 0
+        ####here apply question
+        pdf = file
+        pdf_bytes = pdf.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        
+        img_dir = os.path.join(settings.MEDIA_ROOT, 'predicted_images')
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+
+        saved_image_paths = []
+        result = []
+        for i, page in enumerate(doc):
+            pix = page.get_pixmap()
+            image_bytes = pix.tobytes() 
+            img = Image.open(BytesIO(image_bytes))
+            saved_image_paths.append(Save.save_image(img, exam_id, i))
+        
+        for img_path in saved_image_paths:
+            img = Image.open(img_path)
+            result += Save.apply_yolo_detection(img)
+            # Process YOLO detection results as needed
+            # Delete the temporary image file after processing
+            os.remove(img_path)
+        len(result)
+        for r in range(len(result)):
+            Results.save_crop = Save.custom_save_crop
+            result[r].save_crop(save_dir=img_dir, file_name="crop_image.jpg")
+
+        idx= 0
+        for img_file in sorted(os.listdir(img_dir)):
+
+            if img_file.startswith("crop_image") and img_file.endswith(".jpg"):
+                print("inside")
+                img_path = os.path.join(img_dir, img_file)
+                try:
+                    img_number = int(img_file[len("crop_image"):-len(".jpg")])
+                except:
+                    img_number = 1
+                # Load the cropped image
+                cropped_img = Image.open(img_path)
+
+                # Save the cropped image to a BytesIO object
+                img_byte_arr = BytesIO()
+                cropped_img.save(img_byte_arr, format='JPEG')
+                img_byte_arr.seek(0)
+                
+                django_file = File(img_byte_arr, name=img_file)
+                # # Save the cropped image to the Answer model
+                answer = Answer.objects.get(
+                    answer_of = questions[idx],
+                    uploaded_by=School_Users.objects.get(user_id = student_id))
+                path = settings.MEDIA_ROOT+str(answer.answer_image)
+                if os.path.isfile(path):
+                    os.remove(path)
+                answer.answer_image.save(img_file, django_file)
+                answer.save()
+                idx += 1
+                # # Clean up the cropped image file
+                os.remove(img_path)
+
+        
         if section_exam.exam_mode.mode_id == 3:
             if user == None:
                 return False
@@ -847,7 +1056,22 @@ class Save:
 
 
         return True
-    
+
+    def save_image(img, exam_id, page_num):
+        # Save the image to a temporary location
+        img_dir = os.path.join(settings.MEDIA_ROOT, 'temporary_images')
+        if not os.path.exists(img_dir):
+            os.makedirs(img_dir)
+        img_path = os.path.join(img_dir, f"temp_page_{page_num}_exam_{exam_id}.jpg")
+        img.save(img_path)
+        return img_path
+
+    def apply_yolo_detection(img):
+        # Apply YOLO object detection on the image
+        model = YOLO('yolov8predict.pt') 
+        result = model.predict(img,imgsz=320, conf=0.5)
+        return result
+
     def save_marks_comment(question_pk,marks,comment,student_id):
 
         '''Thus function will save the marks and comments for a answer'''
@@ -878,6 +1102,28 @@ class Save:
         annouce.save()
 
         return True
+    
+    def custom_save_crop(self, save_dir, file_name=Path("im.jpg")):
+        """
+        Save cropped predictions to `save_dir/file_name.jpg`.
+
+        Args:
+            save_dir (str | pathlib.Path): Save path.
+            file_name (str | pathlib.Path): File name.
+        """
+        if self.probs is not None:
+            LOGGER.warning("WARNING ⚠️ Classify task do not support `save_crop`.")
+            return
+        if self.obb is not None:
+            LOGGER.warning("WARNING ⚠️ OBB task do not support `save_crop`.")
+            return
+        for d in self.boxes:
+            save_one_box(
+                d.xyxy,
+                self.orig_img.copy(),
+                file=Path(save_dir) / f"{Path(file_name).stem}.jpg",
+                BGR=True,
+            )
 
 
 class Delete:

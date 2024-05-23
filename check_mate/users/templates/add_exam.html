@@ -139,7 +139,9 @@
                                                                     class="custom-select form-control" name="exam_mode">
                                                                 <option value="0" selected>-------------</option>
                                                                 {% for modes in exam_modes %}
+                                                                {% if modes.mode_id != 2 %}
                                                                 <option value="{{modes.mode_id}}" {% if modes == section_exam.exam_mode %}selected{% endif %}>{{modes.mode}}</option>
+                                                                {% endif %}
                                                                 {% endfor %}
                                                                 
                                                             </select>

@@ -120,6 +120,7 @@
                                         
                                     </div>
                                 </div>
+                                
                                 {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
                                 <div class="card">
                                     <button id="eraseBtn" class="btn btn-danger">Erase Annotations</button>
@@ -260,6 +261,7 @@
         </script>
 
         {% if section_exam.exam_mode.mode_id == 1 or section_exam.exam_mode.mode_id == 3%}
+        
         {% if  answer.answer_image %}
         <script>
             window.onload = function() {
@@ -272,12 +274,15 @@
                 
 
                 img.onload = function () {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
+                    var canvasWidth = canvas.parentElement.clientWidth; // Adjust to parent width
+                    var aspectRatio = img.width / img.height;
+                    var canvasHeight = canvasWidth / aspectRatio; // Calculate height based on aspect ratio
+                    canvas.width = canvasWidth;
+                    canvas.height = canvasHeight;
+                    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
                 };
-                img.src = {{ answer.answer_image }}
-        
+                img.src = "{{media_url}}{{ answer.answer_image }}";
+                {% if 1 in user_type or 3 in user_type %}
                 canvas.addEventListener('mousedown', function (e) {
                     mousePressed = true;
                     var rect = canvas.getBoundingClientRect();
@@ -327,6 +332,20 @@
                     }
                     lastX = x; lastY = y;
                 }
+                // Redraw the image onto the canvas
+                function redrawImage() {
+                    var canvasWidth = canvas.width;
+                    var canvasHeight = canvas.height;
+                    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Clear the canvas
+                    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight); // Draw the image with canvas width and height
+                }
+
+                // Handle erase annotation event
+                document.getElementById('eraseBtn').addEventListener('click', function () {
+                    redrawImage(); // Redraw the image
+                    isAnnotating = false;
+                    toggleButtonsVisibility();
+                });
         
                 function toggleButtonsVisibility() {
                     var eraseBtn = document.getElementById('eraseBtn');
@@ -346,7 +365,7 @@
                     formData.append('annotated_image', dataURL);
                     var csrftoken = getCookie('csrftoken');
                     var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '{% url "users:paper_view" 20 28 2121422 1 %}');
+                    xhr.open('POST', '{% url "users:paper_view" course_id exam_id student_id question_pk %}');
                     xhr.setRequestHeader('X-CSRFToken', csrftoken);
                     xhr.onload = function() {
                         if (xhr.status === 200) {
@@ -375,6 +394,7 @@
                     }
                     return cookieValue;
                 }
+                {% endif %}
             }
         </script>
         {% endif %}

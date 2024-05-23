@@ -20,7 +20,9 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
 from django.http import JsonResponse
 import xlwt
-
+import base64
+import os,time
+from django.core.files.base import ContentFile
 
 logger=logging.getLogger(__name__)
 
@@ -30,7 +32,7 @@ def check_mate(request):
     if request.user.is_authenticated:
         return redirect('users:dashboard')
     else:
-        return HttpResponse("Landing Page")
+        return redirect('users:login')
 
     
 def login(request):
@@ -202,7 +204,11 @@ def dashboard(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
-
+        bar_chart_stats = Load_Courses.get_bar_chart_stats(logged_in_user)
+        print(bar_chart_stats[0])
+        print(bar_chart_stats[1])
+        print(bar_chart_stats[2])
+        print(bar_chart_stats[3])
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -214,6 +220,7 @@ def dashboard(request):
             'logged_in_user':logged_in_user,
             'year':datetime.now().year,
             'current_semester':current_semester,
+            'bar_chart_stats':bar_chart_stats,
         }
 
         return render(request,"dashboard.html",context)
@@ -963,7 +970,7 @@ def edit_exam(request,course_id,exam_id):
                     if section_exam.exam_mode.mode_id == 1:
                         set_number = request.POST.get('question_set')
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
-                        print(questions[0])
+                        
                         for section in doc.sections:
                             section.top_margin = Inches(1)  # Adjust margin as needed
                             section.bottom_margin = Inches(1)
@@ -1213,7 +1220,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
         sets = Load_Courses.load_set_of_student(logged_in_user,course_id)
         questions = Load_Courses.get_question_and_marks(exam_id,sets)
         students_exam_material_during_exam = Load_Courses.get_exam_uploaded_students(exam_id)
-
+        answers = Load_Courses.load_students_answer(exam_id,student_id)
         print(questions)
         
         user_submitted = None
@@ -1227,6 +1234,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
             try:
                 user_submitted = Exam_Submitted.objects.get(exam_of = section_exam,student = logged_in_user)
                 is_uploaded = user_submitted.is_uploaded
+                print(is_uploaded)
             except:
                 #ta trying to get in
                 ta_allowed = section_exam.ta_available
@@ -1346,6 +1354,7 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
                         'not_pending':not_pending_students,
                         'student_id':student_id,
                         'is_uploaded':is_uploaded,
+                        'quest_ans_dic':answers,
             }
             return render(request,"exam.html",context)
         else:
@@ -1502,6 +1511,7 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
         logged_in_ta = False
 
         question = Question.objects.get(pk = question_pk,questions_of = section_exam)
+        print(question.pk)
         answer = Answer.objects.get(answer_of = question,uploaded_by = School_Users.objects.get(user_id = student_id))
 
 
@@ -1532,11 +1542,32 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
 
         if request.method == 'POST':
 
-            # annotated_image = request.POST.get('annotated_image')
-            # # Process the annotated image data here
-            # # Example: Save the image to a file or database
-            # print(annotated_image)
-            # return JsonResponse({'message': 'Image saved successfully'})
+            annotated_image = request.POST.get('annotated_image')
+            # Process the annotated image data here
+            # Example: Save the image to a file or database
+
+
+            if annotated_image:
+                path = settings.MEDIA_ROOT+str(answer.answer_image)
+                if os.path.isfile(path):
+                    print("Here")
+                    os.remove(path)
+
+                format, imgstr = annotated_image.split(';base64,')
+        
+                # Decode the base64 string to binary data
+                img_data = base64.b64decode(imgstr)
+                
+                # Generate a file name
+                file_name = f'annotated_{int(time.time())}.png'
+                
+                # Create a Django file
+                django_file = ContentFile(img_data, name=file_name)
+                
+                # Assign this file to the answer_image field
+                answer.answer_image.save(file_name, django_file, save=False)
+                answer.save()
+            
 
             if request.POST.get('submit_marks_comment'):
                 marks = request.POST.get('marks')
@@ -1572,6 +1603,7 @@ def paper_view(request,course_id,exam_id,student_id,question_pk):
                                 'student_id':student_id,
                                 'question_back':question_back,
                                 'answer_back':answer_back,
+                                'question_pk':question_pk,
 
         }
 

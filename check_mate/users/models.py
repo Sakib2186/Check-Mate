@@ -13,7 +13,7 @@ def question_picture_upload_path(instance, filename):
 
 def answer_picture_upload_path(instance, filename):
     # Generate file path dynamically
-    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',{str(instance.uploaded_by)}, filename)
+    return os.path.join('Courses', f'{str(instance.answer_of.questions_of.section.course_id.course_code)}',f'{str(instance.answer_of.questions_of.section.section_number)}',f'{str(instance.answer_of.questions_of.exam_type)}_{str(instance.answer_of.questions_of.exam_title)}','answers',str(instance.uploaded_by), filename)
 
 def file_upload_path(instance, filename):
     # Generate file path dynamically
@@ -213,7 +213,7 @@ class Students_Score(models.Model):
 
 
     def __str__(self) -> str:
-        return str(self.exam_of)
+        return str(self.exam_of.section.section_number)
     
     class Meta:
         verbose_name = "Student Score"
@@ -224,7 +224,7 @@ class Exam_Submitted(models.Model):
     is_uploaded  = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return str(self.exam_of)
+        return str(self.exam_of.exam_title)
     
     class Meta:
 
@@ -253,13 +253,13 @@ class Answer(models.Model):
     answer_of = models.ForeignKey(Question,on_delete=models.CASCADE)
     uploaded_by = models.ForeignKey(School_Users,on_delete=models.CASCADE,null=True)
     answer_textfield = models.TextField(blank=True,null=True)
-    answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True)
+    answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True,max_length=255)
     marks_obtained = models.IntegerField(default = 0)
     comment = models.TextField(null=True,blank=True)
 
 
     def __str__(self) -> str:
-        return str(self.answer_of)
+        return str(self.answer_of.question)
     
     class Meta:
 

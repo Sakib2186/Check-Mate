@@ -37,6 +37,25 @@
                 background-color: rgba(0, 0, 0, 0.9);
                 object-fit: contain;
             }
+            .submitted-images-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px; /* Adjust the gap as needed */
+                margin-top: 20px;
+            }
+            
+            .submitted-image-wrapper {
+                width: calc(100% - 40px); /* Adjust width */
+                max-width: 1500px; /* Adjust max-width as needed */
+            }
+            
+            .submitted-image {
+                width: 100%;
+                height: auto;
+                display: block;
+                max-width: 100%;
+            }
         </style>
     </head>
 
@@ -142,7 +161,7 @@
                                              data-value="8"
                                              data-unit="hour"></div>
                                         {% endif %}     
-                                        {% if 3 in type_of_logged_in_user or user_submitted.is_uploaded == false %}
+                                        {% if 3 in type_of_logged_in_user or user_submitted.is_uploaded == False %}
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
@@ -225,12 +244,28 @@
                                     <div class="card">
                                         <div class="card-body text-center">
                                             {% if student_id == 0 %}
-                                            Upload Students Paper
+                                            Upload Students Paper<br>
+                                            <small>Select student from the right</small>
                                             {% else %}
                                             Upload Paper For - {{student_id}}
                                             {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                                <div class="submitted-images-container">
+                                    {% for q,a in quest_ans_dic.items %}
+                                    {% if a.answer_image %}
+                                    <div class="media-body">
+                                        <h4 class="card-title">
+                                            Q-{{forloop.counter}}.{{q.question}}
+                                        </h4>
+                                    </div>
+                                    <div class="submitted-image-wrapper">
+                                        <img class="submitted-image" src="{{media_url}}{{a.answer_image}}" alt="Submitted Image">
+                                    </div>
+                                    <br><hr>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
                             </div>
                             </div>
@@ -245,6 +280,7 @@
                                         
                                         <form method="POST" id="pdf_upload_form" enctype="multipart/form-data"> 
                                             {% csrf_token %}
+                                        {% if student_id != 0 %}
                                         <div class="sidebar-heading">Submit (PDF)</div>
                                         <ul class="list-group list-group-fit">
                                             <li class="list-group-item">
@@ -265,11 +301,12 @@
                                                 
                                             </li>
                                         </ul>
+                                        {% endif %}
                                         </form>
                                         
                                         <div class="sidebar-heading">Uploaded -
                                             {% for student in not_pending %}
-                                            <a href="">
+                                            <a href="{% url 'users:exam' course_id exam_type exam_id student.user_id %}">
                                                 <span class="media align-items-center">
                                                     <span class="media-left">
                                                         <span class="btn btn-white btn-circle"><i class="fa-solid fa-check"></i></span>
@@ -316,14 +353,14 @@
                                 <form method="POST">
                                     {% csrf_token %}
                                 <div class="media align-items-center mb-headings">
-                                    <a href="{% url 'users:student_paper' course_id exam_id student_id %}" class="btn btn-info mr-2">Review Papers</a>
+                                    {% if is_uploaded %}<a href="{% url 'users:student_paper' course_id exam_id student_id %}" class="btn btn-info mr-2">Review Papers</a>{% endif %}
                                 </div>
                                 </form>
 
                                 <div class="card-group">
                                     <div class="card">
                                         <div class="card-body text-center">
-                                            {% if is_uploaded %}Your paper is still not uploaded yet!{% else %}Click Review to view paper{% endif %}
+                                            {% if not is_uploaded %}Your paper is still not uploaded yet!{% else %}Click Review to view paper{% endif %}
                                         </div>
                                     </div>
                                 </div>
