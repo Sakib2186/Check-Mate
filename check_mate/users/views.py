@@ -204,7 +204,11 @@ def dashboard(request):
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
         current_semester = Session.objects.get(current=True)
-
+        bar_chart_stats = Load_Courses.get_bar_chart_stats(logged_in_user)
+        print(bar_chart_stats[0])
+        print(bar_chart_stats[1])
+        print(bar_chart_stats[2])
+        print(bar_chart_stats[3])
         if logged_in_user == None:
             user = request.user.username
         else:
@@ -216,6 +220,7 @@ def dashboard(request):
             'logged_in_user':logged_in_user,
             'year':datetime.now().year,
             'current_semester':current_semester,
+            'bar_chart_stats':bar_chart_stats,
         }
 
         return render(request,"dashboard.html",context)

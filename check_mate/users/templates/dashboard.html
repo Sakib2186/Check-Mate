@@ -237,7 +237,7 @@
                                 <div class="media flex-wrap align-items-center">
                                     <div class="media-body"
                                          style="min-width: 180px">
-                                        User Name: <strong>{{logged_in_user.user_id}}, {{logged_in_user.user_first_name}}</strong>
+                                        Hi <strong>{{logged_in_user.user_id}}, {{logged_in_user.user_first_name}}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -303,10 +303,10 @@
             var myChart = new Chart(ctx, {
                 type: 'doughnut', // or 'line', 'pie', etc.
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    labels: {{bar_chart_stats.2 | safe}},
                     datasets: [{
                         label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: {{bar_chart_stats.3}},
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.8)',
                             'rgba(54, 162, 235, 0.8)',
@@ -327,6 +327,20 @@
                     }]
                 },
                 options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Latest Quiz Highest Score', // Title for the doughnut chart
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
                     animation: {
                         duration: 2000 // 2000 milliseconds = 2 seconds
                     },
@@ -341,35 +355,54 @@
             var myChart = new Chart(ctx, {
                 type: 'bar', // or 'line', 'pie', etc.
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    labels: {{bar_chart_stats.0 | safe}},
                     datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
+                        label: '# of Exams',
+                        data: {{bar_chart_stats.1}},
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.8)',
-                            'rgba(54, 162, 235, 0.8)',
-                            'rgba(255, 206, 86, 0.8)',
-                            'rgba(75, 192, 192, 0.8)',
-                            'rgba(153, 102, 255, 0.8)',
-                            'rgba(255, 159, 64, 0.8)'
+                            'rgba(41, 47, 86, 0.8)',
+                            'rgba(0, 98, 144, 0.8)',
+                            'rgba(0, 151, 163, 0.8)',
+                            'rgba(0, 207, 151, 0.8)',
+                            'rgba(172, 250, 112, 0.8)',
+                            'rgba(169, 224, 222, 0.8)'
                         ],
                         borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
+                            'rgba(41, 47, 86, 1)',
+                            'rgba(0, 98, 144, 1)',
+                            'rgba(0, 151, 163, 1)',
+                            'rgba(0, 207, 151, 1)',
+                            'rgba(172, 250, 112, 1)',
+                            'rgba(169, 224, 222, 1)'
                         ],
                         borderWidth: 0.5
                     }]
                 },
                 options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total Exams Per Section', // Title for the bar chart
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        }
+                    },
                     animation: {
                         duration: 2000 // 2000 milliseconds = 2 seconds
                  
                     },
                     scales: {
+                        x: {
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Exams Per Course', // Label for the x-axis
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
                         y: {
                             beginAtZero: true
                         }

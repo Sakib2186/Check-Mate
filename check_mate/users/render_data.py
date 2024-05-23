@@ -152,6 +152,111 @@ class Login:
 
 class Load_Courses:
 
+    def get_bar_chart_stats(logged_in_user):
+
+        semester = Session.objects.get(current=True)
+        #role of user
+        roles = []
+        if logged_in_user == None:
+            roles.append(3)
+        else:
+            user_role = logged_in_user.user_role.all()
+            for i in user_role:
+                roles.append(i.role_id)
+        courses_list = []
+        count_list = []
+        all_courses = []
+        highest_achiever = []
+        highest_marks = []
+        #getting all courses of this user
+        if 3 in roles:
+            #as admin so getting all courses
+            all_courses = Course_Section.objects.filter(semester = semester,year = semester.year)
+            for course in all_courses:
+                sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                courses_list.append(name_sec)
+                count_list.append(sec_exam_count)
+
+                sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                print(sec_exam)
+                highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                
+                if highest_mark == None:
+                    continue
+                print(highest_mark.student.user_id)
+                new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                highest_achiever.append(new)
+                highest_marks.append(highest_mark.score)
+        elif 2 in roles:
+            try:
+                #getting students courses
+                student_courses = Student.objects.filter(student_id = logged_in_user,semester = semester,year = semester.year)
+
+                for course in student_courses:
+
+                    course_obj = Course.objects.get(id = course.courses.pk)
+                    specific_course = Course_Section.objects.filter(course_id = course_obj,semester = semester,year = semester.year,section_number = course.section)
+
+                    #checking which course section belongs to this student
+                    for i in specific_course:
+                        try:
+                            stud = None
+                            stud = i.students.get(student_id = logged_in_user)
+                            if stud:
+                                all_courses.append(i)
+                                
+                        except:
+                            pass
+                    for course in all_courses:
+                        sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                        name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                        courses_list.append(name_sec)
+                        count_list.append(sec_exam_count)
+
+                        sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                        print(sec_exam)
+                        highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                        
+                        if highest_mark == None:
+                            continue
+                        print(highest_mark.student.user_id)
+                        new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                        highest_achiever.append(new)
+                        highest_marks.append(highest_mark.score)
+            except:
+                pass
+
+        elif 1 in roles:
+            try:
+                #loading instructors courses
+                instructor_courses = Instructor.objects.filter(instructor_id = logged_in_user,semester = semester,year = semester.year)
+                for course in instructor_courses:
+                    specific_course = Course_Section.objects.filter(course_id = course.courses.pk,semester = semester,year = semester.year,section_number = course.section)
+                    for i in specific_course:
+                        all_courses.append(i)
+            except:
+                pass
+            for course in all_courses:
+                sec_exam_count = Section_Exam.objects.filter(section = course).count()
+                name_sec = f"{course.course_id.course_code}.{course.section_number}"
+                courses_list.append(name_sec)
+                count_list.append(sec_exam_count)
+
+                sec_exam = Section_Exam.objects.filter(section = course,exam_type = Exam_Type.objects.get(type_id = 1)).order_by('-pk')[:1]
+                print(sec_exam)
+                highest_mark = Students_Score.objects.filter(exam_of = sec_exam).order_by('-score').first()
+                
+                if highest_mark == None:
+                    continue
+                print(highest_mark.student.user_id)
+                new = f"{highest_mark.exam_of.section.course_id.course_code}.{highest_mark.exam_of.section.section_number}"
+                highest_achiever.append(new)
+                highest_marks.append(highest_mark.score)
+
+        return (courses_list[:6],count_list[:6],highest_achiever[:6],highest_marks[:6])
+
+
     def get_user_courses(logged_in_user):
 
         #semester

@@ -213,7 +213,7 @@ class Students_Score(models.Model):
 
 
     def __str__(self) -> str:
-        return str(self.exam_of)
+        return str(self.exam_of.section.section_number)
     
     class Meta:
         verbose_name = "Student Score"
