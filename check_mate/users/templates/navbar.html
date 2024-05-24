@@ -11,18 +11,6 @@
                 <a href="{% url 'users:courses' %}"
                     class="nav-link">Courses</a>
             </li>
-            {% if 2 in user_type or 3 in user_type %}
-            <li class="nav-item dropdown">
-                <a href="#"
-                    class="nav-link">My Results</a>
-            </li>
-            {% endif %}
-            {% if 1 in user_type or 3 in user_type%}
-            <li class="nav-item dropdown">
-                <a href="#"
-                    class="nav-link">Take Exam</a>
-            </li>
-            {% endif %}
             <li class="nav-item dropdown">
                 <a href="{% url 'users:announcements' %}"
                     class="nav-link">Announcements</a>

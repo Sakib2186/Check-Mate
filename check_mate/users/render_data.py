@@ -1125,6 +1125,16 @@ class Save:
                 BGR=True,
             )
 
+    def update_profile_picture(profile_picture,user):
+
+        path = settings.MEDIA_ROOT+str(user.user_profile_picture)
+        if os.path.isfile(path):
+            os.remove(path)
+        user.user_profile_picture = profile_picture
+        user.save()
+
+        return True
+
 
 class Delete:
 
