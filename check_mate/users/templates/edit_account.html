@@ -69,9 +69,11 @@
                             <div class="tab-content card-body">
                                 <div class="tab-pane active"
                                      id="first">
-                                    <form method="POST"
+                                    <form method="POST" enctype="multipart/form-data"
                                           class="form-horizontal">
-                                          <div class="form-group row">
+                                          {% csrf_token %}
+                                        {% if 1 in user_type or 2 in user_type %}
+                                        <div class="form-group row">
                                             <label for="name"
                                                    class="col-sm-3 col-form-label form-label">Full Name</label>
                                             <div class="col-sm-8">
@@ -81,19 +83,22 @@
                                                                type="text"
                                                                class="form-control"
                                                                placeholder="First Name"
-                                                               value="MD.Sakib">
+                                                               value="MD.Sakib"
+                                                               disabled>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <input type="text"
                                                                class="form-control"
                                                                placeholder="Middle Name"
-                                                               value="">
+                                                               value=""
+                                                               disabled>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <input type="text"
                                                                class="form-control"
                                                                placeholder="Last Name"
-                                                               value="Sami">
+                                                               value="Sami"
+                                                               disabled>
                                                     </div>
                                                 </div>
                                             </div>
@@ -113,7 +118,9 @@
                                                              style="width: auto;">
                                                             <input type="file"
                                                                    id="avatar"
-                                                                   class="custom-file-input">
+                                                                   class="custom-file-input"
+                                                                   name="profile_picture"
+                                                                   accept="image/*">
                                                             <label for="avatar"
                                                                    class="custom-file-label">Choose file</label>
                                                         </div>
@@ -160,6 +167,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        {% endif %}
                                         <div class="form-group row">
                                             <label for="password"
                                                    class="col-sm-3 col-form-label form-label">Old Password</label>
@@ -173,7 +181,8 @@
                                                     <input type="password"
                                                            id="password"
                                                            class="form-control"
-                                                           placeholder="Enter old password">
+                                                           placeholder="Enter old password"
+                                                           name="old_password">
                                                 </div>
                                             </div>
                                         </div>
@@ -190,7 +199,8 @@
                                                     <input type="password"
                                                            id="password"
                                                            class="form-control"
-                                                           placeholder="Enter new password">
+                                                           placeholder="Enter new password"
+                                                           name="new_password">
                                                 </div>
                                             </div>
                                         </div>
@@ -207,7 +217,8 @@
                                                     <input type="password"
                                                            id="password"
                                                            class="form-control"
-                                                           placeholder="Confirm new password">
+                                                           placeholder="Confirm new password"
+                                                           name="confirm_new_password">
                                                 </div>
                                             </div>
                                         </div>
@@ -215,8 +226,8 @@
                                             <div class="col-sm-8 offset-sm-3">
                                                 <div class="media align-items-center">
                                                     <div class="media-left">
-                                                        <a href="#"
-                                                           class="btn btn-success">Save Changes</a>
+                                                        <input type="submit"
+                                                           class="btn btn-success" values = "Save Changes" name="Update">
                                                     </div>
                                                 </div>
                                             </div>
@@ -329,7 +340,16 @@
             </div>
 
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            {% for message in messages %}
+            {% if message.tags == 'error' %}
+            swal("Error!", "{{message}}", "error");
+            {% else %}
+            swal("Done!", "{{message}}", "success");
+            {% endif %}
+            {% endfor %}
+        </script>
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/popper.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.min.js' %}"></script>

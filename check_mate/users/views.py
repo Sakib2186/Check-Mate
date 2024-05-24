@@ -18,6 +18,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from io import BytesIO
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 import xlwt
 import base64
@@ -256,6 +257,56 @@ def edit_profile(request):
             user = request.user.username
         else:
             user = logged_in_user.user_id
+
+        if request.method == "POST":
+
+            if request.POST.get('Update'):
+
+                if 3 in type_of_logged_in_user:
+                    profile_picture = None
+                else:
+                    profile_picture = request.FILES['profile_picture']
+                
+                if profile_picture:
+                    
+                    if Save.update_profile_picture(profile_picture,logged_in_user):
+                        messages.success(request,"Profile picture updated")
+                    else:
+                        messages.error(request,"Error Occured while updating!")
+                    
+                    return redirect('users:edit_profile')
+                
+                old_password = None
+                old_password = request.POST.get('old_password')
+
+                if old_password:
+                    try:
+                        user = User.objects.get(username = logged_in_user.user_id)
+                        user = authenticate(username=logged_in_user.user_id, password=old_password)
+                    except:
+                        user = User.objects.get(username = request.user.username)
+                        user = authenticate(username=request.user.username, password=old_password)
+                    
+                    if user is not None:
+                    
+                        new_password = request.POST.get('new_password')
+                        confirm_new_password = request.POST.get('confirm_new_password')
+
+                        if new_password != "" or new_password != None:
+                            if new_password == confirm_new_password:
+                                user.set_password(new_password)
+                                user.save()
+                                messages.success(request,"Password Saved!")
+                            else:
+                                messages.error(request,"Password entered did not match!")
+                            return redirect('users:edit_profile')
+                        else:
+                            messages.error(request,"No Password Provided")
+                            return redirect('users:edit_profile')
+                    else:
+                        messages.error(request,"Old Password Did Not Match!")
+                        return redirect('users:edit_profile')
+
         context = {
             'page_title':'Check Mate',
             'user_type':type_of_logged_in_user,
