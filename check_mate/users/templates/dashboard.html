@@ -301,11 +301,11 @@
             
             var ctx = document.getElementById('myChart').getContext('2d');
             var myChart = new Chart(ctx, {
-                type: 'doughnut', // or 'line', 'pie', etc.
+                type: 'polarArea', // or 'line', 'pie', etc.
                 data: {
                     labels: {{bar_chart_stats.2 | safe}},
                     datasets: [{
-                        label: '# of Votes',
+                        label: 'Highest Mark',
                         data: {{bar_chart_stats.3}},
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.8)',
