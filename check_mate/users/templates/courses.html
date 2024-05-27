@@ -27,6 +27,13 @@
               href="{% static 'css/spinkit.css' %}"
               rel="stylesheet">
 
+        <style>
+            .more-text {
+                display: none;
+            }
+        </style>
+        
+
     </head>
 
     <body class=" fixed-layout">
@@ -74,7 +81,11 @@
                                         </a>
                                         <div class="card-body">
                                             <h5 class="card-title"><a href="{% url 'users:course' x.pk %}" class="card-link" style="text-decoration:none;color:black;">{{ x.course_id.course_code }}.{{x.section_number}}</a></h5>
-                                            <p class="card-text">{{x.course_id.course_description}}</p>
+                                            <p class="card-text">
+                                                {{ x.course_id.course_description|truncatechars:100 }}
+                                                <span class="more-text" style="display:none;">{{ x.course_id.course_description }}</span>
+                                                <a href="javascript:void(0);" class="read-more">Read more</a>
+                                            </p>
                                         </div>
                                         
                                     </div>
@@ -99,6 +110,23 @@
         <script src="{% static 'js/dom-factory.js' %}"></script>
         <script src="{% static 'js/material-design-kit.js' %}"></script>
         <script src="{% static 'js/check_mate.js' %}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const readMoreLinks = document.querySelectorAll('.read-more');
+                readMoreLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        const moreText = this.previousElementSibling;
+                        if (moreText.style.display === "none") {
+                            moreText.style.display = "inline";
+                            this.textContent = "Read less";
+                        } else {
+                            moreText.style.display = "none";
+                            this.textContent = "Read more";
+                        }
+                    });
+                });
+            });
+        </script>
 
 
     </body>
