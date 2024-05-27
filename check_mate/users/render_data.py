@@ -94,6 +94,7 @@ class Login:
             plain_message = strip_tags(html_message)
 
             email_from = settings.EMAIL_HOST_USER
+            print(email_from)
             subject="Registration OTP"
             recipient_list = []
             recipient_list.append(user.user_email)
@@ -105,7 +106,9 @@ class Login:
                 to = recipient_list,
             )
             sent_email.attach_alternative(html_message,"text/html")
+            print("email sen22")
             sent_email.send()
+            print("email sent")
             return True
         
         except:
