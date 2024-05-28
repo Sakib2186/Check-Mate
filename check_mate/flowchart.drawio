@@ -130,7 +130,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="28" value="Log Out" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.display;whiteSpace=wrap;rounded=1;labelBackgroundColor=none;labelBorderColor=none;fillStyle=auto;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=#66B2FF;gradientColor=none;" vertex="1" parent="1">
+                <mxCell id="28" value="Log Out" style="strokeWidth=2;shape=mxgraph.flowchart.display;rounded=1;labelBackgroundColor=none;labelBorderColor=none;fillStyle=auto;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=#66B2FF;gradientColor=none;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                     <mxGeometry x="310" y="550" width="100" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="34" value="Courses" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.display;whiteSpace=wrap;rounded=1;labelBackgroundColor=none;labelBorderColor=none;fillStyle=auto;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=#66B2FF;gradientColor=none;" vertex="1" parent="1">
