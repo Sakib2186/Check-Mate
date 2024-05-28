@@ -148,7 +148,7 @@
                             <div class="card card-sm">
                                 <div class="card-body media">
                                     <div class="media-left">
-                                            <a href="{% if logged_in_user %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}"
+                                            <a href="{% if logged_in_user and 2 in user_type %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}"
 
                                             class="avatar avatar-lg avatar-4by3">
                                              <img src="{% if exam.exam_type.type_id == 1 %}{% static 'static_pics/Quiz.png' %}{% elif exam.exam_type.type_id == 2 or exam.exam_type.type_id == 3 %}{% static 'static_pics/Mid-term.png' %}{% endif %}"
@@ -157,7 +157,7 @@
                                             </a>
                                     </div>
                                     <div class="media-body">
-                                        <h4 class="card-title mb-0"><a href="{% if logged_in_user %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}">{{exam.exam_title}}</a></h4>
+                                        <h4 class="card-title mb-0"><a href="{% if logged_in_user and 2 in user_type %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk logged_in_user.user_id %}{% else %}{% url 'users:exam' course_id exam.exam_type.exam_type exam.pk 0 %}{% endif %}">{{exam.exam_title}}</a></h4>
                                         <small class="text-muted">{{exam.exam_description}}</small>
                                     </div>
                                 </div>

@@ -1023,10 +1023,10 @@ def edit_exam(request,course_id,exam_id):
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
                         
                         for section in doc.sections:
-                            section.top_margin = Inches(1)  # Adjust margin as needed
-                            section.bottom_margin = Inches(1)
-                            section.left_margin = Inches(1)
-                            section.right_margin = Inches(1)
+                            section.top_margin = Inches(0.5)  # Adjust margin as needed
+                            section.bottom_margin = Inches(0.5)
+                            section.left_margin = Inches(0.5)
+                            section.right_margin = Inches(0.5)
 
                     
                         doc.add_picture('graduation (1).png', width=Inches(2)) 
@@ -1176,10 +1176,10 @@ def edit_exam(request,course_id,exam_id):
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
                         
                         for section in doc.sections:
-                            section.top_margin = Inches(1)  # Adjust margin as needed
-                            section.bottom_margin = Inches(1)
-                            section.left_margin = Inches(1)
-                            section.right_margin = Inches(1)
+                            section.top_margin = Inches(0.5)  # Adjust margin as needed
+                            section.bottom_margin = Inches(0.5)
+                            section.left_margin = Inches(0.5)
+                            section.right_margin = Inches(0.5)
 
 
 

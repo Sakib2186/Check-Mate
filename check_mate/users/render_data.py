@@ -509,9 +509,12 @@ class Load_Courses:
         '''This function will return all the submission details of student'''
 
         section_exam = Load_Courses.get_saved_section_exams(exam_id)
+        x = {}
         papers = Exam_Submitted.objects.filter(exam_of = section_exam)
-
-        return papers
+        for p in papers:
+            marks = Load_Courses.get_question_and_answer_of_student(exam_id,p.student.user_id)
+            x[p] = [marks[2],marks[3]]
+        return x
 
     def get_question_and_answer_of_student(exam_id,student_id):
 
