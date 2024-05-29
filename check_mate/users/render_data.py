@@ -1104,7 +1104,7 @@ class Save:
         if logged_in_user == None:
             annouce.given_by = "Admin"
         else:
-            annouce.given_by = logged_in_user
+            annouce.given_by = logged_in_user.user_first_name
         annouce.save()
 
         return True
