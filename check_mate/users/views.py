@@ -1739,7 +1739,7 @@ def generate_spreadsheet(request,course_id):
                 mid_columns = [f'MidTerm-{i}' for i in range(1,len(numbers[1])+1)]
 
                 # Defining columns that will stay in the first row
-                columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final']
+                columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final','Total']
 
                 # Defining first column
                 column_widths = [5000,5000]
