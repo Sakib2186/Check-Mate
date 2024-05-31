@@ -181,8 +181,11 @@
                                             </div>
                                         </div>
                                     </div> {% endcomment %}
+                                    {% if quiz_number|length > 0 or midterm or final %}
                                     <input type="submit" class="btn btn-success mr-2" value="Generate Spreadsheet" name="generate_excel" style="width:200px;">
-                                
+                                    {% else %}
+                                    <p style="color:red;text-align:center;">No Exam Have Been Taken Yet!</p>
+                                    {% endif %}
                             </div>
                         </form>
 

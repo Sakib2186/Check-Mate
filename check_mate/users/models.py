@@ -253,7 +253,7 @@ class Answer(models.Model):
     answer_of = models.ForeignKey(Question,on_delete=models.CASCADE)
     uploaded_by = models.ForeignKey(School_Users,on_delete=models.CASCADE,null=True)
     answer_textfield = models.TextField(blank=True,null=True)
-    answer_image = ResizedImageField(size=[500, 300], upload_to=answer_picture_upload_path, blank=True, null=True,max_length=255)
+    answer_image = models.ImageField(upload_to=answer_picture_upload_path, blank=True, null=True,max_length=255)
     marks_obtained = models.IntegerField(default = 0)
     comment = models.TextField(null=True,blank=True)
 

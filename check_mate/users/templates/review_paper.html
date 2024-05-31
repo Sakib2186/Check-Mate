@@ -100,7 +100,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="list">
-                                                {% for student in all_students_papers %}
+                                                {% for student,value in all_students_papers.items %}
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
@@ -130,7 +130,7 @@
                                                     <td class="text-center">
                                                         <div class="d-flex align-items-center">
                                                             <small class="text-uppercase text-muted mr-2">Marks</small>
-                                                            <small class="text-uppercase">0/10
+                                                            <small class="text-uppercase">{{value.1}}/{{value.0}}
                                                                 
                                                             </small>
                                                         </div>

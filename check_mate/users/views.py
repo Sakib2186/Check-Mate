@@ -1023,10 +1023,10 @@ def edit_exam(request,course_id,exam_id):
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
                         
                         for section in doc.sections:
-                            section.top_margin = Inches(1)  # Adjust margin as needed
-                            section.bottom_margin = Inches(1)
-                            section.left_margin = Inches(1)
-                            section.right_margin = Inches(1)
+                            section.top_margin = Inches(0.5)  # Adjust margin as needed
+                            section.bottom_margin = Inches(0.5)
+                            section.left_margin = Inches(0.5)
+                            section.right_margin = Inches(0.5)
 
                     
                         doc.add_picture('graduation (1).png', width=Inches(2)) 
@@ -1176,10 +1176,10 @@ def edit_exam(request,course_id,exam_id):
                         questions = Load_Courses.get_questions_and_marks_list(exam_id,set_number)
                         
                         for section in doc.sections:
-                            section.top_margin = Inches(1)  # Adjust margin as needed
-                            section.bottom_margin = Inches(1)
-                            section.left_margin = Inches(1)
-                            section.right_margin = Inches(1)
+                            section.top_margin = Inches(0.5)  # Adjust margin as needed
+                            section.bottom_margin = Inches(0.5)
+                            section.left_margin = Inches(0.5)
+                            section.right_margin = Inches(0.5)
 
 
 
@@ -1262,7 +1262,7 @@ def edit_exam(request,course_id,exam_id):
 @login_required
 def exam(request,course_id,exam_type,exam_id,student_id = None):
 
-    try:
+    # try:
         #loading the data to pass them in dictionary, context
         type_of_logged_in_user = Login.user_type_logged_in(request)
         logged_in_user = Login.logged_in_user(request)
@@ -1419,11 +1419,11 @@ def exam(request,course_id,exam_type,exam_id,student_id = None):
             }
             return render(request,"access_denied.html",context)
         
-    except Exception as e:
-        #saving error information in database if error occured
-        logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
-        ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
-        return HttpResponse("Bad Request")
+    # except Exception as e:
+    #     #saving error information in database if error occured
+    #     logger.error("An error occurred for during logging in at {datetime}".format(datetime=datetime.now()), exc_info=True)
+    #     ErrorHandling.save_system_errors(user,error_name=e,error_traceback=traceback.format_exc())
+    #     return HttpResponse("Bad Request")
 @login_required
 def review_paper_all(request,course_id,exam_id):
 
@@ -1739,7 +1739,7 @@ def generate_spreadsheet(request,course_id):
                 mid_columns = [f'MidTerm-{i}' for i in range(1,len(numbers[1])+1)]
 
                 # Defining columns that will stay in the first row
-                columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final']
+                columns = ['ID', 'Name'] + quiz_columns + ['Quiz (Average)'] + mid_columns + ['Mid (Average)', 'Final','Total']
 
                 # Defining first column
                 column_widths = [5000,5000]
