@@ -19,6 +19,8 @@ from ultralytics.engine.results import Results
 from ultralytics.utils.plotting import save_one_box
 import logging
 from io import BytesIO
+import torch
+from ultralytics.engine.results import Boxes
 from django.core.files import File
 from pathlib import Path
 
@@ -984,7 +986,7 @@ class Save:
         if section_exam.exam_mode.mode_id == 3:
             student_id = user.user_id
         shuffeled = Shuffled_Papers.objects.get(student = Student.objects.get(courses=section_exam.section.course_id,semester=session,student_id =  School_Users.objects.get(user_id = student_id)),course_id = section_exam.section)
-        questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('pk')
+        questions = Question.objects.filter(questions_of = section_exam,question_set = shuffeled.set_name).order_by('-pk')
         
         count = 0
         ####here apply question
@@ -1075,8 +1077,43 @@ class Save:
     def apply_yolo_detection(img):
         # Apply YOLO object detection on the image
         model = YOLO('yolov8predict.pt') 
-        result = model.predict(img,imgsz=320, conf=0.5)
-        return result
+        results = model.predict(img,imgsz=320, conf=0.5)
+        # print("printing length")
+        # print(len(result))
+        # # if len(result)>0:
+        # result = result [::-1]
+        #     # new_list = [[]]
+        #     # j=len(result)-1
+        #     # while(j>=0):
+        #     #     new_list.append(result[j])
+        #     #     j-=1
+        #     # result = new_list
+        result = results[0]
+
+        # Extract bounding boxes in xyxy format, including confidence and class
+        boxes = result.boxes.xyxy.cpu().numpy()
+        conf = result.boxes.conf.cpu().numpy()
+        cls = result.boxes.cls.cpu().numpy()
+
+        # Combine boxes, conf, and cls into a single array
+        boxes_combined = torch.tensor(
+            [
+                [*box, c, cl]
+                for box, c, cl in zip(boxes, conf, cls)
+            ],
+            device=result.boxes.xyxy.device
+        )
+        
+        # Sort boxes based on the y-coordinate of the top-left corner (i.e., boxes_combined[:, 1])
+        sorted_indices = boxes_combined[:, 1].argsort()
+        sorted_boxes_combined = boxes_combined[sorted_indices]
+
+        # Create a new Boxes object with the sorted boxes and original shape
+        result.boxes = Boxes(sorted_boxes_combined, result.boxes.orig_shape)
+
+        # Return the sorted result in a list
+        return [result]
+
 
     def save_marks_comment(question_pk,marks,comment,student_id):
 
